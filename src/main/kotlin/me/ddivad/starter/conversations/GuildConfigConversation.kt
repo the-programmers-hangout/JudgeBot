@@ -1,8 +1,8 @@
-package me.ddivad.judgebot.conversations
+package me.ddivad.starter.conversations
 
 import com.gitlab.kordlib.core.entity.Guild
-import me.ddivad.judgebot.dataclasses.Configuration
-import me.ddivad.judgebot.dataclasses.LoggingConfiguration
+import me.ddivad.starter.dataclasses.Configuration
+import me.ddivad.starter.dataclasses.LoggingConfiguration
 import me.jakejmattson.discordkt.api.arguments.ChannelArg
 import me.jakejmattson.discordkt.api.arguments.EveryArg
 import me.jakejmattson.discordkt.api.arguments.RoleArg

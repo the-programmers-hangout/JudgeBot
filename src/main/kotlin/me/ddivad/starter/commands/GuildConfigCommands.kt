@@ -1,9 +1,9 @@
-package me.ddivad.judgebot.commands
+package me.ddivad.starter.commands
 
-import me.ddivad.judgebot.conversations.ConfigurationConversation
-import me.ddivad.judgebot.dataclasses.Configuration
-import me.ddivad.judgebot.services.PermissionLevel
-import me.ddivad.judgebot.services.requiredPermissionLevel
+import me.ddivad.starter.conversations.ConfigurationConversation
+import me.ddivad.starter.dataclasses.Configuration
+import me.ddivad.starter.services.PermissionLevel
+import me.ddivad.starter.services.requiredPermissionLevel
 import me.jakejmattson.discordkt.api.arguments.ChannelArg
 import me.jakejmattson.discordkt.api.arguments.EveryArg
 import me.jakejmattson.discordkt.api.arguments.RoleArg
@@ -12,7 +12,7 @@ import me.jakejmattson.discordkt.api.services.ConversationService
 
 fun guildConfigCommands(configuration: Configuration, conversationService: ConversationService) = commands("Configuration") {
     command("configure") {
-        description = "Configure a guild to use Judgebot."
+        description = "Configure a guild to use this bot."
         requiredPermissionLevel = PermissionLevel.Administrator
         execute {
             if (configuration.hasGuildConfig(guild!!.id.longValue))

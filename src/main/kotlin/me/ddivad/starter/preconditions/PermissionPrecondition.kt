@@ -1,8 +1,8 @@
-package me.ddivad.judgebot.preconditions
+package me.ddivad.starter.preconditions
 
-import me.ddivad.judgebot.services.DEFAULT_REQUIRED_PERMISSION
-import me.ddivad.judgebot.services.PermissionsService
-import me.ddivad.judgebot.services.requiredPermissionLevel
+import me.ddivad.starter.services.DEFAULT_REQUIRED_PERMISSION
+import me.ddivad.starter.services.PermissionsService
+import me.ddivad.starter.services.requiredPermissionLevel
 import me.jakejmattson.discordkt.api.dsl.*
 
 class PermissionPrecondtion(private val permissionsService: PermissionsService) : Precondition() {
