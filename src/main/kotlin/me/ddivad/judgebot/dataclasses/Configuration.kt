@@ -1,4 +1,4 @@
-package me.ddivad.starter.dataclasses
+package me.ddivad.judgebot.dataclasses
 
 import com.gitlab.kordlib.core.entity.Guild
 import com.gitlab.kordlib.core.entity.Role
@@ -6,8 +6,9 @@ import me.jakejmattson.discordkt.api.dsl.Data
 
 data class Configuration(
         val ownerId: String = "insert-owner-id",
-        var prefix: String = "++",
+        var prefix: String = "judge!",
         val guildConfigurations: MutableMap<Long, GuildConfiguration> = mutableMapOf(),
+        val dbConfiguration: DatabaseConfiguration = DatabaseConfiguration(),
 ) : Data("config/config.json") {
     operator fun get(id: Long) = guildConfigurations[id]
     fun hasGuildConfig(guildId: Long) = guildConfigurations.containsKey(guildId)
@@ -26,6 +27,11 @@ data class Configuration(
         save()
     }
 }
+
+data class DatabaseConfiguration(
+        val address: String = "localhost:27017",
+        val databaseName: String = "judgebot"
+)
 
 data class GuildConfiguration(
         val id: String = "",

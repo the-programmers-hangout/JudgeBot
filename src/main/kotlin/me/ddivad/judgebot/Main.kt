@@ -1,12 +1,15 @@
-package me.ddivad.starter
+package me.ddivad.judgebot
 
-import me.ddivad.starter.dataclasses.Configuration
-import me.ddivad.starter.services.BotStatsService
-import me.ddivad.starter.services.PermissionsService
-import me.ddivad.starter.services.requiredPermissionLevel
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
+import me.ddivad.judgebot.dataclasses.Configuration
+import me.ddivad.judgebot.services.BotStatsService
+import me.ddivad.judgebot.services.PermissionsService
+import me.ddivad.judgebot.services.requiredPermissionLevel
 import me.jakejmattson.discordkt.api.dsl.bot
 import me.jakejmattson.discordkt.api.extensions.addInlineField
 import java.awt.Color
+import java.util.*
 
 suspend fun main(args: Array<String>) {
     val token = args.firstOrNull()
@@ -39,7 +42,7 @@ suspend fun main(args: Array<String>) {
 
             field {
                 name = self.tag
-                value = "DiscordKT Starter. Replace with bot description"
+                value = "A bot for managing discord infractions in an intelligent and user-friendly way."
             }
 
             addInlineField("Prefix", it.prefix())

@@ -1,4 +1,4 @@
-package me.ddivad.starter.util
+package me.ddivad.judgebot.util
 
 fun timeToString(milliseconds: Long): String{
     val seconds = (milliseconds / 1000) % 60
