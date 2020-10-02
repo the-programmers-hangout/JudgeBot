@@ -15,6 +15,12 @@
 | setprefix       | Text         | Set the bot prefix.                               |
 | setstaffrole    | Role         | Set the bot staff role.                           |
 
+## Notes
+| Commands   | Arguments            | Description                                  |
+| ---------- | -------------------- | -------------------------------------------- |
+| deleteNote | Member, Integer      | Use this to add a delete a note from a user. |
+| note       | Member, Note Content | Use this to add a note to a user.            |
+
 ## Utility
 | Commands | Arguments | Description          |
 | -------- | --------- | -------------------- |

@@ -8,7 +8,7 @@ data class Configuration(
         val ownerId: String = "insert-owner-id",
         var prefix: String = "judge!",
         val guildConfigurations: MutableMap<Long, GuildConfiguration> = mutableMapOf(),
-        val dbConfiguration: DatabaseConfiguration = DatabaseConfiguration(),
+        val dbConfiguration: DatabaseConfiguration = DatabaseConfiguration()
 ) : Data("config/config.json") {
     operator fun get(id: Long) = guildConfigurations[id]
     fun hasGuildConfig(guildId: Long) = guildConfigurations.containsKey(guildId)
@@ -38,7 +38,7 @@ data class GuildConfiguration(
         var prefix: String = "j!",
         var staffRole: String = "",
         var adminRole: String = "",
-        var loggingConfiguration: LoggingConfiguration = LoggingConfiguration(),
+        var loggingConfiguration: LoggingConfiguration = LoggingConfiguration()
 )
 
 data class LoggingConfiguration(
