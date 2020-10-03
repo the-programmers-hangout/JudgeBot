@@ -21,6 +21,12 @@
 | deleteNote | Member, Integer      | Use this to add a delete a note from a user. |
 | note       | Member, Note Content | Use this to add a note to a user.            |
 
+## User
+| Commands   | Arguments | Description                            |
+| ---------- | --------- | -------------------------------------- |
+| history, h | Member    | Use this to view a user's record.      |
+| status, s  | Member    | Use this to view a user's status card. |
+
 ## Utility
 | Commands | Arguments | Description          |
 | -------- | --------- | -------------------- |
