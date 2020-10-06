@@ -18,8 +18,9 @@ suspend fun CommandEvent<*>.createHistoryEmbed(target: Member,
                                                includeModerator: Boolean): Unit = respondMenu {
     val userGuildDetails = member.getGuildInfo(guild.id.value)!!
     val notes = userGuildDetails.notes
+    val infractions = userGuildDetails.infractions
     val paginatedNotes = notes.chunked(5)
-
+    val lastInfraction = userGuildDetails.infractions[userGuildDetails.infractions.size - 1]
     page {
         color = discord.configuration.theme
         title = "${target.asUser().tag}'s Record"
@@ -28,11 +29,19 @@ suspend fun CommandEvent<*>.createHistoryEmbed(target: Member,
         }
 
         addInlineField("Notes", "${notes.size}")
-        addInlineField("Infractions", "0")
+        addInlineField("Infractions", "${infractions.size}")
         addInlineField("Status", "TBI")
         addInlineField("Join date", target.joinedAt.toString())
         addInlineField("Creation date", target.asUser().id.timeStamp.toString())
         addInlineField("History Invokes", "${userGuildDetails.historyCount}")
+        addField("", "")
+        addField(
+                "**__Most Recent Infraction__**",
+                "Type: **${lastInfraction.weight}** :: Weight: **${lastInfraction.strikes}**\n " +
+                        "Issued by **${guild.kord.getUser(Snowflake(lastInfraction.moderator))?.username}** " +
+                        "on **${SimpleDateFormat("dd/MM/yyyy").format(Date(lastInfraction.dateTime))}**\n" +
+                        lastInfraction.reason
+        )
     }
 
     if (notes.isEmpty()) {
@@ -44,7 +53,7 @@ suspend fun CommandEvent<*>.createHistoryEmbed(target: Member,
             }
 
             addInlineField("Notes", "${notes.size}")
-            addInlineField("Infractions", "0")
+            addInlineField("Infractions", "${infractions.size}")
             addInlineField("Status", "TBI")
             addInlineField("Join date", target.joinedAt.toString())
             addInlineField("Creation date", target.asUser().id.timeStamp.toString())
@@ -64,7 +73,7 @@ suspend fun CommandEvent<*>.createHistoryEmbed(target: Member,
             }
 
             addInlineField("Notes", "${notes.size}")
-            addInlineField("Infractions", "0")
+            addInlineField("Infractions", "${infractions.size}")
             addInlineField("Status", "TBI")
             addInlineField("Join date", target.joinedAt.toString())
             addInlineField("Creation date", target.asUser().id.timeStamp.toString())
@@ -76,11 +85,8 @@ suspend fun CommandEvent<*>.createHistoryEmbed(target: Member,
 
                 addField(
                         "ID :: ${note.id} :: Staff :: __${moderator}__",
-                        "Noted by **${moderator}** on **${SimpleDateFormat("dd/MM/yyyy").format(Date(note.dateTime))}**"
-                )
-                addField(
-                        "Note",
-                        note.note
+                        "Noted by **${moderator}** on **${SimpleDateFormat("dd/MM/yyyy").format(Date(note.dateTime))}**\n" +
+                                note.note
                 )
             }
         }
@@ -88,8 +94,8 @@ suspend fun CommandEvent<*>.createHistoryEmbed(target: Member,
 }
 
 suspend fun CommandEvent<*>.createStatusEmbed(target: Member,
-                                               member: GuildMember,
-                                               guild: Guild) = respond {
+                                              member: GuildMember,
+                                              guild: Guild) = respond {
     val userGuildDetails = member.getGuildInfo(guild.id.value)!!
     val notes = userGuildDetails.notes
 

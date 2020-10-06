@@ -5,6 +5,7 @@ import com.gitlab.kordlib.core.entity.Member
 import kotlinx.coroutines.runBlocking
 import me.ddivad.judgebot.dataclasses.GuildDetails
 import me.ddivad.judgebot.dataclasses.GuildMember
+import me.ddivad.judgebot.dataclasses.Infraction
 import me.jakejmattson.discordkt.api.annotations.Service
 import org.litote.kmongo.eq
 
@@ -37,6 +38,11 @@ class UserOperations(private val connection: ConnectionService) {
 
     suspend fun deleteNote(guild: Guild, user: GuildMember, noteId: Int): GuildMember {
         user.deleteNote(noteId, guild)
+        return this.updateUser(user)
+    }
+
+    suspend fun addInfraction(guild: Guild, user: GuildMember, infraction: Infraction): GuildMember {
+        user.addInfraction(infraction, guild)
         return this.updateUser(user)
     }
 
