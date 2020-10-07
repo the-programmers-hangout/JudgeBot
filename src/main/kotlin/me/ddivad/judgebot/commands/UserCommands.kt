@@ -9,7 +9,7 @@ import me.ddivad.judgebot.services.requiredPermissionLevel
 import me.jakejmattson.discordkt.api.arguments.MemberArg
 import me.jakejmattson.discordkt.api.dsl.commands
 
-fun createInfractonCommands(databaseService: DatabaseService,
+fun createUserCommands(databaseService: DatabaseService,
                             config: Configuration) = commands("User") {
     command("history", "h") {
         description = "Use this to view a user's record."
@@ -22,7 +22,7 @@ fun createInfractonCommands(databaseService: DatabaseService,
         }
     }
 
-    command("status", "s") {
+    command("status", "st") {
         description = "Use this to view a user's status card."
         requiresGuild = true
         requiredPermissionLevel = PermissionLevel.Staff

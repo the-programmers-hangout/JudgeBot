@@ -15,6 +15,12 @@
 | setprefix       | Text         | Set the bot prefix.                               |
 | setstaffrole    | Role         | Set the bot staff role.                           |
 
+## Infraction
+| Commands  | Arguments               | Description    |
+| --------- | ----------------------- | -------------- |
+| strike, s | Member, (Integer), Text | Strike a user. |
+| warn, w   | Member, Text            | Warn a user.   |
+
 ## Notes
 | Commands   | Arguments            | Description                                  |
 | ---------- | -------------------- | -------------------------------------------- |
@@ -25,7 +31,7 @@
 | Commands   | Arguments | Description                            |
 | ---------- | --------- | -------------------------------------- |
 | history, h | Member    | Use this to view a user's record.      |
-| status, s  | Member    | Use this to view a user's status card. |
+| status, st | Member    | Use this to view a user's status card. |
 
 ## Utility
 | Commands | Arguments | Description          |
