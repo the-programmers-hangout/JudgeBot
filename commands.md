@@ -21,6 +21,16 @@
 | deleteNote | Member, Integer      | Use this to add a delete a note from a user. |
 | note       | Member, Note Content | Use this to add a note to a user.            |
 
+## Rules
+| Commands     | Arguments | Description                   |
+| ------------ | --------- | ----------------------------- |
+| addRule      |           | Add a rule to this guild.     |
+| archiveRule  |           | Archive a rule in this guild. |
+| editRule     |           | Edit a rule in this guild.    |
+| listRules    |           | List the rules of this guild. |
+| rule         | Integer   | List a rule from this guild.  |
+| ruleHeadings |           | List the rules of this guild. |
+
 ## User
 | Commands   | Arguments | Description                            |
 | ---------- | --------- | -------------------------------------- |

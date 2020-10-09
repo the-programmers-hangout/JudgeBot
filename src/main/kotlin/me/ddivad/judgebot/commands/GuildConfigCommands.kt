@@ -2,6 +2,7 @@ package me.ddivad.judgebot.commands
 
 import me.ddivad.judgebot.conversations.ConfigurationConversation
 import me.ddivad.judgebot.dataclasses.Configuration
+import me.ddivad.judgebot.services.DatabaseService
 import me.ddivad.judgebot.services.PermissionLevel
 import me.ddivad.judgebot.services.requiredPermissionLevel
 import me.jakejmattson.discordkt.api.arguments.ChannelArg
@@ -10,7 +11,9 @@ import me.jakejmattson.discordkt.api.arguments.RoleArg
 import me.jakejmattson.discordkt.api.dsl.commands
 import me.jakejmattson.discordkt.api.services.ConversationService
 
-fun guildConfigCommands(configuration: Configuration, conversationService: ConversationService) = commands("Configuration") {
+fun guildConfigCommands(configuration: Configuration,
+                        conversationService: ConversationService,
+                        databaseService: DatabaseService) = commands("Configuration") {
     command("configure") {
         description = "Configure a guild to use Judgebot."
         requiredPermissionLevel = PermissionLevel.Administrator
@@ -19,6 +22,7 @@ fun guildConfigCommands(configuration: Configuration, conversationService: Conve
                 return@execute respond("Guild configuration exists. To modify it use the commands to set values.")
 
             conversationService.startPublicConversation<ConfigurationConversation>(author, channel.asChannel(), guild!!)
+            databaseService.guilds.setupGuild(guild!!)
             respond("Guild setup")
         }
     }
