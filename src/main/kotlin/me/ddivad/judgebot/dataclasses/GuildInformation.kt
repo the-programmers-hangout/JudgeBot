@@ -2,7 +2,9 @@ package me.ddivad.judgebot.dataclasses
 
 data class GuildInformation(
         val guildId: String,
-        val rules: MutableList<Rule> = mutableListOf()
+        val guildName: String,
+        val rules: MutableList<Rule> = mutableListOf(),
+        val punishments: MutableList<Punishment> = mutableListOf()
 ) {
     fun addRule(rule: Rule) {
         this.rules.add(rule)
@@ -20,6 +22,20 @@ data class GuildInformation(
         val index = this.rules.indexOf(oldRule)
         this.rules[index] = updatedRule
         return updatedRule
+    }
+
+    fun addPunishment(punishment: Punishment) {
+        punishment.id = this.punishments.size + 1
+        this.punishments.add(punishment)
+    }
+
+    fun removePunishment(userId: String, type: InfractionType) {
+        val punishment = this.findPunishmentByType(type, userId).first()
+        this.punishments.remove(punishment)
+    }
+
+    fun findPunishmentByType(type: InfractionType, userId: String): List<Punishment> {
+        return this.punishments.filter { it.type == type && it.userId == userId }
     }
 }
 

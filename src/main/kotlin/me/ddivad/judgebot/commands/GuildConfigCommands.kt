@@ -101,4 +101,18 @@ fun guildConfigCommands(configuration: Configuration,
             respond("Channel set to: **${channel.name}**")
         }
     }
+
+    command("setmuterole") {
+        description = "Set the role to be used to mute members."
+        requiredPermissionLevel = PermissionLevel.Administrator
+        execute(RoleArg) {
+            if (!configuration.hasGuildConfig(guild!!.id.longValue))
+                return@execute respond("Please run the **configure** command to set this initially.")
+
+            val role = args.first
+            configuration[guild!!.id.longValue]?.mutedRole = role.id.value
+            configuration.save()
+            respond("Role set to: **${role.name}**")
+        }
+    }
 }

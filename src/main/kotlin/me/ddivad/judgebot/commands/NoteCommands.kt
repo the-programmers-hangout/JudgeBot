@@ -34,4 +34,16 @@ fun noteCommands(databaseService: DatabaseService, configuration: Configuration)
             respond("Note deleted.")
         }
     }
+
+    command("cleansenotes") {
+        description = "Use this to delete (permanently) as user's notes."
+        requiresGuild = true
+        requiredPermissionLevel = PermissionLevel.Administrator
+        execute(MemberArg) {
+            val user = databaseService.users.getOrCreateUser(args.first, guild!!.id.value)
+            if (user.getGuildInfo(guild!!.id.value)!!.notes.isEmpty()) return@execute respond("User has no notes.")
+            databaseService.users.cleanseNotes(guild!!, user)
+            respond("Notes cleansed.")
+        }
+    }
 }

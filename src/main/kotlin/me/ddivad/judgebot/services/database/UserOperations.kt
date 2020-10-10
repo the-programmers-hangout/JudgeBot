@@ -41,8 +41,18 @@ class UserOperations(private val connection: ConnectionService) {
         return this.updateUser(user)
     }
 
+    suspend fun cleanseNotes(guild: Guild, user: GuildMember): GuildMember {
+        user.cleanseNotes(guild)
+        return this.updateUser(user)
+    }
+
     suspend fun addInfraction(guild: Guild, user: GuildMember, infraction: Infraction): GuildMember {
         user.addInfraction(infraction, guild)
+        return this.updateUser(user)
+    }
+
+    suspend fun cleanseInfractions(guild: Guild, user: GuildMember): GuildMember {
+        user.cleanseInfractions(guild)
         return this.updateUser(user)
     }
 

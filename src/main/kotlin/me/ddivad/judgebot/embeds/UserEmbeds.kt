@@ -37,7 +37,7 @@ suspend fun CommandEvent<*>.createHistoryEmbed(target: Member,
         addField("", "")
         addField(
                 "**__Most Recent Infraction__**",
-                "Type: **${lastInfraction.weight}** :: Weight: **${lastInfraction.strikes}**\n " +
+                "Type: **${lastInfraction.type}** :: Weight: **${lastInfraction.strikes}**\n " +
                         "Issued by **${guild.kord.getUser(Snowflake(lastInfraction.moderator))?.username}** " +
                         "on **${SimpleDateFormat("dd/MM/yyyy").format(Date(lastInfraction.dateTime))}**\n" +
                         lastInfraction.reason
