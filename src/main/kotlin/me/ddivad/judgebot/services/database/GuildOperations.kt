@@ -1,8 +1,12 @@
 package me.ddivad.judgebot.services.database
 
 import com.gitlab.kordlib.core.entity.Guild
+import com.gitlab.kordlib.core.entity.Member
+import com.gitlab.kordlib.core.entity.User
 import kotlinx.coroutines.runBlocking
 import me.ddivad.judgebot.dataclasses.GuildInformation
+import me.ddivad.judgebot.dataclasses.InfractionType
+import me.ddivad.judgebot.dataclasses.Punishment
 import me.ddivad.judgebot.dataclasses.Rule
 import me.jakejmattson.discordkt.api.annotations.Service
 import org.litote.kmongo.eq
@@ -14,7 +18,7 @@ class GuildOperations(private val connection: ConnectionService) {
     private val guildCollection = connection.db.getCollection<GuildInformation>("Guilds")
 
     suspend fun setupGuild(guild: Guild): GuildInformation {
-        val guildConfig = GuildInformation(guild.id.value)
+        val guildConfig = GuildInformation(guild.id.value, guild.name)
         this.guildCollection.insertOne(guildConfig)
         return guildConfig
     }
@@ -53,6 +57,28 @@ class GuildOperations(private val connection: ConnectionService) {
             guildInfo!!.archiveRule(ruleNumber)
             updateGuild(guildInfo)
         }
+    }
+
+    suspend fun addPunishment(guild: Guild, punishment: Punishment) {
+        val guildInfo = guildCollection.findOne(GuildInformation::guildId eq guild.id.value)
+        guildInfo!!.addPunishment(punishment)
+        updateGuild(guildInfo)
+    }
+
+    suspend fun removePunishment(guild: Guild, userId: String, type: InfractionType) {
+        val guildInfo = guildCollection.findOne(GuildInformation::guildId eq guild.id.value)
+        guildInfo!!.removePunishment(userId, type)
+        updateGuild(guildInfo)
+    }
+
+    suspend fun checkPunishmentExists(member: Member, type: InfractionType): List<Punishment> {
+        val guildInfo = guildCollection.findOne(GuildInformation::guildId eq member.getGuild().id.value)
+        return guildInfo!!.findPunishmentByType(type, member.asUser().id.value)
+    }
+
+    suspend fun getPunishmentsForGuild(guild: Guild): MutableList<Punishment> {
+        val guildInfo = guildCollection.findOne(GuildInformation::guildId eq guild.id.value)
+        return guildInfo!!.punishments
     }
 
     private suspend fun updateGuild(guildInformation: GuildInformation): GuildInformation {

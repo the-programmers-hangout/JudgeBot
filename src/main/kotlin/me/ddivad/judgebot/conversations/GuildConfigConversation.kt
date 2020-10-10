@@ -17,7 +17,15 @@ class ConfigurationConversation(private val configuration: Configuration): Conve
         val staffRole = promptMessage(RoleArg, "Staff role:")
         val logChannel = promptMessage(ChannelArg, "Log Channel:")
         val alertChannel = promptMessage(ChannelArg, "Alert Channel:")
+        val mutedRole = promptMessage(RoleArg, "Muted role:")
 
-        configuration.setup(guild, prefix, adminRole, staffRole, LoggingConfiguration(logChannel.id.value, alertChannel.id.value))
+        configuration.setup(
+                guild,
+                prefix,
+                adminRole,
+                staffRole,
+                mutedRole,
+                LoggingConfiguration(logChannel.id.value, alertChannel.id.value),
+        )
     }
 }

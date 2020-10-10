@@ -13,7 +13,7 @@ data class Configuration(
     operator fun get(id: Long) = guildConfigurations[id]
     fun hasGuildConfig(guildId: Long) = guildConfigurations.containsKey(guildId)
 
-    fun setup(guild: Guild, prefix: String, adminRole: Role, staffRole: Role, logging: LoggingConfiguration) {
+    fun setup(guild: Guild, prefix: String, adminRole: Role, staffRole: Role, mutedRole: Role, logging: LoggingConfiguration) {
         if (guildConfigurations[guild.id.longValue] != null) return
 
         val newConfiguration = GuildConfiguration(
@@ -21,6 +21,7 @@ data class Configuration(
                 prefix,
                 staffRole.id.value,
                 adminRole.id.value,
+                mutedRole.id.value,
                 logging
         )
         guildConfigurations[guild.id.longValue] = newConfiguration
@@ -29,7 +30,7 @@ data class Configuration(
 }
 
 data class DatabaseConfiguration(
-        val address: String = "localhost:27017",
+        val address: String = "mongodb://localhost:27017",
         val databaseName: String = "judgebot"
 )
 
@@ -38,6 +39,7 @@ data class GuildConfiguration(
         var prefix: String = "j!",
         var staffRole: String = "",
         var adminRole: String = "",
+        var mutedRole: String = "",
         var loggingConfiguration: LoggingConfiguration = LoggingConfiguration()
 )
 

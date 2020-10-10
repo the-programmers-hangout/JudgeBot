@@ -1,7 +1,5 @@
 package me.ddivad.judgebot.services.database
 
-import com.mongodb.reactivestreams.client.MongoClient
-import com.mongodb.reactivestreams.client.MongoDatabase
 import me.ddivad.judgebot.dataclasses.Configuration
 import me.jakejmattson.discordkt.api.annotations.Service
 import org.litote.kmongo.coroutine.CoroutineClient

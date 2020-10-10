@@ -12,20 +12,30 @@
 | setadminrole    | Role         | Set the bot admin role.                           |
 | setalertchannel | Text Channel | Set the channel that the bot alerts will be sent. |
 | setlogchannel   | Text Channel | Set the channel that the bot logs will be sent.   |
+| setmuterole     | Role         | Set the role to be used to mute members.          |
 | setprefix       | Text         | Set the bot prefix.                               |
 | setstaffrole    | Role         | Set the bot staff role.                           |
 
 ## Infraction
-| Commands  | Arguments               | Description    |
-| --------- | ----------------------- | -------------- |
-| strike, s | Member, (Integer), Text | Strike a user. |
-| warn, w   | Member, Text            | Warn a user.   |
+| Commands  | Arguments               | Description                                             |
+| --------- | ----------------------- | ------------------------------------------------------- |
+| cleanse   | Member                  | Use this to delete (permanently) as user's infractions. |
+| strike, s | Member, (Integer), Text | Strike a user.                                          |
+| warn, w   | Member, Text            | Warn a user.                                            |
+
+## Mute
+| Commands | Arguments          | Description                                             |
+| -------- | ------------------ | ------------------------------------------------------- |
+| gag      | Member             | Mute a user for 5 minutes while you deal with something |
+| mute     | Member, Time, Text | Mute a user for a specified time.                       |
+| unmute   | Member             | Unmute a user.                                          |
 
 ## Notes
-| Commands   | Arguments            | Description                                  |
-| ---------- | -------------------- | -------------------------------------------- |
-| deleteNote | Member, Integer      | Use this to add a delete a note from a user. |
-| note       | Member, Note Content | Use this to add a note to a user.            |
+| Commands     | Arguments            | Description                                       |
+| ------------ | -------------------- | ------------------------------------------------- |
+| cleansenotes | Member               | Use this to delete (permanently) as user's notes. |
+| deleteNote   | Member, Integer      | Use this to add a delete a note from a user.      |
+| note         | Member, Note Content | Use this to add a note to a user.                 |
 
 ## Rules
 | Commands     | Arguments | Description                   |

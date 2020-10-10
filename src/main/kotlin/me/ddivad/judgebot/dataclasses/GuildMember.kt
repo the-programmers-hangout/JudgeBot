@@ -5,7 +5,7 @@ import org.joda.time.DateTime
 
 data class GuildDetails(
         val guildId: String,
-        val notes: MutableList<Note> = mutableListOf<Note>(),
+        var notes: MutableList<Note> = mutableListOf<Note>(),
         val infractions: MutableList<Infraction> = mutableListOf<Infraction>(),
         var historyCount: Int = 0,
         var points: Int = 0,
@@ -23,6 +23,14 @@ data class GuildMember(
 
     fun deleteNote(noteId: Int, guild: Guild) = with(this.getGuildInfo(guild.id.value)) {
         this?.notes?.removeIf { it.id == noteId }
+    }
+
+    fun cleanseNotes(guild: Guild) = with(this.getGuildInfo(guild.id.value)) {
+        this?.notes?.clear()
+    }
+
+    fun cleanseInfractions(guild: Guild) = with(this.getGuildInfo(guild.id.value)) {
+        this?.infractions?.clear()
     }
 
     fun addInfraction(infraction: Infraction, guild:Guild) = with(this.getGuildInfo(guild.id.value)) {
