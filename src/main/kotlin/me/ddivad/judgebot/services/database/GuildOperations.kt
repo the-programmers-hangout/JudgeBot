@@ -71,8 +71,8 @@ class GuildOperations(private val connection: ConnectionService) {
         updateGuild(guildInfo)
     }
 
-    suspend fun checkPunishmentExists(member: Member, type: InfractionType): List<Punishment> {
-        val guildInfo = guildCollection.findOne(GuildInformation::guildId eq member.getGuild().id.value)
+    suspend fun checkPunishmentExists(guild: Guild, member: Member, type: InfractionType): List<Punishment> {
+        val guildInfo = guildCollection.findOne(GuildInformation::guildId eq guild.asGuild().id.value)
         return guildInfo!!.findPunishmentByType(type, member.asUser().id.value)
     }
 

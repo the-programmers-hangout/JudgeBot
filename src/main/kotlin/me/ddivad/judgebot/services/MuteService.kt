@@ -76,15 +76,25 @@ class MuteService(val configuration: Configuration,
     private suspend fun handleExistingMutes(guild: Guild) {
         databaseService.guilds.getPunishmentsForGuild(guild).forEach {
             val difference = it.clearTime - DateTime.now().millis
-            val member = guild.getMember(it.userId.toSnowflake()!!)
-            applyRoleWithTimer(member, getMutedRole(guild), difference) { _ ->
-                removeMute(member, it.type)
+            val member = guild.getMemberOrNull(it.userId.toSnowflake()!!)
+            if (member != null) {
+                applyRoleWithTimer(member, getMutedRole(guild), difference) { _ ->
+                    removeMute(member, it.type)
+                }
             }
         }
     }
 
-    suspend fun checkRoleState(member: Member, type: InfractionType) = when {
-        databaseService.guilds.checkPunishmentExists(member, type).isNotEmpty() -> RoleState.Tracked
+    suspend fun handleRejoinMute(guild: Guild, member: Member) {
+        val mute = databaseService.guilds.checkPunishmentExists(guild, member, InfractionType.Mute).first()
+        val difference = mute.clearTime - DateTime.now().millis
+        applyRoleWithTimer(member, getMutedRole(guild), difference) { _ ->
+            removeMute(member, mute.type)
+        }
+    }
+
+    suspend fun checkRoleState(guild: Guild, member: Member, type: InfractionType) = when {
+        databaseService.guilds.checkPunishmentExists(guild, member, type).isNotEmpty() -> RoleState.Tracked
         member.roles.toList().contains(getMutedRole(member.getGuild())) -> RoleState.Untracked
         else -> RoleState.None
     }
@@ -92,13 +102,8 @@ class MuteService(val configuration: Configuration,
     private suspend fun setupMutedRole(guild: Guild) {
         val mutedRole = guild.getRole(configuration[guild.id.longValue]!!.mutedRole.toSnowflake()!!)
         guild.channels.toList().forEach {
-            val deniedPermissions = it.getPermissionOverwritesForRole(mutedRole.id)?.denied
-            if (deniedPermissions == null) {
-                val permissions = Permissions().plus(Permission.AddReactions).plus(Permission.SendMessages)
-                it.addOverwrite(PermissionOverwrite.forRole(
-                        mutedRole.id,
-                        denied = permissions))
-            } else if (!deniedPermissions.contains(Permission.SendMessages) || !deniedPermissions.contains(Permission.AddReactions)) {
+            val deniedPermissions = it.getPermissionOverwritesForRole(mutedRole.id)?.denied ?: Permissions()
+            if (!deniedPermissions.contains(Permission.SendMessages) || !deniedPermissions.contains(Permission.AddReactions)) {
                 it.addOverwrite(
                         PermissionOverwrite.forRole(
                                 mutedRole.id,
