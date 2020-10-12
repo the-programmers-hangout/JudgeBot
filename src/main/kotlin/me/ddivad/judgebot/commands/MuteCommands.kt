@@ -25,7 +25,7 @@ fun createMuteCommands(muteService: MuteService) = commands("Mute") {
         requiredPermissionLevel = PermissionLevel.Staff
         execute(MemberArg) {
             val targetMember = args.first
-            if (muteService.checkRoleState(targetMember, InfractionType.Mute) == RoleState.None)
+            if (muteService.checkRoleState(guild!!, targetMember, InfractionType.Mute) == RoleState.None)
                 return@execute respond("User ${targetMember.mention} isn't muted")
 
             muteService.removeMute(targetMember, InfractionType.Mute)
