@@ -4,6 +4,8 @@ import com.gitlab.kordlib.common.entity.Permission
 import com.gitlab.kordlib.common.entity.Permissions
 import com.gitlab.kordlib.core.entity.PermissionOverwrite
 import com.gitlab.kordlib.core.event.channel.TextChannelCreateEvent
+import com.gitlab.kordlib.core.event.guild.BanAddEvent
+import kotlinx.coroutines.runBlocking
 import me.ddivad.judgebot.dataclasses.Configuration
 import me.jakejmattson.discordkt.api.dsl.listeners
 import me.jakejmattson.discordkt.api.extensions.toSnowflake

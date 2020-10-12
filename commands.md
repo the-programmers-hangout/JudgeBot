@@ -48,10 +48,13 @@
 | ruleHeadings |           | List the rules of this guild. |
 
 ## User
-| Commands   | Arguments | Description                            |
-| ---------- | --------- | -------------------------------------- |
-| history, h | Member    | Use this to view a user's record.      |
-| status, st | Member    | Use this to view a user's status card. |
+| Commands   | Arguments                           | Description                                                |
+| ---------- | ----------------------------------- | ---------------------------------------------------------- |
+| ban        | Member, (Delete message days), Text | Ban a member from this guild.                              |
+| history, h | Member                              | Use this to view a user's record.                          |
+| status, st | Member                              | Use this to view a user's status card.                     |
+| unban      | User                                | Unban a banned member from this guild.                     |
+| whatpfp    | User                                | Perform a reverse image search of a User's profile picture |
 
 ## Utility
 | Commands | Arguments | Description          |
