@@ -30,7 +30,8 @@ enum class RoleState {
 @Service
 class MuteService(val configuration: Configuration,
                   private val discord: Discord,
-                  private val databaseService: DatabaseService) {
+                  private val databaseService: DatabaseService,
+                  private val loggingService: LoggingService) {
     private val punishmentTimerMap = hashMapOf<Pair<GuildID, UserId>, Job>()
     private suspend fun toKey(member: Member) = member.guild.id.value to member.asUser().id.value
     private suspend fun getMutedRole(guild: Guild) = guild.getRole(configuration[guild.id.longValue]?.mutedRole?.toSnowflake()!!)
@@ -50,6 +51,7 @@ class MuteService(val configuration: Configuration,
         val userId = member.asUser().id.value
         val key = toKey(member)
         val clearTime = DateTime.now().plus(time).millis
+        val muteRole = getMutedRole(guild)
 
         if (key in punishmentTimerMap) {
             punishmentTimerMap[key]?.cancel()
@@ -57,19 +59,21 @@ class MuteService(val configuration: Configuration,
         }
         val punishment = Punishment(userId, type, reason, clearTime)
         databaseService.guilds.addPunishment(guild.asGuild(), punishment)
-        punishmentTimerMap[toKey(member)] = applyRoleWithTimer(member, getMutedRole(guild), time) {
+        punishmentTimerMap[toKey(member)] = applyRoleWithTimer(member, muteRole, time) {
             removeMute(member, type)
-        }
+        }.also { loggingService.roleApplied(guild, member.asUser(), muteRole) }
     }
 
     fun removeMute(member: Member, type: InfractionType) {
         runBlocking {
             val guild = member.guild.asGuild()
             val key = toKey(member)
-            member.removeRole(getMutedRole(guild).id)
+            val muteRole = getMutedRole(guild)
+            member.removeRole(muteRole.id)
             databaseService.guilds.removePunishment(guild, member.asUser().id.value, type)
             punishmentTimerMap[key]?.cancel()
             punishmentTimerMap.remove(toKey(member))
+            loggingService.roleRemoved(guild, member.asUser(), muteRole)
         }
     }
 

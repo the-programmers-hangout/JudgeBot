@@ -98,6 +98,7 @@ suspend fun CommandEvent<*>.createStatusEmbed(target: Member,
                                               guild: Guild) = respond {
     val userGuildDetails = member.getGuildInfo(guild.id.value)!!
     val notes = userGuildDetails.notes
+    val infractions = userGuildDetails.infractions
 
     color = discord.configuration.theme
     title = "${target.asUser().tag}'s Record"
@@ -106,7 +107,7 @@ suspend fun CommandEvent<*>.createStatusEmbed(target: Member,
     }
 
     addInlineField("Notes", "${notes.size}")
-    addInlineField("Infractions", "0")
+    addInlineField("Infractions", "${infractions.size}")
     addInlineField("Status", "TBI")
     addInlineField("Join date", target.joinedAt.toString())
     addInlineField("Creation date", target.asUser().id.timeStamp.toString())
