@@ -15,6 +15,7 @@
 | setmuterole     | Role         | Set the role to be used to mute members.          |
 | setprefix       | Text         | Set the bot prefix.                               |
 | setstaffrole    | Role         | Set the bot staff role.                           |
+| viewconfig      |              | View the configuration vales for this guild.      |
 
 ## Infraction
 | Commands  | Arguments               | Description                                             |

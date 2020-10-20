@@ -61,6 +61,7 @@ fun createUserCommands(databaseService: DatabaseService,
         requiredPermissionLevel = PermissionLevel.Staff
         execute(MemberArg, IntegerArg("Delete message days").makeOptional(1), EveryArg) {
             val (target, deleteDays, reason) = args
+            //TODO: save this in Guild collection
             guild!!.ban(target.id) {
                 this.reason = reason
                 this.deleteMessagesDays = deleteDays

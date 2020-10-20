@@ -80,11 +80,9 @@ class MuteService(val configuration: Configuration,
     private suspend fun handleExistingMutes(guild: Guild) {
         databaseService.guilds.getPunishmentsForGuild(guild).forEach {
             val difference = it.clearTime - DateTime.now().millis
-            val member = guild.getMemberOrNull(it.userId.toSnowflake()!!)
-            if (member != null) {
-                applyRoleWithTimer(member, getMutedRole(guild), difference) { _ ->
-                    removeMute(member, it.type)
-                }
+            val member = guild.getMemberOrNull(it.userId.toSnowflake()!!) ?: return
+            applyRoleWithTimer(member, getMutedRole(guild), difference) { _ ->
+                removeMute(member, it.type)
             }
         }
     }

@@ -40,7 +40,8 @@ data class GuildConfiguration(
         var staffRole: String = "",
         var adminRole: String = "",
         var mutedRole: String = "",
-        var loggingConfiguration: LoggingConfiguration = LoggingConfiguration()
+        var loggingConfiguration: LoggingConfiguration = LoggingConfiguration(),
+        var infractionConfiguration: InfractionConfiguration = InfractionConfiguration()
 )
 
 data class LoggingConfiguration(
@@ -49,4 +50,12 @@ data class LoggingConfiguration(
         var logRoles: Boolean = true,
         var logInfractions: Boolean = true,
         var logPunishments: Boolean = true
+)
+
+data class InfractionConfiguration(
+        var pointCeiling: Int = 50,
+        var strikePoints: Int = 10,
+        var warnPoints: Int = 0,
+        var pointsBetweenPunishment: Int = 10,
+        var pointDecayPerWeek: Int = 2
 )
