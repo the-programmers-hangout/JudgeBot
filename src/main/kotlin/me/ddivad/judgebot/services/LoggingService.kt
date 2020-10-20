@@ -22,6 +22,9 @@ class LoggingService(private val configuration: Configuration) {
     suspend fun rejoinMute(guild: Guild, user: User, roleState: RoleState) =
             log(guild, "**Info ::** User ${user.mention} :: ${user.tag} joined the server with ${if(roleState == RoleState.Tracked) "an infraction" else "a manual"} mute remaining")
 
+    suspend fun channelOverrideAdded(guild: Guild, channel: TextChannel) =
+            log(guild, "**Info ::** Channel overrides for muted role added to ${channel.name}")
+
     suspend fun infractionApplied(guild: Guild, user: User, infraction: Infraction) {
         val moderator = guild.kord.getUser(Snowflake(infraction.moderator))
         log(guild, "**Info ::** User ${user.mention} :: ${user.tag} was infracted by **${moderator?.username} :: ${moderator?.tag}** \nReason: **${infraction.reason}**")

@@ -2,6 +2,7 @@ package me.ddivad.judgebot.commands
 
 import me.ddivad.judgebot.conversations.ConfigurationConversation
 import me.ddivad.judgebot.dataclasses.Configuration
+import me.ddivad.judgebot.embeds.createConfigEmbed
 import me.ddivad.judgebot.services.DatabaseService
 import me.ddivad.judgebot.services.PermissionLevel
 import me.ddivad.judgebot.services.requiredPermissionLevel
@@ -24,6 +25,20 @@ fun guildConfigCommands(configuration: Configuration,
             conversationService.startPublicConversation<ConfigurationConversation>(author, channel.asChannel(), guild!!)
             databaseService.guilds.setupGuild(guild!!)
             respond("Guild setup")
+        }
+    }
+
+    command("viewconfig") {
+        description = "View the configuration vales for this guild."
+        requiredPermissionLevel = PermissionLevel.Staff
+        execute {
+            if (!configuration.hasGuildConfig(guild!!.id.longValue))
+                return@execute respond("Please run the **configure** command to set this initially.")
+
+            val config = configuration[guild!!.id.longValue] ?: return@execute
+            respond {
+                createConfigEmbed(config, guild!!)
+            }
         }
     }
 
@@ -50,7 +65,7 @@ fun guildConfigCommands(configuration: Configuration,
                 return@execute respond("Please run the **configure** command to set this initially.")
 
             val role = args.first
-            configuration[guild!!.id.longValue]?.staffRole = role.name
+            configuration[guild!!.id.longValue]?.staffRole = role.id.value
             configuration.save()
 
             respond("Role set to: **${role.name}**")
@@ -65,7 +80,7 @@ fun guildConfigCommands(configuration: Configuration,
                 return@execute respond("Please run the **configure** command to set this initially.")
 
             val role = args.first
-            configuration[guild!!.id.longValue]?.adminRole = role.name
+            configuration[guild!!.id.longValue]?.adminRole = role.id.value
             configuration.save()
 
             respond("Role set to: **${role.name}**")

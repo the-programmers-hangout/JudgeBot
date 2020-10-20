@@ -13,8 +13,7 @@ import me.jakejmattson.discordkt.api.dsl.commands
 
 fun createInfractonCommands(databaseService: DatabaseService,
                             config: Configuration,
-                            infractionService: InfractionService,
-                            roleService: MuteService) = commands("Infraction") {
+                            infractionService: InfractionService) = commands("Infraction") {
     command("strike", "s") {
         description = "Strike a user."
         requiresGuild = true

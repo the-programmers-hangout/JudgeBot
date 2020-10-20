@@ -2,8 +2,7 @@ package me.ddivad.judgebot.services.database
 
 import com.gitlab.kordlib.core.entity.Guild
 import com.gitlab.kordlib.core.entity.Member
-import kotlinx.coroutines.runBlocking
-import me.ddivad.judgebot.dataclasses.GuildDetails
+import me.ddivad.judgebot.dataclasses.GuildMemberDetails
 import me.ddivad.judgebot.dataclasses.GuildMember
 import me.ddivad.judgebot.dataclasses.Infraction
 import me.jakejmattson.discordkt.api.annotations.Service
@@ -20,7 +19,7 @@ class UserOperations(private val connection: ConnectionService) {
                 userRecord
             } else {
                 val guildMember = GuildMember(target.id.value)
-                guildMember.guilds.add(GuildDetails(guildId))
+                guildMember.guilds.add(GuildMemberDetails(guildId))
                 userCollection.insertOne(guildMember)
                 guildMember
             }
