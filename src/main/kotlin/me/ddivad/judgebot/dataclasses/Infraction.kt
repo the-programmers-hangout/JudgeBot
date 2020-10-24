@@ -10,6 +10,7 @@ data class Infraction(
         val moderator: String,
         val reason: String,
         val type: InfractionType,
-        val strikes: Int = 0,
+        var points: Int = 0,
+        val ruleNumber: Int? = null,
         val dateTime: Long = Date().time
 )

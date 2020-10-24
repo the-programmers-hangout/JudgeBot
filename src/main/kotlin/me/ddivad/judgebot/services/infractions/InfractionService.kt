@@ -16,6 +16,7 @@ class InfractionService(private val configuration: Configuration,
                         private val databaseService: DatabaseService,
                         private val loggingService: LoggingService) {
     suspend fun infract(target: Member, guild: Guild, userRecord: GuildMember, infraction: Infraction): GuildMember {
+
         target.asUser().sendPrivateMessage {
             createInfractionEmbed()
         }

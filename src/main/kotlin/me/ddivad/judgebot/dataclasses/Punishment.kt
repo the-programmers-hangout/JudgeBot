@@ -5,3 +5,8 @@ data class Punishment(val userId: String,
                       var reason: String,
                       val clearTime: Long,
                       var id: Int = 0)
+
+data class Ban(val userId: String,
+               val moderator: String,
+               val reason: String,
+               val clearTime: Long? = null)

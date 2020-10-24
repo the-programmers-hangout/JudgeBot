@@ -4,6 +4,7 @@ data class GuildInformation(
         val guildId: String,
         val guildName: String,
         val rules: MutableList<Rule> = mutableListOf(),
+        val bans: MutableList<Ban> = mutableListOf(),
         val punishments: MutableList<Punishment> = mutableListOf()
 ) {
     fun addRule(rule: Rule) {
@@ -36,6 +37,15 @@ data class GuildInformation(
 
     fun findPunishmentByType(type: InfractionType, userId: String): List<Punishment> {
         return this.punishments.filter { it.type == type && it.userId == userId }
+    }
+
+    fun addBan(ban: Ban) {
+        this.bans.add(ban)
+    }
+
+    fun removeBan(userId: String) {
+        val ban = this.bans.find { it.userId == userId }
+        this.bans.remove(ban)
     }
 }
 
