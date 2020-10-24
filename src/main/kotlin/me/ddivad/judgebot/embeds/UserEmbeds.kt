@@ -3,26 +3,29 @@ package me.ddivad.judgebot.embeds
 import com.gitlab.kordlib.common.entity.Snowflake
 import com.gitlab.kordlib.core.entity.Guild
 import com.gitlab.kordlib.core.entity.Member
+import com.gitlab.kordlib.rest.builder.message.EmbedBuilder
 import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.dataclasses.GuildMember
 import me.jakejmattson.discordkt.api.dsl.CommandEvent
+import me.jakejmattson.discordkt.api.dsl.MenuBuilder
 import me.jakejmattson.discordkt.api.extensions.addField
 import me.jakejmattson.discordkt.api.extensions.addInlineField
+import java.awt.Color
 import java.text.SimpleDateFormat
 import java.util.*
 
-suspend fun CommandEvent<*>.createHistoryEmbed(target: Member,
+suspend fun MenuBuilder.createHistoryEmbed(target: Member,
                                                member: GuildMember,
                                                guild: Guild,
                                                config: Configuration,
-                                               includeModerator: Boolean): Unit = respondMenu {
+                                               includeModerator: Boolean,) {
     val userGuildDetails = member.getGuildInfo(guild.id.value)!!
     val notes = userGuildDetails.notes
     val infractions = userGuildDetails.infractions
     val paginatedNotes = notes.chunked(5)
     val lastInfraction = userGuildDetails.infractions[userGuildDetails.infractions.size - 1]
     page {
-        color = discord.configuration.theme
+        color = Color.MAGENTA
         title = "${target.asUser().tag}'s Record"
         thumbnail {
             url = target.asUser().avatar.url
@@ -37,7 +40,7 @@ suspend fun CommandEvent<*>.createHistoryEmbed(target: Member,
         addField("", "")
         addField(
                 "**__Most Recent Infraction__**",
-                "Type: **${lastInfraction.type}** :: Weight: **${lastInfraction.strikes}**\n " +
+                "Type: **${lastInfraction.type}** :: Weight: **${lastInfraction.points}**\n " +
                         "Issued by **${guild.kord.getUser(Snowflake(lastInfraction.moderator))?.username}** " +
                         "on **${SimpleDateFormat("dd/MM/yyyy").format(Date(lastInfraction.dateTime))}**\n" +
                         lastInfraction.reason
@@ -46,7 +49,7 @@ suspend fun CommandEvent<*>.createHistoryEmbed(target: Member,
 
     if (notes.isEmpty()) {
         page {
-            color = discord.configuration.theme
+            color = Color.MAGENTA
             title = "${target.asUser().tag}'s Record"
             thumbnail {
                 url = target.asUser().avatar.url
@@ -66,7 +69,7 @@ suspend fun CommandEvent<*>.createHistoryEmbed(target: Member,
 
     paginatedNotes.forEachIndexed { index, list ->
         page {
-            color = discord.configuration.theme
+            color = Color.MAGENTA
             title = "${target.asUser().tag}'s Record"
             thumbnail {
                 url = target.asUser().avatar.url

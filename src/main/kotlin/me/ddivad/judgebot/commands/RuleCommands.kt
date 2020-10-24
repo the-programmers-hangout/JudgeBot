@@ -1,5 +1,6 @@
 package me.ddivad.judgebot.commands
 
+import me.ddivad.judgebot.arguments.RuleArg
 import me.ddivad.judgebot.conversations.rules.AddRuleConversation
 import me.ddivad.judgebot.conversations.rules.ArchiveRuleConversation
 import me.ddivad.judgebot.conversations.rules.EditRuleConversation
@@ -65,8 +66,8 @@ fun ruleCommands(configuration: Configuration,
     command("rule") {
         description = "List a rule from this guild."
         requiredPermissionLevel = PermissionLevel.Everyone
-        execute(IntegerArg) {
-            val rule = databaseService.guilds.getRule(guild!!, args.first)!!
+        execute(RuleArg) {
+            val rule = databaseService.guilds.getRule(guild!!, args.first.number)!!
             respond {
                 createRuleEmbed(guild!!, rule)
             }

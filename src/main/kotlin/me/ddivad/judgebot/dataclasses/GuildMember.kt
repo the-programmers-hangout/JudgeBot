@@ -5,7 +5,7 @@ import org.joda.time.DateTime
 
 data class GuildMemberDetails(
         val guildId: String,
-        var notes: MutableList<Note> = mutableListOf<Note>(),
+        val notes: MutableList<Note> = mutableListOf<Note>(),
         val infractions: MutableList<Infraction> = mutableListOf<Infraction>(),
         var historyCount: Int = 0,
         var points: Int = 0,
@@ -36,6 +36,7 @@ data class GuildMember(
 
     fun addInfraction(infraction: Infraction, guild:Guild) = with(this.getGuildInfo(guild.id.value)) {
         this?.infractions?.add(infraction)
+        this!!.points += infraction.points
     }
 
     fun incrementHistoryCount(guildId: String) {

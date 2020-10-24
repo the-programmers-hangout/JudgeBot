@@ -5,6 +5,7 @@ import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.embeds.createHistoryEmbed
 import me.ddivad.judgebot.embeds.createStatusEmbed
 import me.ddivad.judgebot.services.DatabaseService
+import me.ddivad.judgebot.services.LoggingService
 import me.ddivad.judgebot.services.PermissionLevel
 import me.ddivad.judgebot.services.requiredPermissionLevel
 import me.jakejmattson.discordkt.api.arguments.EveryArg
@@ -15,7 +16,8 @@ import me.jakejmattson.discordkt.api.dsl.commands
 import java.awt.Color
 
 fun createUserCommands(databaseService: DatabaseService,
-                            config: Configuration) = commands("User") {
+                       config: Configuration,
+                       loggingService: LoggingService) = commands("User") {
     command("history", "h") {
         description = "Use this to view a user's record."
         requiresGuild = true
@@ -23,7 +25,9 @@ fun createUserCommands(databaseService: DatabaseService,
         execute(MemberArg) {
             val user = databaseService.users.getOrCreateUser(args.first, guild!!.id.value)
             databaseService.users.incrementUserHistory(user, guild!!.id.value)
-            createHistoryEmbed(args.first, user, guild!!, config, true)
+            respondMenu {
+                createHistoryEmbed(args.first, user, guild!!, config, true)
+            }
         }
     }
 
@@ -61,10 +65,12 @@ fun createUserCommands(databaseService: DatabaseService,
         requiredPermissionLevel = PermissionLevel.Staff
         execute(MemberArg, IntegerArg("Delete message days").makeOptional(1), EveryArg) {
             val (target, deleteDays, reason) = args
-            //TODO: save this in Guild collection
             guild!!.ban(target.id) {
                 this.reason = reason
                 this.deleteMessagesDays = deleteDays
+                val ban = databaseService.guilds.banUser(guild!!, target.id.value, author.id.value, reason)
+                loggingService.userBanned(guild!!, target.asUser(), ban)
+                respond("User ${target.tag} banned")
             }
         }
     }
@@ -76,6 +82,8 @@ fun createUserCommands(databaseService: DatabaseService,
         execute(UserArg) {
             val user = args.first
             guild!!.unban(user.id)
+            databaseService.guilds.removeBan(guild!!, user.id.value)
+            loggingService.userUnbanned(guild!!, user)
             respond("${user.tag} unbanned")
         }
     }
