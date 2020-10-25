@@ -11,65 +11,68 @@ import me.ddivad.judgebot.embeds.createRulesEmbedDetailed
 import me.ddivad.judgebot.services.DatabaseService
 import me.ddivad.judgebot.services.PermissionLevel
 import me.ddivad.judgebot.services.requiredPermissionLevel
-import me.jakejmattson.discordkt.api.arguments.IntegerArg
 import me.jakejmattson.discordkt.api.dsl.commands
-import me.jakejmattson.discordkt.api.services.ConversationService
 
 fun ruleCommands(configuration: Configuration,
-                        conversationService: ConversationService,
-                        databaseService: DatabaseService) = commands("Rules") {
+                 databaseService: DatabaseService) = commands("Rules") {
 
-    command("addRule") {
+    guildCommand("addRule") {
         description = "Add a rule to this guild."
         requiredPermissionLevel = PermissionLevel.Administrator
         execute {
-            conversationService.startPublicConversation<AddRuleConversation>(author, channel.asChannel(), guild!!)
+            AddRuleConversation(configuration, databaseService)
+                    .createAddRuleConversation(guild)
+                    .startPublicly(discord, author, channel)
         }
     }
 
-    command("editRule") {
+    guildCommand("editRule") {
         description = "Edit a rule in this guild."
         requiredPermissionLevel = PermissionLevel.Administrator
         execute {
-            conversationService.startPublicConversation<EditRuleConversation>(author, channel.asChannel(), guild!!)
+            EditRuleConversation(configuration, databaseService)
+                    .createAddRuleConversation(guild)
+                    .startPublicly(discord, author, channel)
         }
     }
 
-    command("archiveRule") {
+    guildCommand("archiveRule") {
         description = "Archive a rule in this guild."
         requiredPermissionLevel = PermissionLevel.Administrator
         execute {
-            conversationService.startPublicConversation<ArchiveRuleConversation>(author, channel.asChannel(), guild!!)
+            ArchiveRuleConversation(configuration, databaseService)
+                    .createArchiveRuleConversation(guild)
+                    .startPublicly(discord, author, channel)
         }
     }
 
-    command("ruleHeadings") {
+    guildCommand("ruleHeadings") {
         description = "List the rules of this guild."
         requiredPermissionLevel = PermissionLevel.Everyone
         execute {
             respond {
-                createRulesEmbed(guild!!, databaseService.guilds.getRules(guild!!)!!)
+                createRulesEmbed(guild, databaseService.guilds.getRules(guild)!!)
             }
         }
     }
 
-    command("listRules") {
+    guildCommand("listRules") {
         description = "List the rules of this guild."
         requiredPermissionLevel = PermissionLevel.Everyone
         execute {
             respond {
-                createRulesEmbedDetailed(guild!!, databaseService.guilds.getRules(guild!!)!!)
+                createRulesEmbedDetailed(guild, databaseService.guilds.getRules(guild)!!)
             }
         }
     }
 
-    command("rule") {
+    guildCommand("rule") {
         description = "List a rule from this guild."
         requiredPermissionLevel = PermissionLevel.Everyone
         execute(RuleArg) {
-            val rule = databaseService.guilds.getRule(guild!!, args.first.number)!!
+            val rule = databaseService.guilds.getRule(guild, args.first.number)!!
             respond {
-                createRuleEmbed(guild!!, rule)
+                createRuleEmbed(guild, rule)
             }
         }
     }

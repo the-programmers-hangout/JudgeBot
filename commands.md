@@ -6,16 +6,16 @@
 | (Argument)  | Argument is not required.      |
 
 ## Configuration
-| Commands        | Arguments    | Description                                       |
-| --------------- | ------------ | ------------------------------------------------- |
-| configure       |              | Configure a guild to use Judgebot.                |
-| setadminrole    | Role         | Set the bot admin role.                           |
-| setalertchannel | Text Channel | Set the channel that the bot alerts will be sent. |
-| setlogchannel   | Text Channel | Set the channel that the bot logs will be sent.   |
-| setmuterole     | Role         | Set the role to be used to mute members.          |
-| setprefix       | Text         | Set the bot prefix.                               |
-| setstaffrole    | Role         | Set the bot staff role.                           |
-| viewconfig      |              | View the configuration vales for this guild.      |
+| Commands        | Arguments | Description                                       |
+| --------------- | --------- | ------------------------------------------------- |
+| configure       |           | Configure a guild to use Judgebot.                |
+| setadminrole    | Role      | Set the bot admin role.                           |
+| setalertchannel | Channel   | Set the channel that the bot alerts will be sent. |
+| setlogchannel   | Channel   | Set the channel that the bot logs will be sent.   |
+| setmuterole     | Role      | Set the role to be used to mute members.          |
+| setprefix       | Text      | Set the bot prefix.                               |
+| setstaffrole    | Role      | Set the bot staff role.                           |
+| viewconfig      |           | View the configuration vales for this guild.      |
 
 ## Infraction
 | Commands  | Arguments               | Description                                             |

@@ -11,8 +11,9 @@ import me.jakejmattson.discordkt.api.arguments.BooleanArg
 import me.jakejmattson.discordkt.api.dsl.Conversation
 import me.jakejmattson.discordkt.api.dsl.conversation
 
-class InfractionConveration(private val databaseService: DatabaseService, private val configuration: Configuration, private val infractionService: InfractionService): Conversation() {
-    @Conversation.Start
+class InfractionConversation(private val databaseService: DatabaseService,
+                             private val configuration: Configuration,
+                             private val infractionService: InfractionService) {
     fun createInfractionConversation(guild: Guild, targetUser: Member, weight: Int, infractionReason: String) = conversation {
         val guildConfiguration = configuration[guild.id.longValue] ?: return@conversation
         val user = databaseService.users.getOrCreateUser(targetUser, guild.id.value)
