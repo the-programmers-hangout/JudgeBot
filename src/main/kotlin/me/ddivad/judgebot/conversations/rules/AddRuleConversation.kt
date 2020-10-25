@@ -8,12 +8,10 @@ import me.ddivad.judgebot.services.DatabaseService
 import me.jakejmattson.discordkt.api.arguments.BooleanArg
 import me.jakejmattson.discordkt.api.arguments.EveryArg
 import me.jakejmattson.discordkt.api.arguments.UrlArg
-import me.jakejmattson.discordkt.api.dsl.Conversation
 import me.jakejmattson.discordkt.api.dsl.conversation
 
 class AddRuleConversation(private val configuration: Configuration,
-                          private val databaseService: DatabaseService): Conversation() {
-    @Conversation.Start
+                          private val databaseService: DatabaseService) {
     fun createAddRuleConversation(guild: Guild) = conversation {
         val rules = databaseService.guilds.getRules(guild)
         val nextId = rules?.size?.plus(1)!!

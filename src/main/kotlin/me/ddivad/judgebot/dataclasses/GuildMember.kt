@@ -18,7 +18,7 @@ data class GuildMember(
         val guilds: MutableList<GuildMemberDetails> = mutableListOf<GuildMemberDetails>()
 ) {
     fun addNote(note: String, moderator: String, guild: Guild) = with(this.getGuildInfo(guild.id.value)) {
-        val nextId: Int = if (this!!.notes.isEmpty()) 1 else this.notes.maxBy { it.id }!!.id + 1
+        val nextId: Int = if (this!!.notes.isEmpty()) 1 else this.notes.maxByOrNull { it.id }!!.id + 1
         this.notes.add(Note(note, moderator, DateTime.now().millis, nextId))
     }
 

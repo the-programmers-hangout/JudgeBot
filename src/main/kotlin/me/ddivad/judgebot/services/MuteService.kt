@@ -6,7 +6,6 @@ import com.gitlab.kordlib.core.entity.Guild
 import com.gitlab.kordlib.core.entity.Member
 import com.gitlab.kordlib.core.entity.PermissionOverwrite
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import me.ddivad.judgebot.dataclasses.Configuration
@@ -36,13 +35,11 @@ class MuteService(val configuration: Configuration,
     private suspend fun toKey(member: Member) = member.guild.id.value to member.asUser().id.value
     private suspend fun getMutedRole(guild: Guild) = guild.getRole(configuration[guild.id.longValue]?.mutedRole?.toSnowflake()!!)
 
-    init {
-        runBlocking {
-            configuration.guildConfigurations.forEach { config ->
-                val guild = config.value.id.toSnowflake()?.let { discord.api.getGuild(it) } ?: return@forEach
-                handleExistingMutes(guild)
-                setupMutedRole(guild)
-            }
+    suspend fun initGuilds() {
+        configuration.guildConfigurations.forEach { config ->
+            val guild = config.value.id.toSnowflake().let { discord.api.getGuild(it) } ?: return@forEach
+            handleExistingMutes(guild)
+            setupMutedRole(guild)
         }
     }
 
@@ -80,7 +77,7 @@ class MuteService(val configuration: Configuration,
     private suspend fun handleExistingMutes(guild: Guild) {
         databaseService.guilds.getPunishmentsForGuild(guild).forEach {
             val difference = it.clearTime - DateTime.now().millis
-            val member = guild.getMemberOrNull(it.userId.toSnowflake()!!) ?: return
+            val member = guild.getMemberOrNull(it.userId.toSnowflake()) ?: return
             applyRoleWithTimer(member, getMutedRole(guild), difference) { _ ->
                 removeMute(member, it.type)
             }
@@ -102,7 +99,7 @@ class MuteService(val configuration: Configuration,
     }
 
     private suspend fun setupMutedRole(guild: Guild) {
-        val mutedRole = guild.getRole(configuration[guild.id.longValue]!!.mutedRole.toSnowflake()!!)
+        val mutedRole = guild.getRole(configuration[guild.id.longValue]!!.mutedRole.toSnowflake())
         guild.channels.toList().forEach {
             val deniedPermissions = it.getPermissionOverwritesForRole(mutedRole.id)?.denied ?: Permissions()
             if (!deniedPermissions.contains(Permission.SendMessages) || !deniedPermissions.contains(Permission.AddReactions)) {

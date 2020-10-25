@@ -6,21 +6,32 @@ description = "judgebot"
 
 plugins {
     kotlin("jvm") version "1.4.10"
-    kotlin("plugin.serialization") version "1.4.10"
-    id("com.github.ben-manes.versions") version "0.33.0"
+    id("com.github.johnrengelman.shadow") version "6.0.0"
 }
 
 repositories {
     mavenCentral()
     jcenter()
+    maven("https://oss.sonatype.org/content/repositories/snapshots/")
 }
 
 dependencies {
-    implementation("me.jakejmattson:DiscordKt:0.20.0")
-    implementation("org.litote.kmongo:kmongo-coroutine:4.1.2")
+    implementation("me.jakejmattson:DiscordKt:0.21.1-SNAPSHOT")
+    implementation("org.litote.kmongo:kmongo-coroutine:4.1.3")
     implementation("joda-time:joda-time:2.10.6")
 }
 
-tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "1.8"
+tasks {
+    withType<KotlinCompile> {
+        kotlinOptions.jvmTarget = "1.8"
+    }
+
+    shadowJar {
+        archiveFileName.set("Judgebot.jar")
+        manifest {
+            attributes(
+                    "Main-Class" to "me.ddivad.judgebot.MainKt"
+            )
+        }
+    }
 }

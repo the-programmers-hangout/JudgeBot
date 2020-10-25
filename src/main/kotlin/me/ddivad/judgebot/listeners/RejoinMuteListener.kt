@@ -1,8 +1,6 @@
 package me.ddivad.judgebot.listeners
 
-import com.gitlab.kordlib.core.event.guild.BanAddEvent
 import com.gitlab.kordlib.core.event.guild.MemberJoinEvent
-import com.gitlab.kordlib.core.supplier.EntitySupplyStrategy
 import kotlinx.coroutines.runBlocking
 import me.ddivad.judgebot.dataclasses.InfractionType
 import me.ddivad.judgebot.services.LoggingService
