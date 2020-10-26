@@ -11,9 +11,11 @@ import kotlinx.coroutines.runBlocking
 import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.dataclasses.InfractionType
 import me.ddivad.judgebot.dataclasses.Punishment
+import me.ddivad.judgebot.embeds.createMuteEmbed
 import me.ddivad.judgebot.util.applyRoleWithTimer
 import me.jakejmattson.discordkt.api.Discord
 import me.jakejmattson.discordkt.api.annotations.Service
+import me.jakejmattson.discordkt.api.extensions.sendPrivateMessage
 import me.jakejmattson.discordkt.api.extensions.toSnowflake
 import org.joda.time.DateTime
 
@@ -58,7 +60,12 @@ class MuteService(val configuration: Configuration,
         databaseService.guilds.addPunishment(guild.asGuild(), punishment)
         punishmentTimerMap[toKey(member)] = applyRoleWithTimer(member, muteRole, time) {
             removeMute(member, type)
-        }.also { loggingService.roleApplied(guild, member.asUser(), muteRole) }
+        }.also {
+            loggingService.roleApplied(guild, member.asUser(), muteRole)
+            member.sendPrivateMessage {
+                createMuteEmbed(guild, member, reason, time)
+            }
+        }
     }
 
     fun removeMute(member: Member, type: InfractionType) {
