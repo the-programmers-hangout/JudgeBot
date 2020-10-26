@@ -16,7 +16,7 @@ repositories {
 }
 
 dependencies {
-    implementation("me.jakejmattson:DiscordKt:0.21.1-SNAPSHOT")
+    implementation("me.jakejmattson:DiscordKt:0.21.1")
     implementation("org.litote.kmongo:kmongo-coroutine:4.1.3")
     implementation("joda-time:joda-time:2.10.6")
 }

@@ -3,6 +3,7 @@ package me.ddivad.judgebot.conversations.rules
 import com.gitlab.kordlib.core.entity.Guild
 import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.dataclasses.Rule
+import me.ddivad.judgebot.embeds.createRuleEmbed
 import me.ddivad.judgebot.services.DatabaseService
 import me.jakejmattson.discordkt.api.arguments.BooleanArg
 import me.jakejmattson.discordkt.api.arguments.EveryArg
@@ -15,8 +16,11 @@ class EditRuleConversation(private val configuration: Configuration,
     fun createAddRuleConversation(guild: Guild) = conversation {
         val rules = databaseService.guilds.getRules(guild)
         val ruleNumberToUpdate = promptMessage(IntegerArg, "Which rule would you like to update?")
-        // TODO: rule embed for chosen rule here
-        val ruleToUpdate = rules?.find { it.number == ruleNumberToUpdate }
+        val ruleToUpdate = rules?.find { it.number == ruleNumberToUpdate } ?: return@conversation
+        respond("Current Rule:")
+        respond {
+            createRuleEmbed(guild, ruleToUpdate)
+        }
 
         val updateNumber = promptMessage(BooleanArg(truthValue = "y", falseValue = "n"),
                 "Update Rule number? (Y/N)")
@@ -24,7 +28,7 @@ class EditRuleConversation(private val configuration: Configuration,
             updateNumber -> promptUntil(
                     argumentType = IntegerArg,
                     prompt = "Please enter rule number:",
-                    isValid = { number -> !rules?.any { it.number == number }!! },
+                    isValid = { number -> !rules?.any { it.number == number } },
                     error = "Rule with that number already exists"
             )
             else -> ruleToUpdate!!.number
@@ -36,27 +40,30 @@ class EditRuleConversation(private val configuration: Configuration,
                     EveryArg,
                     "Please enter rule name:",
                     "Rule with that name already exists",
-                    isValid = { name -> !rules?.any { it.title == name }!! }
+                    isValid = { name -> !rules?.any { it.title == name } }
             )
-            else -> ruleToUpdate!!.title
+            else -> ruleToUpdate.title
         }
 
         val updateText = promptMessage(BooleanArg(truthValue = "y", falseValue = "n"),
                 "Update Rule text? (Y/N)")
         val ruleText = when {
             updateText -> promptMessage(EveryArg, "Please enter rule text:")
-            else -> ruleToUpdate!!.description
+            else -> ruleToUpdate.description
         }
 
         val updateLink = promptMessage(BooleanArg(truthValue = "y", falseValue = "n"),
                 "Update Rule link? (Y/N)")
         val ruleLink = when {
             updateLink -> promptMessage(UrlArg, "Please enter the link")
-            else -> ruleToUpdate!!.link
+            else -> ruleToUpdate.link
         }
 
-        val newRule = Rule(ruleNumber, ruleName, ruleText, ruleLink, ruleToUpdate!!.archived)
+        val newRule = Rule(ruleNumber, ruleName, ruleText, ruleLink, ruleToUpdate.archived)
         databaseService.guilds.editRule(guild, ruleToUpdate, newRule)
         respond("Rule edited.")
+        respond {
+            createRuleEmbed(guild, newRule)
+        }
     }
 }

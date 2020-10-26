@@ -36,7 +36,7 @@ class LoggingService(private val configuration: Configuration) {
 
     suspend fun infractionApplied(guild: Guild, user: User, infraction: Infraction) {
         val moderator = guild.kord.getUser(Snowflake(infraction.moderator))
-        log(guild, "**Info ::** User ${user.mention} :: ${user.tag} was infracted (**${infraction.type}**) by **${moderator?.username} :: ${moderator?.tag}** \n**Reason&&: ${infraction.reason}")
+        log(guild, "**Info ::** User ${user.mention} :: ${user.tag} was infracted (**${infraction.type}**) by **${moderator?.username} :: ${moderator?.tag}** \n**Reason**: ${infraction.reason}")
     }
 
     private suspend fun log(guild: Guild, message: String) = getLoggingChannel(guild)?.createMessage(message)
