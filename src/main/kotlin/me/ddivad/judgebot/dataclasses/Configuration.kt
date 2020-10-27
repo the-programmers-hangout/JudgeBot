@@ -30,7 +30,7 @@ data class Configuration(
 }
 
 data class DatabaseConfiguration(
-        val address: String = "mongodb://localhost:27017",
+            val address: String = "mongodb://localhost:27017",
         val databaseName: String = "judgebot"
 )
 
