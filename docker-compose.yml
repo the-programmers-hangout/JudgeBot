@@ -4,7 +4,7 @@ services:
   database:
     image: mongo
     restart: always
-    container_name: "judgebot-db"
+    container_name: judgebot-db
     env_file:
       - .env
     ports:
@@ -13,7 +13,7 @@ services:
       - judgebot:/data/db
 
   bot:
-    container_name: Judgebot
+    container_name: judgebot
     build:
       dockerfile: Dockerfile
       context: .

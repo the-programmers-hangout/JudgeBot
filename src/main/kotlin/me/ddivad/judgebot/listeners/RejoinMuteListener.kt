@@ -1,8 +1,6 @@
 package me.ddivad.judgebot.listeners
 
-import com.gitlab.kordlib.core.event.guild.BanAddEvent
 import com.gitlab.kordlib.core.event.guild.MemberJoinEvent
-import com.gitlab.kordlib.core.supplier.EntitySupplyStrategy
 import kotlinx.coroutines.runBlocking
 import me.ddivad.judgebot.dataclasses.InfractionType
 import me.ddivad.judgebot.services.LoggingService
@@ -14,6 +12,7 @@ fun onMemberRejoinWithMute(muteService: MuteService, loggingService: LoggingServ
     on<MemberJoinEvent> {
         val member = this.member
         val guild = this.getGuild()
+        // RunBlocking needed here for listener to work correctly (maybe an issue with listeners & coroutines exists)
         runBlocking {
             if (muteService.checkRoleState(guild, member, InfractionType.Mute) == RoleState.Tracked) {
                 muteService.handleRejoinMute(guild, member)

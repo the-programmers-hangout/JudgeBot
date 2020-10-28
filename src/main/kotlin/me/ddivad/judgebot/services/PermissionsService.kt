@@ -45,14 +45,14 @@ class PermissionsService(private val configuration: Configuration) {
     private fun Member.isBotOwner() = id.value == configuration.ownerId
     private suspend fun Member.isGuildOwner() = isOwner()
     private suspend fun Member.isAdministrator(): Boolean {
-        val role = configuration[guild!!.id.longValue]?.adminRole.let { role ->
+        val role = configuration[guild.id.longValue]?.adminRole.let { role ->
             guild.roles.filter { it.name == role }.first().id
         }
         return roleIds.contains(role)
     }
 
     private suspend fun Member.isStaff(): Boolean {
-        val role = configuration[guild!!.id.longValue]?.staffRole.let { role ->
+        val role = configuration[guild.id.longValue]?.staffRole.let { role ->
             guild.roles.filter { it.name == role }.first().id
         }
         return roleIds.contains(role)

@@ -2,6 +2,7 @@ package me.ddivad.judgebot
 
 import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.services.BotStatsService
+import me.ddivad.judgebot.services.MuteService
 import me.ddivad.judgebot.services.PermissionsService
 import me.ddivad.judgebot.services.requiredPermissionLevel
 import me.jakejmattson.discordkt.api.dsl.bot
@@ -74,6 +75,11 @@ suspend fun main(args: Array<String>) {
                 permissionsService.hasClearance(guild!!, user, permission)
             else
                 false
+        }
+
+        onStart {
+            val muteService = this.getInjectionObjects(MuteService::class)
+            muteService.initGuilds()
         }
     }
 }

@@ -1,5 +1,6 @@
 package me.ddivad.judgebot.commands
 
+import me.ddivad.judgebot.conversations.InfractionConversation
 import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.dataclasses.Infraction
 import me.ddivad.judgebot.dataclasses.InfractionType
@@ -13,38 +14,42 @@ import me.jakejmattson.discordkt.api.dsl.commands
 
 fun createInfractonCommands(databaseService: DatabaseService,
                             config: Configuration,
-                            infractionService: InfractionService,
-                            roleService: MuteService) = commands("Infraction") {
-    command("strike", "s") {
+                            infractionService: InfractionService) = commands("Infraction") {
+    guildCommand("strike", "s") {
         description = "Strike a user."
-        requiresGuild = true
         requiredPermissionLevel = PermissionLevel.Staff
         execute(MemberArg, IntegerArg.makeOptional(1), EveryArg) {
-            val user = databaseService.users.getOrCreateUser(args.first, guild!!.id.value)
-            createHistoryEmbed(args.first, user, guild!!, config, true)
+            val (user, weight, reason) = args
+            InfractionConversation(databaseService, config, infractionService)
+                    .createInfractionConversation(guild, user, weight, reason)
+                    .startPublicly(discord, author, channel)
         }
     }
 
-    command("warn", "w") {
+    guildCommand("warn", "w") {
         description = "Warn a user."
-        requiresGuild = true
         requiredPermissionLevel = PermissionLevel.Staff
         execute(MemberArg, EveryArg) {
-            val user = databaseService.users.getOrCreateUser(args.first, guild!!.id.value)
-            val infraction = Infraction(this.author.id.value, args.second, InfractionType.Warn)
-            infractionService.infract(args.first, guild!!, user, infraction)
-            createHistoryEmbed(args.first, user, guild!!, config, true)
+            val guildConfiguration = config[guild.id.longValue] ?: return@execute
+            val user = databaseService.users.getOrCreateUser(args.first, guild.id.value)
+            val infraction = Infraction(this.author.id.value, args.second, InfractionType.Warn, guildConfiguration.infractionConfiguration.warnPoints)
+            infractionService.infract(args.first, guild, user, infraction)
+            respondMenu {
+                createHistoryEmbed(args.first, user, guild, config, true)
+            }
         }
     }
 
-    command("cleanse") {
+    guildCommand("cleanse") {
         description = "Use this to delete (permanently) as user's infractions."
-        requiresGuild = true
         requiredPermissionLevel = PermissionLevel.Administrator
         execute(MemberArg) {
-            val user = databaseService.users.getOrCreateUser(args.first, guild!!.id.value)
-            if (user.getGuildInfo(guild!!.id.value)!!.infractions.isEmpty()) return@execute respond("User has no infractions.")
-            databaseService.users.cleanseInfractions(guild!!, user)
+            val user = databaseService.users.getOrCreateUser(args.first, guild.id.value)
+            if (user.getGuildInfo(guild.id.value)!!.infractions.isEmpty()) {
+                respond("User has no infractions.")
+                return@execute
+            }
+            databaseService.users.cleanseInfractions(guild, user)
             respond("Infractions cleansed.")
         }
     }

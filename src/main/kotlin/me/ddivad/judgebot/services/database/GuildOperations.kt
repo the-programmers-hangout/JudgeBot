@@ -4,10 +4,7 @@ import com.gitlab.kordlib.core.entity.Guild
 import com.gitlab.kordlib.core.entity.Member
 import com.gitlab.kordlib.core.entity.User
 import kotlinx.coroutines.runBlocking
-import me.ddivad.judgebot.dataclasses.GuildInformation
-import me.ddivad.judgebot.dataclasses.InfractionType
-import me.ddivad.judgebot.dataclasses.Punishment
-import me.ddivad.judgebot.dataclasses.Rule
+import me.ddivad.judgebot.dataclasses.*
 import me.jakejmattson.discordkt.api.annotations.Service
 import org.litote.kmongo.eq
 
@@ -69,6 +66,19 @@ class GuildOperations(private val connection: ConnectionService) {
         val guildInfo = guildCollection.findOne(GuildInformation::guildId eq guild.id.value)
         guildInfo!!.removePunishment(userId, type)
         updateGuild(guildInfo)
+    }
+
+    suspend fun banUser(guild: Guild, userId: String, moderator: String, reason: String): Ban {
+        val guildInfo = guildCollection.findOne(GuildInformation::guildId eq guild.id.value)
+        val ban = Ban(userId, moderator, reason)
+        guildInfo!!.addBan(ban)
+        updateGuild(guildInfo)
+        return ban
+    }
+
+    suspend fun removeBan(guild: Guild, userId: String) {
+        val guildInfo = guildCollection.findOne(GuildInformation::guildId eq guild.id.value)
+        guildInfo!!.removeBan(userId)
     }
 
     suspend fun checkPunishmentExists(guild: Guild, member: Member, type: InfractionType): List<Punishment> {

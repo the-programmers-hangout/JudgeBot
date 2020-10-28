@@ -1,3 +1,4 @@
+
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 group = "me.ddivad"
@@ -6,19 +7,18 @@ description = "judgebot"
 
 plugins {
     kotlin("jvm") version "1.4.10"
-    kotlin("plugin.serialization") version "1.4.10"
-    id("com.github.ben-manes.versions") version "0.33.0"
     id("com.github.johnrengelman.shadow") version "6.0.0"
 }
 
 repositories {
     mavenCentral()
     jcenter()
+    maven("https://oss.sonatype.org/content/repositories/snapshots/")
 }
 
 dependencies {
     implementation("me.jakejmattson:DiscordKt:${Versions.DISCORDKT}")
-    implementation("org.litote.kmongo:kmongo-coroutine:4.1.2")
+    implementation("org.litote.kmongo:kmongo-coroutine:4.1.3")
     implementation("joda-time:joda-time:2.10.6")
 }
 
@@ -38,6 +38,6 @@ tasks {
 }
 
 object Versions {
-    const val BOT = "0.0.1"
-    const val DISCORDKT = "0.20.0"
+    const val BOT = "1.0.0"
+    const val DISCORDKT = "0.21.1"
 }
