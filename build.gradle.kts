@@ -1,7 +1,8 @@
+
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 group = "me.ddivad"
-version = "0.0.1"
+version = Versions.BOT
 description = "judgebot"
 
 plugins {
@@ -16,7 +17,7 @@ repositories {
 }
 
 dependencies {
-    implementation("me.jakejmattson:DiscordKt:0.21.1")
+    implementation("me.jakejmattson:DiscordKt:${Versions.DISCORDKT}")
     implementation("org.litote.kmongo:kmongo-coroutine:4.1.3")
     implementation("joda-time:joda-time:2.10.6")
 }
@@ -34,4 +35,9 @@ tasks {
             )
         }
     }
+}
+
+object Versions {
+    const val BOT = "1.0.0"
+    const val DISCORDKT = "0.21.1"
 }

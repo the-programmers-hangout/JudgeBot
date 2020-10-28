@@ -9,3 +9,4 @@ build
 # Project #
 data/
 config/*
+.env

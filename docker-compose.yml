@@ -1,0 +1,32 @@
+version: '3.7'
+services:
+
+  database:
+    image: mongo
+    restart: always
+    container_name: judgebot-db
+    env_file:
+      - .env
+    ports:
+      - 27017:27017
+    volumes:
+      - judgebot:/data/db
+
+  bot:
+    container_name: judgebot
+    build:
+      dockerfile: Dockerfile
+      context: .
+    volumes:
+      - type: bind
+        source: ./config/config.json
+        target: /config/config.json
+    restart: always
+    env_file:
+      - .env
+    depends_on:
+      - database
+
+volumes:
+  judgebot:
+  config:
