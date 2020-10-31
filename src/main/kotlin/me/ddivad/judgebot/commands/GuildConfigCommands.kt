@@ -55,12 +55,6 @@ fun guildConfigCommands(configuration: Configuration,
                 return@execute
             }
             val prefix = args.first
-            configuration[guild.id.longValue]?.punishments?.add(PunishmentLevel(10, PunishmentType.MUTE, 1000L * 60 * 1))
-            configuration[guild.id.longValue]?.punishments?.add(PunishmentLevel(20, PunishmentType.MUTE, 1000L * 60 * 12))
-            configuration[guild.id.longValue]?.punishments?.add(PunishmentLevel(30, PunishmentType.MUTE, 1000L * 60 * 24))
-            configuration[guild.id.longValue]?.punishments?.add(PunishmentLevel(30, PunishmentType.BAN, 1000L * 60 * 30))
-            configuration[guild.id.longValue]?.punishments?.add(PunishmentLevel(30, PunishmentType.BAN))
-            configuration[guild.id.longValue]?.prefix = prefix
             configuration.save()
             respond("Prefix set to: **$prefix**")
         }

@@ -27,11 +27,11 @@ data class Configuration(
 
         // Setup default punishments
         // TODO: Add configuration commands for this
-        newConfiguration.punishments.add(PunishmentLevel(10, PunishmentType.MUTE, 1000L * 60 * 1))
-        newConfiguration.punishments.add(PunishmentLevel(20, PunishmentType.MUTE, 1000L * 60 * 12))
-        newConfiguration.punishments.add(PunishmentLevel(30, PunishmentType.MUTE, 1000L * 60 * 24))
-        newConfiguration.punishments.add(PunishmentLevel(30, PunishmentType.BAN, 1000L * 60 * 30))
-        newConfiguration.punishments.add(PunishmentLevel(30, PunishmentType.BAN))
+        newConfiguration.punishments.add(PunishmentLevel(10, PunishmentType.MUTE, 1000L * 60 * 60 * 1))
+        newConfiguration.punishments.add(PunishmentLevel(20, PunishmentType.MUTE, 1000L * 60 * 60 * 12))
+        newConfiguration.punishments.add(PunishmentLevel(30, PunishmentType.MUTE, 1000L * 60 * 60 * 24))
+        newConfiguration.punishments.add(PunishmentLevel(40, PunishmentType.BAN, 1000L * 60 * 60 * 24 * 30))
+        newConfiguration.punishments.add(PunishmentLevel(50, PunishmentType.BAN))
 
         guildConfigurations[guild.id.longValue] = newConfiguration
         save()
