@@ -27,6 +27,15 @@ class InfractionService(private val configuration: Configuration,
             createInfractionEmbed(guild, target, infraction, rule)
         }
         loggingService.infractionApplied(guild, target.asUser(), infraction)
+        applyPunishment(target,guild, userRecord)
         return databaseService.users.addInfraction(guild, userRecord, infraction)
+    }
+
+    private suspend fun applyPunishment(target: Member, guild: Guild, guildMember: GuildMember) {
+        val punishmentLevels = configuration[guild.id.longValue]?.punishments
+        val punishmentForPoints = punishmentLevels?.filter {
+            it.points <= guildMember.getGuildInfo(guild.id.value)?.points!!
+        }?.maxByOrNull { it.points }
+        print(punishmentForPoints)
     }
 }

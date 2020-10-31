@@ -134,6 +134,6 @@ private fun formatOffsetTime(time: Instant): String {
         "$days days ago\n${formatter.format(time)}"
     } else {
         val hours = TimeUnit.MILLISECONDS.toHours(DateTime.now().millis - time.toEpochMilli())
-        "$hours hours ago\n"
+        "$hours hours ago\n${formatter.format(time)}"
     }
 }

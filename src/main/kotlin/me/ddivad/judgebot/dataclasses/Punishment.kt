@@ -10,3 +10,7 @@ data class Ban(val userId: String,
                val moderator: String,
                val reason: String,
                val clearTime: Long? = null)
+
+enum class PunishmentType {
+    MUTE, BAN
+}
