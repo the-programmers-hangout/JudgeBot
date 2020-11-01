@@ -66,7 +66,6 @@ data class InfractionConfiguration(
         var pointCeiling: Int = 50,
         var strikePoints: Int = 10,
         var warnPoints: Int = 0,
-        var pointsBetweenPunishment: Int = 10,
         var pointDecayPerWeek: Int = 2
 )
 

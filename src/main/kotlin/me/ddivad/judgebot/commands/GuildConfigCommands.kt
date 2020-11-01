@@ -2,8 +2,6 @@ package me.ddivad.judgebot.commands
 
 import me.ddivad.judgebot.conversations.ConfigurationConversation
 import me.ddivad.judgebot.dataclasses.Configuration
-import me.ddivad.judgebot.dataclasses.PunishmentLevel
-import me.ddivad.judgebot.dataclasses.PunishmentType
 import me.ddivad.judgebot.embeds.createConfigEmbed
 import me.ddivad.judgebot.services.DatabaseService
 import me.ddivad.judgebot.services.PermissionLevel
@@ -55,6 +53,7 @@ fun guildConfigCommands(configuration: Configuration,
                 return@execute
             }
             val prefix = args.first
+            configuration[guild.id.longValue]?.prefix = prefix
             configuration.save()
             respond("Prefix set to: **$prefix**")
         }

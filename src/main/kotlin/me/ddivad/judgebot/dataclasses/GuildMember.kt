@@ -32,6 +32,7 @@ data class GuildMember(
 
     fun cleanseInfractions(guild: Guild) = with(this.getGuildInfo(guild.id.value)) {
         this?.infractions?.clear()
+        this?.points = 0
     }
 
     fun addInfraction(infraction: Infraction, guild:Guild) = with(this.getGuildInfo(guild.id.value)) {

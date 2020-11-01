@@ -12,5 +12,6 @@ data class Infraction(
         val type: InfractionType,
         var points: Int = 0,
         val ruleNumber: Int? = null,
-        val dateTime: Long = Date().time
+        val dateTime: Long = Date().time,
+        var punishment: PunishmentLevel? = null
 )

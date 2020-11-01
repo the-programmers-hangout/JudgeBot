@@ -5,6 +5,7 @@ import com.gitlab.kordlib.core.entity.Guild
 import com.gitlab.kordlib.core.entity.Member
 import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.dataclasses.GuildMember
+import me.ddivad.judgebot.util.timeToString
 import me.jakejmattson.discordkt.api.dsl.CommandEvent
 import me.jakejmattson.discordkt.api.dsl.MenuBuilder
 import me.jakejmattson.discordkt.api.extensions.addField
@@ -51,6 +52,9 @@ suspend fun MenuBuilder.createHistoryEmbed(
                     "Type: **${lastInfraction.type}** :: Weight: **${lastInfraction.points}**\n " +
                             "Issued by **${guild.kord.getUser(Snowflake(lastInfraction.moderator))?.username}** " +
                             "on **${SimpleDateFormat("dd/MM/yyyy").format(Date(lastInfraction.dateTime))}**\n" +
+                            "Punishment: **${lastInfraction.punishment?.punishment}** for **${
+                                timeToString(lastInfraction.punishment?.duration!!)
+                            }**\n" +
                             lastInfraction.reason
             )
         } else addField("User has no recent infractions.", "")

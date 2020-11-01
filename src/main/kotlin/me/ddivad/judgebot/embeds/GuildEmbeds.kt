@@ -28,8 +28,7 @@ suspend fun EmbedBuilder.createConfigEmbed(config: GuildConfiguration, guild: Gu
         value = "Point Ceiling: ${config.infractionConfiguration.pointCeiling} \n" +
                 "Strike points: ${config.infractionConfiguration.strikePoints} \n" +
                 "Warn Points: ${config.infractionConfiguration.warnPoints} \n" +
-                "Point Decay / Week: ${config.infractionConfiguration.pointDecayPerWeek} \n" +
-                "Punishment Increments: ${config.infractionConfiguration.pointsBetweenPunishment}"
+                "Point Decay / Week: ${config.infractionConfiguration.pointDecayPerWeek}"
     }
 
     field {
