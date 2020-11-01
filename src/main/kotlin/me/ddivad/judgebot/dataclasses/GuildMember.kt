@@ -36,8 +36,9 @@ data class GuildMember(
     }
 
     fun addInfraction(infraction: Infraction, guild:Guild) = with(this.getGuildInfo(guild.id.value)) {
-        this?.infractions?.add(infraction)
-        this!!.points += infraction.points
+        this!!.infractions.add(infraction)
+        this.points += infraction.points
+        this.lastInfraction = DateTime.now().millis
     }
 
     fun incrementHistoryCount(guildId: String) {
