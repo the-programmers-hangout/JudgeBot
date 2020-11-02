@@ -1,6 +1,5 @@
 package me.ddivad.judgebot.services.infractions
 
-import com.gitlab.kordlib.core.behavior.ban
 import com.gitlab.kordlib.core.entity.Guild
 import com.gitlab.kordlib.core.entity.Member
 import me.ddivad.judgebot.dataclasses.*

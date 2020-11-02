@@ -1,6 +1,7 @@
 package me.ddivad.judgebot.embeds
 
 import com.gitlab.kordlib.core.entity.Guild
+import com.gitlab.kordlib.core.entity.Member
 import com.gitlab.kordlib.core.entity.User
 import com.gitlab.kordlib.rest.Image
 import com.gitlab.kordlib.rest.builder.message.EmbedBuilder
@@ -99,4 +100,13 @@ fun EmbedBuilder.createMuteEmbed(guild: Guild, user: User, reason: String, lengt
     thumbnail {
         url = guild.getIconUrl(Image.Format.PNG) ?: ""
     }
+}
+
+fun EmbedBuilder.createUnmuteEmbed(guild: Guild, user: Member) {
+    color = Color.GREEN
+    thumbnail {
+        url = guild.getIconUrl(Image.Format.PNG) ?: ""
+    }
+    title = "Mute Removed"
+    description = "${user.mention} you have been unmuted from **${guild.name}**."
 }

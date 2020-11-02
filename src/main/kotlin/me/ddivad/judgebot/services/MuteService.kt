@@ -12,6 +12,7 @@ import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.dataclasses.InfractionType
 import me.ddivad.judgebot.dataclasses.Punishment
 import me.ddivad.judgebot.embeds.createMuteEmbed
+import me.ddivad.judgebot.embeds.createUnmuteEmbed
 import me.ddivad.judgebot.util.applyRoleWithTimer
 import me.jakejmattson.discordkt.api.Discord
 import me.jakejmattson.discordkt.api.annotations.Service
@@ -55,6 +56,8 @@ class MuteService(val configuration: Configuration,
         if (key in punishmentTimerMap) {
             punishmentTimerMap[key]?.cancel()
             punishmentTimerMap.remove(key)
+            databaseService.guilds.removePunishment(guild, member.asUser().id.value, type)
+            loggingService.muteOverwritten(guild, member)
         }
         val punishment = Punishment(userId, type, reason, clearTime)
         databaseService.guilds.addPunishment(guild.asGuild(), punishment)
@@ -77,6 +80,9 @@ class MuteService(val configuration: Configuration,
             databaseService.guilds.removePunishment(guild, member.asUser().id.value, type)
             punishmentTimerMap[key]?.cancel()
             punishmentTimerMap.remove(toKey(member))
+            member.sendPrivateMessage {
+                createUnmuteEmbed(guild, member)
+            }
             loggingService.roleRemoved(guild, member.asUser(), muteRole)
         }
     }
