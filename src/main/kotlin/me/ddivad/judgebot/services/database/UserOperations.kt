@@ -1,6 +1,7 @@
 package me.ddivad.judgebot.services.database
 
 import com.gitlab.kordlib.core.entity.Guild
+
 import me.ddivad.judgebot.dataclasses.GuildMemberDetails
 import me.ddivad.judgebot.dataclasses.GuildMember
 import me.ddivad.judgebot.dataclasses.Infraction
