@@ -14,13 +14,11 @@ services:
 
   bot:
     container_name: judgebot
-    build:
-      dockerfile: Dockerfile
-      context: .
+    image: theprogrammershangout/judgebot:latest
     volumes:
       - type: bind
-        source: ./config/config.json
-        target: /config/config.json
+        source: ./config.json
+        target: /config.json
     restart: always
     env_file:
       - .env

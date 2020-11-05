@@ -6,6 +6,6 @@ RUN gradle shadowJar --no-daemon
 
 FROM openjdk:11.0.8-jre-slim
 RUN mkdir /config/
-COPY --from=build /judgebot/build/libs/*.jar /
+COPY --from=build /judgebot/build/libs/Judgebot.jar /
 
 ENTRYPOINT ["java", "-jar", "/Judgebot.jar"]
