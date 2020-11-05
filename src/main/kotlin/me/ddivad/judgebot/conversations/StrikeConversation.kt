@@ -5,6 +5,7 @@ import com.gitlab.kordlib.core.entity.Member
 import me.ddivad.judgebot.arguments.RuleArg
 import me.ddivad.judgebot.dataclasses.*
 import me.ddivad.judgebot.embeds.createHistoryEmbed
+import me.ddivad.judgebot.embeds.createModeratorInfractionEmbed
 import me.ddivad.judgebot.services.DatabaseService
 import me.ddivad.judgebot.services.infractions.InfractionService
 import me.ddivad.judgebot.util.timeToString
@@ -26,6 +27,6 @@ class StrikeConversation(private val databaseService: DatabaseService,
 
         val infractionRecord = infractionService.infract(targetUser, guild, user, infraction)
         respondMenu { createHistoryEmbed(targetUser, user, guild, configuration, databaseService) }
-        this.user.sendPrivateMessage("User ${targetUser.mention} received a ${infractionRecord.punishment?.punishment} for ${timeToString(infractionRecord.punishment?.duration!!)}")
+        this.user.sendPrivateMessage{ createModeratorInfractionEmbed(guild, targetUser, infractionRecord) }
     }
 }

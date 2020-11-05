@@ -61,7 +61,7 @@ class MuteService(val configuration: Configuration,
         }
         val punishment = Punishment(userId, InfractionType.Mute, reason, "", clearTime)
         databaseService.guilds.addPunishment(guild.asGuild(), punishment)
-        punishmentTimerMap[toKey(member)] = applyRoleWithTimer(member, muteRole, time) {
+        punishmentTimerMap[key] = applyRoleWithTimer(member, muteRole, time) {
             removeMute(member)
         }.also {
             loggingService.roleApplied(guild, member.asUser(), muteRole)
@@ -92,7 +92,8 @@ class MuteService(val configuration: Configuration,
             if (it.clearTime != null) {
                 val difference = it.clearTime - DateTime.now().millis
                 val member = guild.getMemberOrNull(it.userId.toSnowflake()) ?: return
-                applyRoleWithTimer(member, getMutedRole(guild), difference) {
+                val key = toKey(member)
+                punishmentTimerMap[key] = applyRoleWithTimer(member, getMutedRole(guild), difference) {
                     removeMute(member)
                 }
             }
@@ -103,7 +104,8 @@ class MuteService(val configuration: Configuration,
         val mute = databaseService.guilds.checkPunishmentExists(guild, member, InfractionType.Mute).first()
         if (mute.clearTime != null) {
             val difference = mute.clearTime - DateTime.now().millis
-            applyRoleWithTimer(member, getMutedRole(guild), difference) {
+            val key = toKey(member)
+            punishmentTimerMap[key] = applyRoleWithTimer(member, getMutedRole(guild), difference) {
                 removeMute(member)
             }
         }
@@ -117,6 +119,7 @@ class MuteService(val configuration: Configuration,
 
     private suspend fun setupMutedRole(guild: Guild) {
         val mutedRole = guild.getRole(configuration[guild.id.longValue]!!.mutedRole.toSnowflake())
+        loggingService.muteSetup(guild, mutedRole)
         guild.channels.toList().forEach {
             val deniedPermissions = it.getPermissionOverwritesForRole(mutedRole.id)?.denied ?: Permissions()
             if (!deniedPermissions.contains(Permission.SendMessages) || !deniedPermissions.contains(Permission.AddReactions)) {

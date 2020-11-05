@@ -12,12 +12,13 @@
 | setup         |             | Configure a guild to use Judgebot.                             |
 
 ## Infraction
-| Commands  | Arguments                       | Description                                                                                                                           |
-| --------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| badpfp    | (cancel), LowerMemberArg        | Notifies the user that they should change their profile pic and applies a 30 minute mute. Bans the user if they don't change picture. |
-| cleanse   | LowerMemberArg                  | Use this to delete (permanently) as user's infractions.                                                                               |
-| strike, s | LowerMemberArg, (Integer), Text | Strike a user.                                                                                                                        |
-| warn, w   | LowerMemberArg, Text            | Warn a user.                                                                                                                          |
+| Commands         | Arguments                       | Description                                                                                                                           |
+| ---------------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| badpfp           | (cancel), LowerMemberArg        | Notifies the user that they should change their profile pic and applies a 30 minute mute. Bans the user if they don't change picture. |
+| cleanse          | LowerMemberArg                  | Use this to delete (permanently) as user's infractions.                                                                               |
+| removeInfraction | LowerMemberArg, Infraction ID   | Use this to delete (permanently) an infraction from a user.                                                                           |
+| strike, s        | LowerMemberArg, (Integer), Text | Strike a user.                                                                                                                        |
+| warn, w          | LowerMemberArg, Text            | Warn a user.                                                                                                                          |
 
 ## Mute
 | Commands | Arguments                  | Description                                             |

@@ -99,7 +99,6 @@ suspend fun MenuBuilder.createHistoryEmbed(
         thumbnail {
             url = target.asUser().avatar.url
         }
-        val infractions = userGuildDetails.infractions
         val warnings = infractions.filter { it.type == InfractionType.Warn }
         val strikes = infractions.filter { it.type == InfractionType.Strike }
         val mutes = infractions.filter { it.type == InfractionType.Mute }
@@ -110,11 +109,12 @@ suspend fun MenuBuilder.createHistoryEmbed(
         addInlineField("Strikes", "${strikes.size}")
         addInlineField("Bans", "${bans.size}")
 
+        if (infractions.isEmpty()) addField("", "**User has no infractions.**")
         if (warnings.isNotEmpty()) addField("", "**__Warnings__**")
-        warnings.forEachIndexed { index, infraction ->
+        warnings.forEachIndexed { _, infraction ->
             val moderator = guild.kord.getUser(Snowflake(infraction.moderator))?.username
             addField(
-                    "ID :: $index :: Staff :: __${moderator}__",
+                    "ID :: ${infraction.id} :: Staff :: __${moderator}__",
                     "Type: **${infraction.type} (${infraction.points})** :: " +
                             "Date: **${SimpleDateFormat("dd/MM/yyyy").format(Date(infraction.dateTime))}**\n " +
                             "Punishment: **${infraction.punishment?.punishment}** ${
@@ -125,10 +125,10 @@ suspend fun MenuBuilder.createHistoryEmbed(
         }
 
         if (strikes.isNotEmpty()) addField("", "**__Strikes__**")
-        strikes.forEachIndexed { index, infraction ->
+        strikes.forEachIndexed { _, infraction ->
             val moderator = guild.kord.getUser(Snowflake(infraction.moderator))?.username
             addField(
-                    "ID :: $index :: Staff :: __${moderator}__",
+                    "ID :: ${infraction.id} :: Staff :: __${moderator}__",
                     "Type: **${infraction.type} (${infraction.points})** :: " +
                             "Date: **${SimpleDateFormat("dd/MM/yyyy").format(Date(infraction.dateTime))}**\n " +
                             "Punishment: **${infraction.punishment?.punishment}** ${
@@ -172,7 +172,7 @@ suspend fun MenuBuilder.createHistoryEmbed(
             thumbnail {
                 url = target.asUser().avatar.url
             }
-            list.forEachIndexed { index, note ->
+            list.forEachIndexed { _, note ->
                 val moderator = guild.kord.getUser(Snowflake(note.moderator))?.username
 
                 addField(
@@ -193,7 +193,7 @@ suspend fun CommandEvent<*>.createStatusEmbed(target: Member,
                                               member: GuildMember,
                                               guild: Guild,
                                               config: Configuration) = respond {
-    val userGuildDetails = member.getGuildInfo(guild.id.value)!!
+    val userGuildDetails = member.getGuildInfo(guild.id.value)
     val notes = userGuildDetails.notes
     val infractions = userGuildDetails.infractions
     val maxPoints = config[guild.id.longValue]?.infractionConfiguration?.pointCeiling

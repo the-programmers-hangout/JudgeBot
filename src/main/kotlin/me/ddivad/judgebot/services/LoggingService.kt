@@ -3,6 +3,7 @@ package me.ddivad.judgebot.services
 import com.gitlab.kordlib.common.entity.Snowflake
 import com.gitlab.kordlib.core.behavior.getChannelOf
 import com.gitlab.kordlib.core.entity.Guild
+import com.gitlab.kordlib.core.entity.Member
 import com.gitlab.kordlib.core.entity.Role
 import com.gitlab.kordlib.core.entity.User
 import com.gitlab.kordlib.core.entity.channel.TextChannel
@@ -41,6 +42,18 @@ class LoggingService(private val configuration: Configuration) {
         val moderator = guild.kord.getUser(Snowflake(infraction.moderator))
         log(guild, "**Info ::** User ${user.mention} :: ${user.tag} was infracted (**${infraction.type}**) by **${moderator?.username} :: ${moderator?.tag}** \n**Reason**: ${infraction.reason}")
     }
+
+    suspend fun badBfpApplied(guild: Guild, user: Member) =
+            log(guild, "**Info ::** User ${user.mention} badPfp triggered for avatar <${user.avatar.url}>")
+
+    suspend fun badPfpCancelled(guild: Guild, user: Member) =
+            log(guild, "**Info ::** BadPfp cancelled for user ${user.mention}")
+
+    suspend fun badPfpBan(guild: Guild, user: Member) =
+            log(guild, "**Info ::** User ${user.mention} banned for not changing their avatar")
+
+    suspend fun muteSetup(guild: Guild, role: Role) =
+            log(guild, "**Info ::** Adding muted role overrides for ${role.mention} :: ${role.id.value}")
 
     private suspend fun log(guild: Guild, message: String) = getLoggingChannel(guild)?.createMessage(message)
 

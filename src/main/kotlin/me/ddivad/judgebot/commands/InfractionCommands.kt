@@ -73,12 +73,26 @@ fun createInfractonCommands(databaseService: DatabaseService,
         requiredPermissionLevel = PermissionLevel.Administrator
         execute(LowerMemberArg) {
             val user = databaseService.users.getOrCreateUser(args.first, guild)
-            if (user.getGuildInfo(guild.id.value)!!.infractions.isEmpty()) {
+            if (user.getGuildInfo(guild.id.value).infractions.isEmpty()) {
                 respond("User has no infractions.")
                 return@execute
             }
             databaseService.users.cleanseInfractions(guild, user)
             respond("Infractions cleansed.")
+        }
+    }
+
+    guildCommand("removeInfraction") {
+        description = "Use this to delete (permanently) an infraction from a user."
+        requiredPermissionLevel = PermissionLevel.Administrator
+        execute(LowerMemberArg, IntegerArg("Infraction ID")) {
+            val user = databaseService.users.getOrCreateUser(args.first, guild)
+            if (user.getGuildInfo(guild.id.value).infractions.isEmpty()) {
+                respond("User has no infractions.")
+                return@execute
+            }
+            databaseService.users.removeInfraction(guild, user, args.second)
+            respond("Infractions removed.")
         }
     }
 }

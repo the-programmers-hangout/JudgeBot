@@ -8,6 +8,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import me.ddivad.judgebot.dataclasses.Infraction
+import me.ddivad.judgebot.embeds.createBadPfpEmbed
 import me.ddivad.judgebot.services.GuildID
 import me.ddivad.judgebot.services.LoggingService
 import me.ddivad.judgebot.services.MuteService
@@ -15,6 +16,7 @@ import me.ddivad.judgebot.services.UserId
 import me.jakejmattson.discordkt.api.Discord
 import me.jakejmattson.discordkt.api.annotations.Service
 import me.jakejmattson.discordkt.api.extensions.sendPrivateMessage
+import kotlin.math.log
 
 @Service
 class BadPfpService(private val muteService: MuteService,
@@ -24,7 +26,11 @@ class BadPfpService(private val muteService: MuteService,
     private suspend fun toKey(member: Member): Pair<GuildID, UserId> = member.guild.id.value to member.asUser().id.value
 
     suspend fun applyBadPfp(target: Member, guild: Guild, badPfp: Infraction, timeLimit: Long) {
+        target.sendPrivateMessage {
+            createBadPfpEmbed(guild, target)
+        }
         muteService.applyMute(target, timeLimit, "Bad Pfp Mute")
+        loggingService.badBfpApplied(guild, target)
         badPfpTracker[toKey((target))] = GlobalScope.launch {
             delay(timeLimit)
             if (target.avatar == discord.api.getUser(target.id)?.avatar) {
@@ -34,6 +40,7 @@ class BadPfpService(private val muteService: MuteService,
                         reason = "BadPfp - Having a bad pfp and refusing to change it."
                         deleteMessagesDays = 1
                     }
+                    loggingService.badPfpBan(guild, target)
                 }
             } else {
                 target.asUser().sendPrivateMessage("Thanks for changing you avatar. You will not be banned.")
@@ -50,6 +57,7 @@ class BadPfpService(private val muteService: MuteService,
         if (hasActiveBapPfp(target)) {
             badPfpTracker[key]?.cancel()
             badPfpTracker.remove(key)
+            loggingService.badPfpCancelled(guild, target)
             muteService.removeMute(target)
         }
     }

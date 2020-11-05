@@ -55,6 +55,11 @@ class UserOperations(private val connection: ConnectionService, private val conf
         return this.updateUser(user)
     }
 
+    suspend fun removeInfraction(guild: Guild, user: GuildMember, infractionId: Int): GuildMember {
+        user.deleteInfraction(guild, infractionId)
+        return this.updateUser(user)
+    }
+
     suspend fun incrementUserHistory(user: GuildMember, guild: Guild): GuildMember {
         user.incrementHistoryCount(guild.id.value)
         return this.updateUser(user)
@@ -73,7 +78,7 @@ class UserOperations(private val connection: ConnectionService, private val conf
     private fun getPunishmentForPoints(guild: Guild, guildMember: GuildMember): PunishmentLevel {
         val punishmentLevels = configuration[guild.id.longValue]?.punishments
         return punishmentLevels!!.filter {
-            it.points <= guildMember.getGuildInfo(guild.id.value)?.points!!
+            it.points <= guildMember.getGuildInfo(guild.id.value).points
         }.maxByOrNull { it.points }!!
     }
 }
