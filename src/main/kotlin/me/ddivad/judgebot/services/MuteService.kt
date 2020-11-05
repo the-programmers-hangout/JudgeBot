@@ -56,18 +56,10 @@ class MuteService(val configuration: Configuration,
         if (key in punishmentTimerMap) {
             punishmentTimerMap[key]?.cancel()
             punishmentTimerMap.remove(key)
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-=======
             databaseService.guilds.removePunishment(guild, member.asUser().id.value, InfractionType.Mute)
             loggingService.muteOverwritten(guild, member)
->>>>>>> Stashed changes
-=======
-            databaseService.guilds.removePunishment(guild, member.asUser().id.value, type)
-            loggingService.muteOverwritten(guild, member)
->>>>>>> 63cd7656c9035e2c078eb824e971c674ac10d7f3
         }
-        val punishment = Punishment(userId, InfractionType.Mute, reason, "",clearTime)
+        val punishment = Punishment(userId, InfractionType.Mute, reason, "", clearTime)
         databaseService.guilds.addPunishment(guild.asGuild(), punishment)
         punishmentTimerMap[toKey(member)] = applyRoleWithTimer(member, muteRole, time) {
             removeMute(member)
@@ -97,7 +89,7 @@ class MuteService(val configuration: Configuration,
 
     private suspend fun handleExistingMutes(guild: Guild) {
         databaseService.guilds.getPunishmentsForGuild(guild, InfractionType.Mute).forEach {
-            if(it.clearTime != null) {
+            if (it.clearTime != null) {
                 val difference = it.clearTime - DateTime.now().millis
                 val member = guild.getMemberOrNull(it.userId.toSnowflake()) ?: return
                 applyRoleWithTimer(member, getMutedRole(guild), difference) {

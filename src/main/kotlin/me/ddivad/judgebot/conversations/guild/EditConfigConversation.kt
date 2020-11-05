@@ -12,7 +12,7 @@ import me.jakejmattson.discordkt.api.dsl.conversation
 class EditConfigConversation(private val configuration: Configuration) {
     fun createEditConfigurationConversation(guild: Guild, parameter: String) = conversation {
         val guildConfiguration = configuration[guild.id.longValue]!!
-        when(parameter) {
+        when (parameter) {
             "setstaffrole" -> {
                 val staffRole = promptMessage(RoleArg, "Enter Staff role:")
                 guildConfiguration.staffRole = staffRole.id.value
@@ -43,11 +43,7 @@ class EditConfigConversation(private val configuration: Configuration) {
                 guildConfiguration.prefix = prefix
                 respond("Prefix set to **${prefix}**")
             }
-<<<<<<< HEAD
             "view", "list" -> {
-=======
-            "view" -> {
->>>>>>> 63cd7656c9035e2c078eb824e971c674ac10d7f3
                 respond {
                     createConfigEmbed(guildConfiguration, guild)
                 }

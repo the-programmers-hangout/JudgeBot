@@ -15,33 +15,14 @@ import org.joda.time.DateTime
 class InfractionService(private val configuration: Configuration,
                         private val databaseService: DatabaseService,
                         private val loggingService: LoggingService,
-<<<<<<< HEAD
-                        private val muteService: MuteService,
-                        private val banService: BanService) {
-=======
+                        private val banService: BanService,
                         private val muteService: MuteService) {
->>>>>>> 63cd7656c9035e2c078eb824e971c674ac10d7f3
     suspend fun infract(target: Member, guild: Guild, userRecord: GuildMember, infraction: Infraction): Infraction {
         var rule: Rule? = null
         if (infraction.ruleNumber != null) {
             rule = databaseService.guilds.getRule(guild, infraction.ruleNumber)
         }
         return databaseService.users.addInfraction(guild, userRecord, infraction).also {
-            applyPunishment(guild, target, userRecord, it)
-            target.asUser().sendPrivateMessage {
-                createInfractionEmbed(guild, configuration[guild.id.longValue]!!, target, it, rule)
-            }
-            loggingService.infractionApplied(guild, target.asUser(), it)
-        }
-    }
-
-    private suspend fun applyPunishment(guild: Guild, target: Member, guildMember: GuildMember, infraction: Infraction) {
-        when(infraction.punishment?.punishment) {
-            PunishmentType.MUTE -> muteService.applyMute(target, infraction.punishment!!.duration!!, infraction.reason, infraction.type)
-            PunishmentType.BAN -> databaseService.guilds.banUser(guild, target.id.value, infraction.moderator, infraction.reason)
-        }
-<<<<<<< HEAD
-        return databaseService.users.addInfraction(guild, userRecord, infraction).also {
             target.asUser().sendPrivateMessage {
                 createInfractionEmbed(guild, configuration[guild.id.longValue]!!, target, it, rule)
             }
@@ -51,7 +32,7 @@ class InfractionService(private val configuration: Configuration,
     }
 
     private suspend fun applyPunishment(guild: Guild, target: Member, guildMember: GuildMember, infraction: Infraction) {
-        when(infraction.punishment?.punishment) {
+        when (infraction.punishment?.punishment) {
             PunishmentType.MUTE -> muteService.applyMute(target, infraction.punishment?.duration!!, infraction.reason)
             PunishmentType.BAN -> {
                 val clearTime = infraction.punishment!!.duration?.let { DateTime().millis.plus(it) }
@@ -59,7 +40,5 @@ class InfractionService(private val configuration: Configuration,
                 banService.banUser(target, guild, infraction.moderator, punishment)
             }
         }
-=======
->>>>>>> 63cd7656c9035e2c078eb824e971c674ac10d7f3
     }
 }

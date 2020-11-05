@@ -20,10 +20,6 @@ data class GuildLeave(
         val leaveDate: Long?
 )
 
-enum class Status {
-    CLEAR, GREEN, YELLOW, ORANGE, RED
-}
-
 data class GuildMember(
         val userId: String,
         val guilds: MutableList<GuildMemberDetails> = mutableListOf()
@@ -42,30 +38,14 @@ data class GuildMember(
     }
 
     fun cleanseInfractions(guild: Guild) = with(this.getGuildInfo(guild.id.value)) {
-<<<<<<< Updated upstream
-        this?.infractions?.clear()
-        this?.points = 0
-    }
-
-    fun addInfraction(infraction: Infraction, guild:Guild) = with(this.getGuildInfo(guild.id.value)) {
-<<<<<<< HEAD
-        this?.infractions?.add(infraction)
-        this!!.points += infraction.points
-=======
         this.infractions.clear()
         this.points = 0
     }
 
-    fun addInfraction(infraction: Infraction, guild:Guild) = with(this.getGuildInfo(guild.id.value)) {
+    fun addInfraction(infraction: Infraction, guild: Guild) = with(this.getGuildInfo(guild.id.value)) {
         this.infractions.add(infraction)
         this.points += infraction.points
         this.lastInfraction = DateTime().millis
->>>>>>> Stashed changes
-=======
-        this!!.infractions.add(infraction)
-        this.points += infraction.points
-        this.lastInfraction = DateTime.now().millis
->>>>>>> 63cd7656c9035e2c078eb824e971c674ac10d7f3
     }
 
     fun incrementHistoryCount(guildId: String) {
@@ -77,9 +57,9 @@ data class GuildMember(
         print("user")
     }
 
-    fun checkPointDecay(guild: Guild, configuration: GuildConfiguration) = with(this.getGuildInfo(guild.id.value))  {
+    fun checkPointDecay(guild: Guild, configuration: GuildConfiguration) = with(this.getGuildInfo(guild.id.value)) {
         val weeksSincePointsDecayed = Weeks.weeksBetween(DateTime(this.pointDecayTimer), DateTime()).weeks
-        if(weeksSincePointsDecayed > 0) {
+        if (weeksSincePointsDecayed > 0) {
             val pointsToRemove = configuration.infractionConfiguration.pointDecayPerWeek * weeksSincePointsDecayed
             this.points -= pointsToRemove
             if (this.points < 0) this.points = 0
@@ -98,10 +78,5 @@ data class GuildMember(
 
     fun getGuildInfo(guildId: String): GuildMemberDetails {
         return this.guilds.firstOrNull { it.guildId == guildId } ?: GuildMemberDetails(guildId)
-    }
-
-    fun getStatus(guild: Guild, configuration: GuildConfiguration) = with(this.getGuildInfo(guild.id.value)) {
-        val pointsToStatus = configuration.infractionConfiguration.pointCeiling / 4
-        return@with Status.values()[0]
     }
 }

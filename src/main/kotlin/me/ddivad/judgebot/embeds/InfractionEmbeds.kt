@@ -54,11 +54,6 @@ fun EmbedBuilder.createStrikeEmbed(guild: Guild, configuration: GuildConfigurati
         value = infraction.reason
         inline = false
     }
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-=======
-=======
->>>>>>> 63cd7656c9035e2c078eb824e971c674ac10d7f3
 
     field {
         name = "__Strike Points__"
@@ -74,16 +69,9 @@ fun EmbedBuilder.createStrikeEmbed(guild: Guild, configuration: GuildConfigurati
 
     field {
         name = "__Punishment__"
-<<<<<<< HEAD
         value = "${infraction.punishment?.punishment.toString()} ${if (infraction.punishment?.duration != null) "for " + timeToString(infraction.punishment?.duration!!) else "indefinitely"}"
         inline = true
     }
->>>>>>> Stashed changes
-=======
-        value = "${infraction.punishment?.punishment.toString()} for ${timeToString(infraction.punishment?.duration!!)}"
-        inline = true
-    }
->>>>>>> 63cd7656c9035e2c078eb824e971c674ac10d7f3
     color = Color.RED
     thumbnail {
         url = guild.getIconUrl(Image.Format.PNG) ?: ""

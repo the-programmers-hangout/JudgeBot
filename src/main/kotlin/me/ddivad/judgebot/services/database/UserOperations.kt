@@ -1,14 +1,10 @@
 package me.ddivad.judgebot.services.database
 
 import com.gitlab.kordlib.core.entity.Guild
-import com.gitlab.kordlib.core.entity.Member
-<<<<<<< HEAD
 import me.ddivad.judgebot.dataclasses.GuildMemberDetails
 import me.ddivad.judgebot.dataclasses.GuildMember
 import me.ddivad.judgebot.dataclasses.Infraction
 import com.gitlab.kordlib.core.entity.User
-=======
->>>>>>> 63cd7656c9035e2c078eb824e971c674ac10d7f3
 import me.ddivad.judgebot.dataclasses.*
 import me.jakejmattson.discordkt.api.annotations.Service
 import org.litote.kmongo.eq
@@ -18,27 +14,19 @@ class UserOperations(private val connection: ConnectionService, private val conf
     private val userCollection = connection.db.getCollection<GuildMember>("Users")
 
     suspend fun getOrCreateUser(target: User, guild: Guild): GuildMember {
-            val userRecord = userCollection.findOne(GuildMember::userId eq target.id.value)
-            return if(userRecord != null) {
-                userRecord.ensureGuildDetailsPresent(guild.id.value)
-                userRecord.checkPointDecay(guild, configuration[guild.id.longValue]!!)
-                userRecord
-            } else {
-                val guildMember = GuildMember(target.id.value)
-                guildMember.guilds.add(GuildMemberDetails(guild.id.value))
-                userCollection.insertOne(guildMember)
-                guildMember
-            }
+        val userRecord = userCollection.findOne(GuildMember::userId eq target.id.value)
+        return if (userRecord != null) {
+            userRecord.ensureGuildDetailsPresent(guild.id.value)
+            userRecord.checkPointDecay(guild, configuration[guild.id.longValue]!!)
+            userRecord
+        } else {
+            val guildMember = GuildMember(target.id.value)
+            guildMember.guilds.add(GuildMemberDetails(guild.id.value))
+            userCollection.insertOne(guildMember)
+            guildMember
+        }
     }
 
-<<<<<<< HEAD
-=======
-    suspend fun updateUser(user: GuildMember): GuildMember {
-        userCollection.updateOne(GuildMember::userId eq user.userId, user)
-        return user
-    }
-
->>>>>>> 63cd7656c9035e2c078eb824e971c674ac10d7f3
     suspend fun addNote(guild: Guild, user: GuildMember, note: String, moderator: String): GuildMember {
         user.addNote(note, moderator, guild)
         return this.updateUser(user)
@@ -76,7 +64,6 @@ class UserOperations(private val connection: ConnectionService, private val conf
         return this.updateUser(user)
     }
 
-<<<<<<< HEAD
     private suspend fun updateUser(user: GuildMember): GuildMember {
         userCollection.updateOne(GuildMember::userId eq user.userId, user)
         return user
@@ -85,13 +72,7 @@ class UserOperations(private val connection: ConnectionService, private val conf
     private fun getPunishmentForPoints(guild: Guild, guildMember: GuildMember): PunishmentLevel {
         val punishmentLevels = configuration[guild.id.longValue]?.punishments
         return punishmentLevels!!.filter {
-            it.points <= guildMember.getGuildInfo(guild.id.value).points
-=======
-    private fun getPunishmentForPoints(guild: Guild, guildMember: GuildMember): PunishmentLevel {
-        val punishmentLevels = configuration[guild.id.longValue]?.punishments
-        return punishmentLevels!!.filter {
             it.points <= guildMember.getGuildInfo(guild.id.value)?.points!!
->>>>>>> 63cd7656c9035e2c078eb824e971c674ac10d7f3
         }.maxByOrNull { it.points }!!
     }
 }
