@@ -1,7 +1,10 @@
 package me.ddivad.judgebot
 
 import com.gitlab.kordlib.gateway.Intent
+<<<<<<< HEAD
 import com.gitlab.kordlib.gateway.PrivilegedIntent
+=======
+>>>>>>> 63cd7656c9035e2c078eb824e971c674ac10d7f3
 import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.services.BotStatsService
 import me.ddivad.judgebot.services.MuteService
@@ -85,6 +88,7 @@ suspend fun main(args: Array<String>) {
             muteService.initGuilds()
         }
 
+<<<<<<< HEAD
         intents {
             +Intent.GuildMessages
             +Intent.DirectMessages
@@ -93,5 +97,10 @@ suspend fun main(args: Array<String>) {
             +Intent.GuildMembers
             +Intent.GuildMessageReactions
         }
+=======
+//        intents {
+//            +Intent.GuildMessages
+//        }
+>>>>>>> 63cd7656c9035e2c078eb824e971c674ac10d7f3
     }
 }

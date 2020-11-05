@@ -44,9 +44,11 @@ data class GuildMember(
     fun cleanseInfractions(guild: Guild) = with(this.getGuildInfo(guild.id.value)) {
 <<<<<<< Updated upstream
         this?.infractions?.clear()
+        this?.points = 0
     }
 
     fun addInfraction(infraction: Infraction, guild:Guild) = with(this.getGuildInfo(guild.id.value)) {
+<<<<<<< HEAD
         this?.infractions?.add(infraction)
         this!!.points += infraction.points
 =======
@@ -59,6 +61,11 @@ data class GuildMember(
         this.points += infraction.points
         this.lastInfraction = DateTime().millis
 >>>>>>> Stashed changes
+=======
+        this!!.infractions.add(infraction)
+        this.points += infraction.points
+        this.lastInfraction = DateTime.now().millis
+>>>>>>> 63cd7656c9035e2c078eb824e971c674ac10d7f3
     }
 
     fun incrementHistoryCount(guildId: String) {

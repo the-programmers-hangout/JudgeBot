@@ -43,7 +43,11 @@ class EditConfigConversation(private val configuration: Configuration) {
                 guildConfiguration.prefix = prefix
                 respond("Prefix set to **${prefix}**")
             }
+<<<<<<< HEAD
             "view", "list" -> {
+=======
+            "view" -> {
+>>>>>>> 63cd7656c9035e2c078eb824e971c674ac10d7f3
                 respond {
                     createConfigEmbed(guildConfiguration, guild)
                 }

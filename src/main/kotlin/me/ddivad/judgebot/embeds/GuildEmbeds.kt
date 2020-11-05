@@ -4,6 +4,7 @@ import com.gitlab.kordlib.core.entity.Guild
 import com.gitlab.kordlib.rest.Image
 import com.gitlab.kordlib.rest.builder.message.EmbedBuilder
 import me.ddivad.judgebot.dataclasses.GuildConfiguration
+import me.ddivad.judgebot.util.timeToString
 import me.jakejmattson.discordkt.api.extensions.toSnowflake
 import java.awt.Color
 
@@ -27,8 +28,16 @@ suspend fun EmbedBuilder.createConfigEmbed(config: GuildConfiguration, guild: Gu
         value = "Point Ceiling: ${config.infractionConfiguration.pointCeiling} \n" +
                 "Strike points: ${config.infractionConfiguration.strikePoints} \n" +
                 "Warn Points: ${config.infractionConfiguration.warnPoints} \n" +
-                "Point Decay / Week: ${config.infractionConfiguration.pointDecayPerWeek} \n" +
-                "Punishment Increments: ${config.infractionConfiguration.pointsBetweenPunishment}"
+                "Point Decay / Week: ${config.infractionConfiguration.pointDecayPerWeek}"
+    }
+
+    field {
+        name = "**Punishments:**"
+        config.punishments.forEach {
+            value += "Punishment Type: ${it.punishment} \n" +
+                    "Point Threshold: ${it.points} \n" +
+                    "Punishment Duration: ${if (it.duration !== null) timeToString(it.duration!!) else "indefinite"}" + "\n\n"
+        }
     }
 
     field {

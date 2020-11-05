@@ -2,10 +2,13 @@ package me.ddivad.judgebot.services.database
 
 import com.gitlab.kordlib.core.entity.Guild
 import com.gitlab.kordlib.core.entity.Member
+<<<<<<< HEAD
 import me.ddivad.judgebot.dataclasses.GuildMemberDetails
 import me.ddivad.judgebot.dataclasses.GuildMember
 import me.ddivad.judgebot.dataclasses.Infraction
 import com.gitlab.kordlib.core.entity.User
+=======
+>>>>>>> 63cd7656c9035e2c078eb824e971c674ac10d7f3
 import me.ddivad.judgebot.dataclasses.*
 import me.jakejmattson.discordkt.api.annotations.Service
 import org.litote.kmongo.eq
@@ -28,6 +31,14 @@ class UserOperations(private val connection: ConnectionService, private val conf
             }
     }
 
+<<<<<<< HEAD
+=======
+    suspend fun updateUser(user: GuildMember): GuildMember {
+        userCollection.updateOne(GuildMember::userId eq user.userId, user)
+        return user
+    }
+
+>>>>>>> 63cd7656c9035e2c078eb824e971c674ac10d7f3
     suspend fun addNote(guild: Guild, user: GuildMember, note: String, moderator: String): GuildMember {
         user.addNote(note, moderator, guild)
         return this.updateUser(user)
@@ -43,9 +54,11 @@ class UserOperations(private val connection: ConnectionService, private val conf
         return this.updateUser(user)
     }
 
-    suspend fun addInfraction(guild: Guild, user: GuildMember, infraction: Infraction): GuildMember {
+    suspend fun addInfraction(guild: Guild, user: GuildMember, infraction: Infraction): Infraction {
         user.addInfraction(infraction, guild)
-        return this.updateUser(user)
+        infraction.punishment = getPunishmentForPoints(guild, user)
+        this.updateUser(user)
+        return infraction
     }
 
     suspend fun cleanseInfractions(guild: Guild, user: GuildMember): GuildMember {
@@ -63,6 +76,7 @@ class UserOperations(private val connection: ConnectionService, private val conf
         return this.updateUser(user)
     }
 
+<<<<<<< HEAD
     private suspend fun updateUser(user: GuildMember): GuildMember {
         userCollection.updateOne(GuildMember::userId eq user.userId, user)
         return user
@@ -72,6 +86,12 @@ class UserOperations(private val connection: ConnectionService, private val conf
         val punishmentLevels = configuration[guild.id.longValue]?.punishments
         return punishmentLevels!!.filter {
             it.points <= guildMember.getGuildInfo(guild.id.value).points
+=======
+    private fun getPunishmentForPoints(guild: Guild, guildMember: GuildMember): PunishmentLevel {
+        val punishmentLevels = configuration[guild.id.longValue]?.punishments
+        return punishmentLevels!!.filter {
+            it.points <= guildMember.getGuildInfo(guild.id.value)?.points!!
+>>>>>>> 63cd7656c9035e2c078eb824e971c674ac10d7f3
         }.maxByOrNull { it.points }!!
     }
 }

@@ -9,10 +9,14 @@ import me.ddivad.judgebot.embeds.createHistoryEmbed
 import me.ddivad.judgebot.services.*
 import me.ddivad.judgebot.services.infractions.BadPfpService
 import me.ddivad.judgebot.services.infractions.InfractionService
+<<<<<<< HEAD
 <<<<<<< Updated upstream
 =======
 import me.jakejmattson.discordkt.api.arguments.BooleanArg
 >>>>>>> Stashed changes
+=======
+import me.ddivad.judgebot.util.timeToString
+>>>>>>> 63cd7656c9035e2c078eb824e971c674ac10d7f3
 import me.jakejmattson.discordkt.api.arguments.EveryArg
 import me.jakejmattson.discordkt.api.arguments.IntegerArg
 import me.jakejmattson.discordkt.api.dsl.commands

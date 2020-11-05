@@ -9,6 +9,7 @@ import com.gitlab.kordlib.rest.Image
 import com.gitlab.kordlib.rest.builder.message.EmbedBuilder
 import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.dataclasses.GuildMember
+<<<<<<< HEAD
 <<<<<<< Updated upstream
 =======
 import me.ddivad.judgebot.dataclasses.InfractionType
@@ -17,6 +18,9 @@ import me.ddivad.judgebot.services.DatabaseService
 import me.ddivad.judgebot.util.timeBetween
 import me.ddivad.judgebot.util.timeToString
 >>>>>>> Stashed changes
+=======
+import me.ddivad.judgebot.util.timeToString
+>>>>>>> 63cd7656c9035e2c078eb824e971c674ac10d7f3
 import me.jakejmattson.discordkt.api.dsl.CommandEvent
 import me.jakejmattson.discordkt.api.dsl.MenuBuilder
 import me.jakejmattson.discordkt.api.extensions.addField
@@ -86,12 +90,18 @@ suspend fun MenuBuilder.createHistoryEmbed(
                     "Type: **${lastInfraction.type}** :: Weight: **${lastInfraction.points}**\n " +
                             "Issued by **${guild.kord.getUser(Snowflake(lastInfraction.moderator))?.username}** " +
                             "on **${SimpleDateFormat("dd/MM/yyyy").format(Date(lastInfraction.dateTime))}**\n" +
+<<<<<<< HEAD
 <<<<<<< Updated upstream
 =======
                             "Punishment: **${lastInfraction.punishment?.punishment}** ${
                                 if (lastInfraction.punishment?.duration != null) "for **" + timeToString(lastInfraction.punishment?.duration!!) + "**" else "indefinitely"
                             }\n" +
 >>>>>>> Stashed changes
+=======
+                            "Punishment: **${lastInfraction.punishment?.punishment}** for **${
+                                timeToString(lastInfraction.punishment?.duration!!)
+                            }**\n" +
+>>>>>>> 63cd7656c9035e2c078eb824e971c674ac10d7f3
                             lastInfraction.reason
             )
         } else addField("", "**User has no recent infractions.**")
@@ -227,6 +237,7 @@ private fun formatOffsetTime(time: Instant): String {
         "${formatter.format(time)}\n($days days ago)"
     } else {
         val hours = TimeUnit.MILLISECONDS.toHours(DateTime.now().millis - time.toEpochMilli())
+<<<<<<< HEAD
 <<<<<<< Updated upstream
         "$hours hours ago\n"
 =======
@@ -288,5 +299,8 @@ suspend fun EmbedBuilder.createSelfHistoryEmbed(target: User,
         icon = guild.getIconUrl(Image.Format.PNG) ?: ""
         text = guild.name
 >>>>>>> Stashed changes
+=======
+        "$hours hours ago\n${formatter.format(time)}"
+>>>>>>> 63cd7656c9035e2c078eb824e971c674ac10d7f3
     }
 }
