@@ -12,25 +12,26 @@
 | setup         |             | Configure a guild to use Judgebot.                             |
 
 ## Infraction
-| Commands  | Arguments               | Description                                             |
-| --------- | ----------------------- | ------------------------------------------------------- |
-| cleanse   | Member                  | Use this to delete (permanently) as user's infractions. |
-| strike, s | Member, (Integer), Text | Strike a user.                                          |
-| warn, w   | Member, Text            | Warn a user.                                            |
+| Commands  | Arguments                       | Description                                                                                                                           |
+| --------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| badpfp    | (cancel), LowerMemberArg        | Notifies the user that they should change their profile pic and applies a 30 minute mute. Bans the user if they don't change picture. |
+| cleanse   | LowerMemberArg                  | Use this to delete (permanently) as user's infractions.                                                                               |
+| strike, s | LowerMemberArg, (Integer), Text | Strike a user.                                                                                                                        |
+| warn, w   | LowerMemberArg, Text            | Warn a user.                                                                                                                          |
 
 ## Mute
-| Commands | Arguments          | Description                                             |
-| -------- | ------------------ | ------------------------------------------------------- |
-| gag      | Member             | Mute a user for 5 minutes while you deal with something |
-| mute     | Member, Time, Text | Mute a user for a specified time.                       |
-| unmute   | Member             | Unmute a user.                                          |
+| Commands | Arguments                  | Description                                             |
+| -------- | -------------------------- | ------------------------------------------------------- |
+| gag      | LowerMemberArg             | Mute a user for 5 minutes while you deal with something |
+| mute     | LowerMemberArg, Time, Text | Mute a user for a specified time.                       |
+| unmute   | LowerMemberArg             | Unmute a user.                                          |
 
 ## Notes
-| Commands     | Arguments            | Description                                       |
-| ------------ | -------------------- | ------------------------------------------------- |
-| cleansenotes | Member               | Use this to delete (permanently) as user's notes. |
-| deleteNote   | Member, Integer      | Use this to add a delete a note from a user.      |
-| note         | Member, Note Content | Use this to add a note to a user.                 |
+| Commands     | Arguments               | Description                                       |
+| ------------ | ----------------------- | ------------------------------------------------- |
+| cleansenotes | LowerMemberArg          | Use this to delete (permanently) as user's notes. |
+| deleteNote   | LowerMemberArg, Integer | Use this to add a delete a note from a user.      |
+| note         | Member, Note Content    | Use this to add a note to a user.                 |
 
 ## Rules
 | Commands     | Arguments | Description                   |
@@ -43,13 +44,16 @@
 | ruleHeadings |           | List the rules of this guild. |
 
 ## User
-| Commands   | Arguments                           | Description                                                |
-| ---------- | ----------------------------------- | ---------------------------------------------------------- |
-| ban        | Member, (Delete message days), Text | Ban a member from this guild.                              |
-| history, h | Member                              | Use this to view a user's record.                          |
-| status, st | Member                              | Use this to view a user's status card.                     |
-| unban      | User                                | Unban a banned member from this guild.                     |
-| whatpfp    | User                                | Perform a reverse image search of a User's profile picture |
+| Commands     | Arguments                                   | Description                                                |
+| ------------ | ------------------------------------------- | ---------------------------------------------------------- |
+| ban          | LowerMemberArg, (Delete message days), Text | Ban a member from this guild.                              |
+| getBanReason | User                                        | Get a ban reason for a banned user                         |
+| history, h   | User                                        | Use this to view a user's record.                          |
+| selfHistory  |                                             | View your infraction history (contents will be DM'd)       |
+| setBanReason | User, Text                                  | Set a ban reason for a banned user                         |
+| status, st   | Member                                      | Use this to view a user's status card.                     |
+| unban        | User                                        | Unban a banned member from this guild.                     |
+| whatpfp      | User                                        | Perform a reverse image search of a User's profile picture |
 
 ## Utility
 | Commands | Arguments | Description          |

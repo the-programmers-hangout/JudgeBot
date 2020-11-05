@@ -9,11 +9,13 @@ import me.ddivad.judgebot.services.LoggingService
 import me.ddivad.judgebot.services.MuteService
 import me.jakejmattson.discordkt.api.annotations.Service
 import me.jakejmattson.discordkt.api.extensions.sendPrivateMessage
+import org.joda.time.DateTime
 
 @Service
 class InfractionService(private val configuration: Configuration,
                         private val databaseService: DatabaseService,
                         private val loggingService: LoggingService,
+                        private val banService: BanService,
                         private val muteService: MuteService) {
     suspend fun infract(target: Member, guild: Guild, userRecord: GuildMember, infraction: Infraction): Infraction {
         var rule: Rule? = null
@@ -21,18 +23,22 @@ class InfractionService(private val configuration: Configuration,
             rule = databaseService.guilds.getRule(guild, infraction.ruleNumber)
         }
         return databaseService.users.addInfraction(guild, userRecord, infraction).also {
-            applyPunishment(guild, target, userRecord, it)
             target.asUser().sendPrivateMessage {
                 createInfractionEmbed(guild, configuration[guild.id.longValue]!!, target, it, rule)
             }
+            applyPunishment(guild, target, userRecord, it)
             loggingService.infractionApplied(guild, target.asUser(), it)
         }
     }
 
     private suspend fun applyPunishment(guild: Guild, target: Member, guildMember: GuildMember, infraction: Infraction) {
-        when(infraction.punishment?.punishment) {
-            PunishmentType.MUTE -> muteService.applyMute(target, infraction.punishment!!.duration!!, infraction.reason, infraction.type)
-            PunishmentType.BAN -> databaseService.guilds.banUser(guild, target.id.value, infraction.moderator, infraction.reason)
+        when (infraction.punishment?.punishment) {
+            PunishmentType.MUTE -> muteService.applyMute(target, infraction.punishment?.duration!!, infraction.reason)
+            PunishmentType.BAN -> {
+                val clearTime = infraction.punishment!!.duration?.let { DateTime().millis.plus(it) }
+                val punishment = Punishment(target.id.value, InfractionType.Ban, infraction.reason, infraction.moderator, clearTime)
+                banService.banUser(target, guild, infraction.moderator, punishment)
+            }
         }
     }
 }

@@ -10,7 +10,7 @@ import me.jakejmattson.discordkt.api.arguments.Error
 import me.jakejmattson.discordkt.api.dsl.CommandEvent
 
 open class RuleArg(override val name : String = "Rule"): ArgumentType<Rule>() {
-    override fun generateExamples(event: CommandEvent<*>): MutableList<String> = mutableListOf("1", "2")
+    override fun generateExamples(event: CommandEvent<*>): List<String> = mutableListOf("1","2","3")
 
     companion object : RuleArg()
 

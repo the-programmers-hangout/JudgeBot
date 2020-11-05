@@ -13,19 +13,19 @@ import me.jakejmattson.discordkt.api.dsl.Conversation
 import me.jakejmattson.discordkt.api.dsl.conversation
 import me.jakejmattson.discordkt.api.extensions.sendPrivateMessage
 
-class InfractionConversation(private val databaseService: DatabaseService,
-                             private val configuration: Configuration,
-                             private val infractionService: InfractionService) {
-    fun createInfractionConversation(guild: Guild, targetUser: Member, weight: Int, infractionReason: String) = conversation {
+class StrikeConversation(private val databaseService: DatabaseService,
+                         private val configuration: Configuration,
+                         private val infractionService: InfractionService) {
+    fun createStrikeConversation(guild: Guild, targetUser: Member, weight: Int, infractionReason: String) = conversation {
         val guildConfiguration = configuration[guild.id.longValue] ?: return@conversation
-        val user = databaseService.users.getOrCreateUser(targetUser, guild.id.value)
+        val user = databaseService.users.getOrCreateUser(targetUser, guild)
         val points = weight * guildConfiguration.infractionConfiguration.strikePoints
         val addRule = promptMessage(BooleanArg("Add Rule", "y", "n"), "Add rule? (y/n)")
         val rule = if (addRule) promptMessage(RuleArg, "Enter rule number: ").number else null
         val infraction = Infraction(this.user.id.value, infractionReason, InfractionType.Strike, points, rule)
 
         val infractionRecord = infractionService.infract(targetUser, guild, user, infraction)
-        respondMenu { createHistoryEmbed(targetUser, user, guild, configuration, true) }
+        respondMenu { createHistoryEmbed(targetUser, user, guild, configuration, databaseService) }
         this.user.sendPrivateMessage("User ${targetUser.mention} received a ${infractionRecord.punishment?.punishment} for ${timeToString(infractionRecord.punishment?.duration!!)}")
     }
 }

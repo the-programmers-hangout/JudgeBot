@@ -21,74 +21,82 @@ class GuildOperations(private val connection: ConnectionService) {
     }
 
     suspend fun getRules(guild: Guild): List<Rule>? {
+        val guildInfo = this.getGuild(guild)
         return runBlocking {
-            guildCollection.findOne(GuildInformation::guildId eq guild.id.value)?.rules?.sortedBy { it.number }
+            guildInfo.rules.sortedBy { it.number }
         }
     }
 
     suspend fun getRule(guild: Guild, ruleId: Int): Rule? {
+        val guildInfo = this.getGuild(guild)
         return runBlocking {
-            guildCollection.findOne(GuildInformation::guildId eq guild.id.value)?.rules?.find { it.number == ruleId }
+            guildInfo.rules.find { it.number == ruleId }
         }
     }
 
-    fun addRule(guild: Guild, rule: Rule) {
+    suspend fun addRule(guild: Guild, rule: Rule) {
+        val guildInfo = this.getGuild(guild)
+        updateGuild(guildInfo.addRule(rule))
+    }
+
+    suspend fun editRule(guild: Guild, oldRule: Rule, updatedRule: Rule) {
+        val guildInfo = this.getGuild(guild)
         runBlocking {
-            val guildInfo = guildCollection.findOne(GuildInformation::guildId eq guild.id.value)
-            guildInfo!!.addRule(rule)
+            guildInfo.editRule(oldRule, updatedRule)
             updateGuild(guildInfo)
         }
     }
 
-    fun editRule(guild: Guild, oldRule: Rule, updatedRule: Rule) {
+    suspend fun archiveRule(guild: Guild, ruleNumber: Int) {
+        val guildInfo = this.getGuild(guild)
         runBlocking {
-            val guildInfo = guildCollection.findOne(GuildInformation::guildId eq guild.id.value)
-            guildInfo!!.editRule(oldRule, updatedRule)
-            updateGuild(guildInfo)
-        }
-    }
-
-    fun archiveRule(guild: Guild, ruleNumber: Int) {
-        runBlocking {
-            val guildInfo = guildCollection.findOne(GuildInformation::guildId eq guild.id.value)
-            guildInfo!!.archiveRule(ruleNumber)
+            guildInfo.archiveRule(ruleNumber)
             updateGuild(guildInfo)
         }
     }
 
     suspend fun addPunishment(guild: Guild, punishment: Punishment) {
-        val guildInfo = guildCollection.findOne(GuildInformation::guildId eq guild.id.value)
-        guildInfo!!.addPunishment(punishment)
-        updateGuild(guildInfo)
+        this.getGuild(guild).addPunishment(punishment).let { updateGuild(it) }
     }
 
     suspend fun removePunishment(guild: Guild, userId: String, type: InfractionType) {
-        val guildInfo = guildCollection.findOne(GuildInformation::guildId eq guild.id.value)
-        guildInfo!!.removePunishment(userId, type)
-        updateGuild(guildInfo)
+        this.getGuild(guild).removePunishment(userId, type).let { updateGuild(it) }
     }
 
-    suspend fun banUser(guild: Guild, userId: String, moderator: String, reason: String): Ban {
-        val guildInfo = guildCollection.findOne(GuildInformation::guildId eq guild.id.value)
-        val ban = Ban(userId, moderator, reason)
-        guildInfo!!.addBan(ban)
-        updateGuild(guildInfo)
+    suspend fun addBan(guild: Guild, userId: String, ban: Ban): Ban {
+        this.getGuild(guild).addBan(ban).let { updateGuild(it) }
         return ban
     }
 
+    suspend fun editBanReason(guild: Guild, userId: String, reason: String) {
+        val guildInfo = this.getGuild(guild)
+        guildInfo.bans.find { it.userId == userId }?.reason
+        updateGuild(guildInfo)
+    }
+
     suspend fun removeBan(guild: Guild, userId: String) {
-        val guildInfo = guildCollection.findOne(GuildInformation::guildId eq guild.id.value)
-        guildInfo!!.removeBan(userId)
+        this.getGuild(guild).removeBan(userId).let { updateGuild(it) }
+    }
+
+    suspend fun checkBanExists(guild: Guild, userId: String): Boolean {
+        return this.getGuild(guild).checkBanExits(userId)
     }
 
     suspend fun checkPunishmentExists(guild: Guild, member: Member, type: InfractionType): List<Punishment> {
-        val guildInfo = guildCollection.findOne(GuildInformation::guildId eq guild.asGuild().id.value)
-        return guildInfo!!.findPunishmentByType(type, member.asUser().id.value)
+        return this.getGuild(guild).getPunishmentByType(type, member.asUser().id.value)
     }
 
-    suspend fun getPunishmentsForGuild(guild: Guild): MutableList<Punishment> {
-        val guildInfo = guildCollection.findOne(GuildInformation::guildId eq guild.id.value)
-        return guildInfo!!.punishments
+    suspend fun getPunishmentsForUser(guild: Guild, user: User): List<Punishment> {
+        return this.getGuild(guild).getPunishmentsByUser(user.id.value)
+    }
+
+    suspend fun getPunishmentsForGuild(guild: Guild, type: InfractionType): List<Punishment> {
+        return this.getGuild(guild).punishments.filter { it.type == type }
+    }
+
+    private suspend fun getGuild(guild: Guild): GuildInformation {
+        return guildCollection.findOne(GuildInformation::guildId eq guild.id.value)
+                ?: GuildInformation(guild.id.value, guild.name)
     }
 
     private suspend fun updateGuild(guildInformation: GuildInformation): GuildInformation {

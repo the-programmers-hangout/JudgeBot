@@ -1,5 +1,6 @@
 package me.ddivad.judgebot.commands
 
+import me.ddivad.judgebot.arguments.LowerMemberArg
 import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.services.DatabaseService
 import me.ddivad.judgebot.services.PermissionLevel
@@ -9,13 +10,13 @@ import me.jakejmattson.discordkt.api.arguments.IntegerArg
 import me.jakejmattson.discordkt.api.arguments.MemberArg
 import me.jakejmattson.discordkt.api.dsl.commands
 
-fun noteCommands(databaseService: DatabaseService, configuration: Configuration) = commands("Notes") {
+fun noteCommands(databaseService: DatabaseService) = commands("Notes") {
     guildCommand("note") {
         description = "Use this to add a note to a user."
         requiredPermissionLevel = PermissionLevel.Staff
         execute(MemberArg, EveryArg("Note Content")) {
             val (target, note) = args
-            val user = databaseService.users.getOrCreateUser(target, guild.id.value)
+            val user = databaseService.users.getOrCreateUser(target, guild)
             databaseService.users.addNote(guild, user, note, author.id.value)
             respond("Note added.")
         }
@@ -24,9 +25,9 @@ fun noteCommands(databaseService: DatabaseService, configuration: Configuration)
     guildCommand("deleteNote") {
         description = "Use this to add a delete a note from a user."
         requiredPermissionLevel = PermissionLevel.Staff
-        execute(MemberArg, IntegerArg) {
+        execute(LowerMemberArg, IntegerArg) {
             val (target, noteId) = args
-            val user = databaseService.users.getOrCreateUser(target, guild.id.value)
+            val user = databaseService.users.getOrCreateUser(target, guild)
             if (user.getGuildInfo(guild.id.value)!!.notes.isEmpty()) {
                 respond("User has no notes.")
                 return@execute
@@ -39,8 +40,8 @@ fun noteCommands(databaseService: DatabaseService, configuration: Configuration)
     guildCommand("cleansenotes") {
         description = "Use this to delete (permanently) as user's notes."
         requiredPermissionLevel = PermissionLevel.Administrator
-        execute(MemberArg) {
-            val user = databaseService.users.getOrCreateUser(args.first, guild.id.value)
+        execute(LowerMemberArg) {
+            val user = databaseService.users.getOrCreateUser(args.first, guild)
             if (user.getGuildInfo(guild.id.value)!!.notes.isEmpty()) {
                 respond("User has no notes.")
                 return@execute

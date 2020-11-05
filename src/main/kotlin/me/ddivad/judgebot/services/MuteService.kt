@@ -46,7 +46,7 @@ class MuteService(val configuration: Configuration,
         }
     }
 
-    suspend fun applyMute(member: Member, time: Long, reason: String, type: InfractionType) {
+    suspend fun applyMute(member: Member, time: Long, reason: String) {
         val guild = member.guild.asGuild()
         val userId = member.asUser().id.value
         val key = toKey(member)
@@ -56,13 +56,13 @@ class MuteService(val configuration: Configuration,
         if (key in punishmentTimerMap) {
             punishmentTimerMap[key]?.cancel()
             punishmentTimerMap.remove(key)
-            databaseService.guilds.removePunishment(guild, member.asUser().id.value, type)
+            databaseService.guilds.removePunishment(guild, member.asUser().id.value, InfractionType.Mute)
             loggingService.muteOverwritten(guild, member)
         }
-        val punishment = Punishment(userId, type, reason, clearTime)
+        val punishment = Punishment(userId, InfractionType.Mute, reason, "", clearTime)
         databaseService.guilds.addPunishment(guild.asGuild(), punishment)
         punishmentTimerMap[toKey(member)] = applyRoleWithTimer(member, muteRole, time) {
-            removeMute(member, type)
+            removeMute(member)
         }.also {
             loggingService.roleApplied(guild, member.asUser(), muteRole)
             member.sendPrivateMessage {
@@ -71,13 +71,13 @@ class MuteService(val configuration: Configuration,
         }
     }
 
-    fun removeMute(member: Member, type: InfractionType) {
+    fun removeMute(member: Member) {
         runBlocking {
             val guild = member.guild.asGuild()
             val key = toKey(member)
             val muteRole = getMutedRole(guild)
             member.removeRole(muteRole.id)
-            databaseService.guilds.removePunishment(guild, member.asUser().id.value, type)
+            databaseService.guilds.removePunishment(guild, member.asUser().id.value, InfractionType.Mute)
             punishmentTimerMap[key]?.cancel()
             punishmentTimerMap.remove(toKey(member))
             member.sendPrivateMessage {
@@ -88,20 +88,24 @@ class MuteService(val configuration: Configuration,
     }
 
     private suspend fun handleExistingMutes(guild: Guild) {
-        databaseService.guilds.getPunishmentsForGuild(guild).forEach {
-            val difference = it.clearTime - DateTime.now().millis
-            val member = guild.getMemberOrNull(it.userId.toSnowflake()) ?: return
-            applyRoleWithTimer(member, getMutedRole(guild), difference) { _ ->
-                removeMute(member, it.type)
+        databaseService.guilds.getPunishmentsForGuild(guild, InfractionType.Mute).forEach {
+            if (it.clearTime != null) {
+                val difference = it.clearTime - DateTime.now().millis
+                val member = guild.getMemberOrNull(it.userId.toSnowflake()) ?: return
+                applyRoleWithTimer(member, getMutedRole(guild), difference) {
+                    removeMute(member)
+                }
             }
         }
     }
 
     suspend fun handleRejoinMute(guild: Guild, member: Member) {
         val mute = databaseService.guilds.checkPunishmentExists(guild, member, InfractionType.Mute).first()
-        val difference = mute.clearTime - DateTime.now().millis
-        applyRoleWithTimer(member, getMutedRole(guild), difference) { _ ->
-            removeMute(member, mute.type)
+        if (mute.clearTime != null) {
+            val difference = mute.clearTime - DateTime.now().millis
+            applyRoleWithTimer(member, getMutedRole(guild), difference) {
+                removeMute(member)
+            }
         }
     }
 

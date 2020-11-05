@@ -69,7 +69,7 @@ fun EmbedBuilder.createStrikeEmbed(guild: Guild, configuration: GuildConfigurati
 
     field {
         name = "__Punishment__"
-        value = "${infraction.punishment?.punishment.toString()} for ${timeToString(infraction.punishment?.duration!!)}"
+        value = "${infraction.punishment?.punishment.toString()} ${if (infraction.punishment?.duration != null) "for " + timeToString(infraction.punishment?.duration!!) else "indefinitely"}"
         inline = true
     }
     color = Color.RED

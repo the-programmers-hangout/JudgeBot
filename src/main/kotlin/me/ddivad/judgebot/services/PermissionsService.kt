@@ -33,7 +33,9 @@ class PermissionsService(private val configuration: Configuration) {
 
     suspend fun hasPermission(member: Member, level: PermissionLevel) = getPermissionLevel(member) >= level
 
-    suspend fun getPermissionLevel(member: Member) =
+    suspend fun getPermissionRank(member: Member) = getPermissionLevel(member).ordinal
+
+    private suspend fun getPermissionLevel(member: Member) =
             when {
                 member.isBotOwner() -> PermissionLevel.BotOwner
                 member.isGuildOwner() -> PermissionLevel.GuildOwner
@@ -46,14 +48,14 @@ class PermissionsService(private val configuration: Configuration) {
     private suspend fun Member.isGuildOwner() = isOwner()
     private suspend fun Member.isAdministrator(): Boolean {
         val role = configuration[guild.id.longValue]?.adminRole.let { role ->
-            guild.roles.filter { it.name == role }.first().id
+            guild.roles.filter { it.id.value == role }.first().id
         }
         return roleIds.contains(role)
     }
 
     private suspend fun Member.isStaff(): Boolean {
         val role = configuration[guild.id.longValue]?.staffRole.let { role ->
-            guild.roles.filter { it.name == role }.first().id
+            guild.roles.filter { it.id.value == role }.first().id
         }
         return roleIds.contains(role)
     }
