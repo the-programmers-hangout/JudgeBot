@@ -7,6 +7,7 @@ import me.ddivad.judgebot.dataclasses.InfractionType
 import me.ddivad.judgebot.embeds.createHistoryEmbed
 import me.ddivad.judgebot.services.*
 import me.ddivad.judgebot.services.infractions.InfractionService
+import me.ddivad.judgebot.util.timeToString
 import me.jakejmattson.discordkt.api.arguments.EveryArg
 import me.jakejmattson.discordkt.api.arguments.IntegerArg
 import me.jakejmattson.discordkt.api.arguments.MemberArg

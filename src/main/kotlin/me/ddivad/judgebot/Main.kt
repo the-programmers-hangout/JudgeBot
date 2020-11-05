@@ -1,5 +1,6 @@
 package me.ddivad.judgebot
 
+import com.gitlab.kordlib.gateway.Intent
 import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.services.BotStatsService
 import me.ddivad.judgebot.services.MuteService
@@ -81,5 +82,9 @@ suspend fun main(args: Array<String>) {
             val muteService = this.getInjectionObjects(MuteService::class)
             muteService.initGuilds()
         }
+
+//        intents {
+//            +Intent.GuildMessages
+//        }
     }
 }

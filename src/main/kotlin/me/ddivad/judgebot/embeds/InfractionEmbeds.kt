@@ -1,18 +1,20 @@
 package me.ddivad.judgebot.embeds
 
 import com.gitlab.kordlib.core.entity.Guild
+import com.gitlab.kordlib.core.entity.Member
 import com.gitlab.kordlib.core.entity.User
 import com.gitlab.kordlib.rest.Image
 import com.gitlab.kordlib.rest.builder.message.EmbedBuilder
+import me.ddivad.judgebot.dataclasses.GuildConfiguration
 import me.ddivad.judgebot.dataclasses.Infraction
 import me.ddivad.judgebot.dataclasses.InfractionType
 import me.ddivad.judgebot.dataclasses.Rule
 import me.ddivad.judgebot.util.timeToString
 import java.awt.Color
 
-fun EmbedBuilder.createInfractionEmbed(guild: Guild, user: User, infraction: Infraction, rule: Rule?) {
+fun EmbedBuilder.createInfractionEmbed(guild: Guild, configuration: GuildConfiguration, user: User, infraction: Infraction, rule: Rule?) {
     if (infraction.type == InfractionType.Warn) createWarnEmbed(guild, user, infraction)
-    else if (infraction.type == InfractionType.Strike) createStrikeEmbed(guild, user, infraction, rule)
+    else if (infraction.type == InfractionType.Strike) createStrikeEmbed(guild, configuration, user, infraction, rule)
 }
 
 fun EmbedBuilder.createWarnEmbed(guild: Guild, user: User, infraction: Infraction) {
@@ -33,7 +35,7 @@ fun EmbedBuilder.createWarnEmbed(guild: Guild, user: User, infraction: Infractio
     }
 }
 
-fun EmbedBuilder.createStrikeEmbed(guild: Guild, user: User, infraction: Infraction, rule: Rule?) {
+fun EmbedBuilder.createStrikeEmbed(guild: Guild, configuration: GuildConfiguration, user: User, infraction: Infraction, rule: Rule?) {
     title = "Strike"
     description = """
                     | ${user.mention}, you have received a **strike** from **${guild.name}**. A strike is a formal warning for breaking the rules.
@@ -51,6 +53,24 @@ fun EmbedBuilder.createStrikeEmbed(guild: Guild, user: User, infraction: Infract
         name = "__Reason__"
         value = infraction.reason
         inline = false
+    }
+
+    field {
+        name = "__Strike Points__"
+        value = "${infraction.points}"
+        inline = true
+    }
+
+    field {
+        name = "__Points Count__"
+        value = "${infraction.points} / ${configuration.infractionConfiguration.pointCeiling}"
+        inline = true
+    }
+
+    field {
+        name = "__Punishment__"
+        value = "${infraction.punishment?.punishment.toString()} for ${timeToString(infraction.punishment?.duration!!)}"
+        inline = true
     }
     color = Color.RED
     thumbnail {
@@ -80,4 +100,13 @@ fun EmbedBuilder.createMuteEmbed(guild: Guild, user: User, reason: String, lengt
     thumbnail {
         url = guild.getIconUrl(Image.Format.PNG) ?: ""
     }
+}
+
+fun EmbedBuilder.createUnmuteEmbed(guild: Guild, user: Member) {
+    color = Color.GREEN
+    thumbnail {
+        url = guild.getIconUrl(Image.Format.PNG) ?: ""
+    }
+    title = "Mute Removed"
+    description = "${user.mention} you have been unmuted from **${guild.name}**."
 }

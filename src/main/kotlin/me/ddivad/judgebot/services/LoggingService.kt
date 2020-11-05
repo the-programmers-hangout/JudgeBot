@@ -17,6 +17,9 @@ class LoggingService(private val configuration: Configuration) {
     suspend fun roleApplied(guild: Guild, user: User, role: Role) =
         log(guild, "**Info ::** Role ${role.mention} :: ${role.id.value} added to ${user.mention} :: ${user.tag}")
 
+    suspend fun muteOverwritten(guild: Guild, user: User) =
+            log(guild, "**Info ::** User ${user.mention} :: ${user.tag} had an active mute, but has received another mute. Active mute will be replaced.")
+
     suspend fun roleRemoved(guild: Guild, user: User, role: Role) =
             log(guild, "**Info ::** Role ${role.mention} :: ${role.id.value} removed from ${user.mention} :: ${user.tag}")
 
