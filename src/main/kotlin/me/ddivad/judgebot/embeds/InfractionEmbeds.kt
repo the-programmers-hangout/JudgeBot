@@ -10,6 +10,7 @@ import me.ddivad.judgebot.dataclasses.Infraction
 import me.ddivad.judgebot.dataclasses.InfractionType
 import me.ddivad.judgebot.dataclasses.Rule
 import me.ddivad.judgebot.util.timeToString
+import me.jakejmattson.discordkt.api.extensions.addField
 import java.awt.Color
 
 fun EmbedBuilder.createInfractionEmbed(guild: Guild, configuration: GuildConfiguration, user: User, infraction: Infraction, rule: Rule?) {
@@ -32,6 +33,10 @@ fun EmbedBuilder.createWarnEmbed(guild: Guild, user: User, infraction: Infractio
     color = Color.RED
     thumbnail {
         url = guild.getIconUrl(Image.Format.PNG) ?: ""
+    }
+    footer {
+        icon = guild.getIconUrl(Image.Format.PNG) ?: ""
+        text = guild.name
     }
 }
 
@@ -76,6 +81,10 @@ fun EmbedBuilder.createStrikeEmbed(guild: Guild, configuration: GuildConfigurati
     thumbnail {
         url = guild.getIconUrl(Image.Format.PNG) ?: ""
     }
+    footer {
+        icon = guild.getIconUrl(Image.Format.PNG) ?: ""
+        text = guild.name
+    }
 }
 
 fun EmbedBuilder.createMuteEmbed(guild: Guild, user: User, reason: String, length: Long) {
@@ -100,13 +109,47 @@ fun EmbedBuilder.createMuteEmbed(guild: Guild, user: User, reason: String, lengt
     thumbnail {
         url = guild.getIconUrl(Image.Format.PNG) ?: ""
     }
+    footer {
+        icon = guild.getIconUrl(Image.Format.PNG) ?: ""
+        text = guild.name
+    }
 }
 
 fun EmbedBuilder.createUnmuteEmbed(guild: Guild, user: Member) {
     color = Color.GREEN
+    title = "Mute Removed"
+    description = "${user.mention} you have been unmuted from **${guild.name}**."
+    footer {
+        icon = guild.getIconUrl(Image.Format.PNG) ?: ""
+        text = guild.name
+    }
+}
+
+fun EmbedBuilder.createBadPfpEmbed(guild: Guild, user: Member) {
+    color = Color.RED
     thumbnail {
         url = guild.getIconUrl(Image.Format.PNG) ?: ""
     }
-    title = "Mute Removed"
-    description = "${user.mention} you have been unmuted from **${guild.name}**."
+    title = "BadPfp"
+    description = """
+        ${user.mention}, we have flagged your profile picture as inappropriate. 
+        Please change it within the next **30 minutes** or you will be banned.
+    """.trimIndent()
+    footer {
+        icon = guild.getIconUrl(Image.Format.PNG) ?: ""
+        text = guild.name
+    }
+}
+
+fun EmbedBuilder.createModeratorInfractionEmbed(guild: Guild, user: Member, infraction: Infraction) {
+    title = "User Infracted"
+    thumbnail {
+        url = user.avatar.url
+    }
+    color = Color.MAGENTA
+    description = """
+        User ${user.mention} infracted **(${infraction.type})** with weight **${infraction.points}** 
+    """.trimIndent()
+    addField("Reason", "${infraction.reason}")
+    addField("Punishment", "${infraction.punishment?.punishment.toString()} ${if (infraction.punishment?.duration != null) "for " + timeToString(infraction.punishment?.duration!!) else "indefinitely"}")
 }

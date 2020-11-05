@@ -42,7 +42,16 @@ data class GuildMember(
         this.points = 0
     }
 
+    fun deleteInfraction(guild: Guild, infractionId: Int) = with(this.getGuildInfo(guild.id.value)) {
+        this.infractions.find { it.id == infractionId }?.let {
+            this.infractions.remove(it)
+            this.points -= it.points
+        }
+    }
+
     fun addInfraction(infraction: Infraction, guild: Guild) = with(this.getGuildInfo(guild.id.value)) {
+        val nextId: Int = if (this.infractions.isEmpty()) 1 else this.infractions.maxByOrNull { it.id!! }?.id!! + 1
+        infraction.id = nextId
         this.infractions.add(infraction)
         this.points += infraction.points
         this.lastInfraction = DateTime().millis

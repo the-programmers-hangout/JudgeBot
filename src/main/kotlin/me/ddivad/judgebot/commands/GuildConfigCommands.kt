@@ -5,12 +5,14 @@ import me.ddivad.judgebot.conversations.guild.GuildSetupConversation
 import me.ddivad.judgebot.conversations.guild.EditConfigConversation
 import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.services.DatabaseService
+import me.ddivad.judgebot.services.MuteService
 import me.ddivad.judgebot.services.PermissionLevel
 import me.ddivad.judgebot.services.requiredPermissionLevel
 import me.jakejmattson.discordkt.api.dsl.commands
 
 fun guildConfigCommands(configuration: Configuration,
-                        databaseService: DatabaseService) = commands("Configuration") {
+                        databaseService: DatabaseService,
+                        muteService: MuteService) = commands("Configuration") {
     guildCommand("setup") {
         description = "Configure a guild to use Judgebot."
         requiredPermissionLevel = PermissionLevel.Administrator
@@ -19,7 +21,7 @@ fun guildConfigCommands(configuration: Configuration,
                 respond("Guild configuration exists. To modify it use the commands to set values.")
                 return@execute
             }
-            GuildSetupConversation(configuration)
+            GuildSetupConversation(configuration, muteService)
                     .createSetupConversation(guild)
                     .startPublicly(discord, author, channel)
             databaseService.guilds.setupGuild(guild)

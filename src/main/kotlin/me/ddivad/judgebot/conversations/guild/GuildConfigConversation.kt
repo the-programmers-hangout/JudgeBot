@@ -3,12 +3,13 @@ package me.ddivad.judgebot.conversations.guild
 import com.gitlab.kordlib.core.entity.Guild
 import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.dataclasses.LoggingConfiguration
+import me.ddivad.judgebot.services.MuteService
 import me.jakejmattson.discordkt.api.arguments.ChannelArg
 import me.jakejmattson.discordkt.api.arguments.EveryArg
 import me.jakejmattson.discordkt.api.arguments.RoleArg
 import me.jakejmattson.discordkt.api.dsl.conversation
 
-class GuildSetupConversation(private val configuration: Configuration) {
+class GuildSetupConversation(private val configuration: Configuration, private val muteService: MuteService) {
     fun createSetupConversation(guild: Guild) = conversation {
         val prefix = promptMessage(EveryArg, "Bot prefix:")
         val adminRole = promptMessage(RoleArg, "Admin role:")
@@ -25,5 +26,6 @@ class GuildSetupConversation(private val configuration: Configuration) {
                 mutedRole,
                 LoggingConfiguration(logChannel.id.value, alertChannel.id.value),
         )
+        muteService.initGuilds()
     }
 }
