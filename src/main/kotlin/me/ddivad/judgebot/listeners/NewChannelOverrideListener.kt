@@ -15,7 +15,6 @@ fun onChannelCreated(configuration: Configuration, loggingService: LoggingServic
         val guild = channel.getGuild()
         val guildConfiguration = configuration[guild.id.longValue] ?: return@on
         val mutedRole = guild.getRole(guildConfiguration.mutedRole.toSnowflake())
-
         val deniedPermissions = channel.getPermissionOverwritesForRole(mutedRole.id)?.denied ?: Permissions()
         if (!deniedPermissions.contains(Permission.SendMessages) || !deniedPermissions.contains(Permission.AddReactions)) {
             channel.addOverwrite(

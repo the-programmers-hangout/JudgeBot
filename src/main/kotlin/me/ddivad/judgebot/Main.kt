@@ -1,5 +1,7 @@
 package me.ddivad.judgebot
 
+import com.gitlab.kordlib.gateway.Intent
+import com.gitlab.kordlib.gateway.PrivilegedIntent
 import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.services.BotStatsService
 import me.ddivad.judgebot.services.MuteService
@@ -9,6 +11,7 @@ import me.jakejmattson.discordkt.api.dsl.bot
 import me.jakejmattson.discordkt.api.extensions.addInlineField
 import java.awt.Color
 
+@PrivilegedIntent
 suspend fun main(args: Array<String>) {
     val token = System.getenv("BOT_TOKEN") ?: null
     val defaultPrefix = System.getenv("DEFAULT_PREFIX") ?: "<none>"
@@ -52,7 +55,7 @@ suspend fun main(args: Array<String>) {
             field {
                 name = "Build Info"
                 value = "```" +
-                        "Version:   0.0.1\n" +
+                        "Version:   1.0.0-Beta-1\n" +
                         "DiscordKt: ${versions.library}\n" +
                         "Kotlin:    $kotlinVersion" +
                         "```"
@@ -80,6 +83,15 @@ suspend fun main(args: Array<String>) {
         onStart {
             val muteService = this.getInjectionObjects(MuteService::class)
             muteService.initGuilds()
+        }
+
+        intents {
+            +Intent.GuildMessages
+            +Intent.DirectMessages
+            +Intent.GuildBans
+            +Intent.Guilds
+            +Intent.GuildMembers
+            +Intent.GuildMessageReactions
         }
     }
 }

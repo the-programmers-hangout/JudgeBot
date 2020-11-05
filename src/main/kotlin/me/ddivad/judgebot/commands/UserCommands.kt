@@ -1,31 +1,37 @@
 package me.ddivad.judgebot.commands
 
 import com.gitlab.kordlib.core.behavior.ban
+import me.ddivad.judgebot.arguments.LowerMemberArg
+import me.ddivad.judgebot.dataclasses.Ban
 import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.embeds.createHistoryEmbed
+import me.ddivad.judgebot.embeds.createSelfHistoryEmbed
 import me.ddivad.judgebot.embeds.createStatusEmbed
 import me.ddivad.judgebot.services.DatabaseService
 import me.ddivad.judgebot.services.LoggingService
 import me.ddivad.judgebot.services.PermissionLevel
+import me.ddivad.judgebot.services.infractions.BanService
 import me.ddivad.judgebot.services.requiredPermissionLevel
 import me.jakejmattson.discordkt.api.arguments.EveryArg
 import me.jakejmattson.discordkt.api.arguments.IntegerArg
 import me.jakejmattson.discordkt.api.arguments.MemberArg
 import me.jakejmattson.discordkt.api.arguments.UserArg
 import me.jakejmattson.discordkt.api.dsl.commands
+import me.jakejmattson.discordkt.api.extensions.sendPrivateMessage
 import java.awt.Color
 
 fun createUserCommands(databaseService: DatabaseService,
                        config: Configuration,
-                       loggingService: LoggingService) = commands("User") {
+                       loggingService: LoggingService,
+                       banService: BanService) = commands("User") {
     guildCommand("history", "h") {
         description = "Use this to view a user's record."
         requiredPermissionLevel = PermissionLevel.Staff
-        execute(MemberArg) {
-            val user = databaseService.users.getOrCreateUser(args.first, guild.id.value)
-            databaseService.users.incrementUserHistory(user, guild.id.value)
+        execute(UserArg) {
+            val user = databaseService.users.getOrCreateUser(args.first, guild)
+            databaseService.users.incrementUserHistory(user, guild)
             respondMenu {
-                createHistoryEmbed(args.first, user, guild, config, true)
+                createHistoryEmbed(args.first, user, guild, config, databaseService)
             }
         }
     }
@@ -34,9 +40,9 @@ fun createUserCommands(databaseService: DatabaseService,
         description = "Use this to view a user's status card."
         requiredPermissionLevel = PermissionLevel.Staff
         execute(MemberArg) {
-            val user = databaseService.users.getOrCreateUser(args.first, guild.id.value)
-            databaseService.users.incrementUserHistory(user, guild.id.value)
-            createStatusEmbed(args.first, user, guild)
+            val user = databaseService.users.getOrCreateUser(args.first, guild)
+            databaseService.users.incrementUserHistory(user, guild)
+            createStatusEmbed(args.first, user, guild, config)
         }
     }
 
@@ -58,12 +64,13 @@ fun createUserCommands(databaseService: DatabaseService,
     guildCommand("ban") {
         description = "Ban a member from this guild."
         requiredPermissionLevel = PermissionLevel.Staff
-        execute(MemberArg, IntegerArg("Delete message days").makeOptional(1), EveryArg) {
+        execute(LowerMemberArg, IntegerArg("Delete message days").makeOptional(1), EveryArg) {
             val (target, deleteDays, reason) = args
             guild.ban(target.id) {
                 this.reason = reason
                 this.deleteMessagesDays = deleteDays
-                databaseService.guilds.banUser(guild, target.id.value, author.id.value, reason).also {
+                val ban = Ban(target.id.value, reason, author.id.value)
+                databaseService.guilds.addBan(guild, target.id.value, ban).also {
                     loggingService.userBanned(guild, target.asUser(), it)
                     respond("User ${target.tag} banned")
                 }
@@ -77,9 +84,48 @@ fun createUserCommands(databaseService: DatabaseService,
         execute(UserArg) {
             val user = args.first
             guild.unban(user.id)
-            databaseService.guilds.removeBan(guild, user.id.value).also {
-                loggingService.userUnbanned(guild, user)
-                respond("${user.tag} unbanned")
+            banService.unbanUser(guild, user)
+            loggingService.userUnbanned(guild, user)
+            respond("${user.tag} unbanned")
+        }
+    }
+
+    guildCommand("setBanReason") {
+        description = "Set a ban reason for a banned user"
+        requiredPermissionLevel = PermissionLevel.Staff
+        execute(UserArg, EveryArg) {
+            val (user, reason) = args
+            val ban = Ban(user.id.value, author.id.value, reason)
+            if (guild.getBanOrNull(user.id) != null) {
+                if (!databaseService.guilds.checkBanExists(guild, user.id.value)) {
+                    databaseService.guilds.addBan(guild, user.id.value, ban)
+                } else {
+                    databaseService.guilds.editBanReason(guild, user.id.value, reason)
+                }
+                respond("Ban reason for ${user.mention} set to: $reason")
+            } else respond("User ${user.mention} isn't banned")
+
+        }
+    }
+
+    guildCommand("getBanReason") {
+        description = "Get a ban reason for a banned user"
+        requiredPermissionLevel = PermissionLevel.Staff
+        execute(UserArg) {
+            val reason = guild.getBan(args.first.id).reason ?: "No ban reason logged."
+            respond(reason)
+        }
+    }
+
+    guildCommand("selfHistory") {
+        description = "View your infraction history (contents will be DM'd)"
+        requiredPermissionLevel = PermissionLevel.Everyone
+        execute {
+            val user = author
+            val guildMember = databaseService.users.getOrCreateUser(user, guild)
+
+            user.sendPrivateMessage {
+                createSelfHistoryEmbed(user, guildMember, guild, config)
             }
         }
     }

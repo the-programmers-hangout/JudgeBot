@@ -7,16 +7,18 @@ data class GuildInformation(
         val bans: MutableList<Ban> = mutableListOf(),
         val punishments: MutableList<Punishment> = mutableListOf()
 ) {
-    fun addRule(rule: Rule) {
-        this.rules.add(rule)
+    fun addRule(rule: Rule): GuildInformation {
+        this.rules.add(rule).let { this }
+        return this
     }
 
     fun getRuleById(ruleNumber: Int): Rule? {
         return this.rules.firstOrNull { it.number == ruleNumber }
     }
 
-    fun archiveRule(ruleNumber: Int) {
+    fun archiveRule(ruleNumber: Int): GuildInformation {
         this.rules.find { it.number == ruleNumber }!!.archived = true
+        return this
     }
 
     fun editRule(oldRule: Rule, updatedRule: Rule): Rule {
@@ -25,27 +27,39 @@ data class GuildInformation(
         return updatedRule
     }
 
-    fun addPunishment(punishment: Punishment) {
+    fun addPunishment(punishment: Punishment): GuildInformation {
         punishment.id = this.punishments.size + 1
         this.punishments.add(punishment)
+        return this
     }
 
-    fun removePunishment(userId: String, type: InfractionType) {
-        val punishment = this.findPunishmentByType(type, userId).first()
+    fun removePunishment(userId: String, type: InfractionType): GuildInformation {
+        val punishment = this.getPunishmentByType(type, userId).first()
         this.punishments.remove(punishment)
+        return this
     }
 
-    fun findPunishmentByType(type: InfractionType, userId: String): List<Punishment> {
+    fun getPunishmentByType(type: InfractionType, userId: String): List<Punishment> {
         return this.punishments.filter { it.type == type && it.userId == userId }
     }
 
-    fun addBan(ban: Ban) {
-        this.bans.add(ban)
+    fun getPunishmentsByUser(userId: String): List<Punishment> {
+        return this.punishments.filter { it.userId == userId }
     }
 
-    fun removeBan(userId: String) {
+    fun checkBanExits(userId: String): Boolean {
+        return this.bans.any { it.userId == userId }
+    }
+
+    fun addBan(ban: Ban): GuildInformation {
+        this.bans.add(ban)
+        return this
+    }
+
+    fun removeBan(userId: String): GuildInformation {
         val ban = this.bans.find { it.userId == userId }
         this.bans.remove(ban)
+        return this
     }
 }
 

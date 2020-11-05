@@ -3,7 +3,7 @@ package me.ddivad.judgebot.dataclasses
 import java.util.*
 
 enum class InfractionType {
-    Warn, Strike, Mute, BadPfp
+    Warn, Strike, Mute, BadPfp, Ban
 }
 
 data class Infraction(
