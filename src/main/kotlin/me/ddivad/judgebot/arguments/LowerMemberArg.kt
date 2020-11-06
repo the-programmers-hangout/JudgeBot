@@ -18,8 +18,7 @@ open class LowerMemberArg(override val name: String = "LowerMemberArg") : Argume
         val permissionsService = event.discord.getInjectionObjects(PermissionsService::class)
         val guild = event.guild ?: return Error("No guild found")
 
-        val member = arg.toSnowflakeOrNull()?.let { guild.getMemberOrNull(it) }
-                ?: return Error("Couldn't find member $arg")
+        val member = arg.toSnowflakeOrNull()?.let { guild.getMemberOrNull(it) } ?: return Error("Not found")
 
         return when {
             event.author.asMember(event.guild!!.id).isHigherRankedThan(permissionsService, member) ->
@@ -27,7 +26,9 @@ open class LowerMemberArg(override val name: String = "LowerMemberArg") : Argume
             else -> Success(member)
         }
     }
+    override fun formatData(data: Member) = "@${data.tag}"
 }
 
 private suspend fun Member.isHigherRankedThan(permissions: PermissionsService, targetMember: Member) =
         permissions.getPermissionRank(this) < permissions.getPermissionRank(targetMember)
+

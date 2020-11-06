@@ -36,18 +36,3 @@ fun EmbedBuilder.createRulesEmbed(guild: Guild, rules: List<Rule>) {
         text = guild.name
     }
 }
-
-fun EmbedBuilder.createRulesEmbedDetailed(guild: Guild, rules: List<Rule>) {
-    title = "**__Rules__**"
-    thumbnail {
-        url = guild.getIconUrl(Image.Format.PNG) ?: ""
-    }
-    color = Color.MAGENTA
-
-    for (rule in rules) {
-        field {
-            value = "**__${rule.number}: ${rule.title}__**\n${rule.description}"
-            inline = false
-        }
-    }
-}
