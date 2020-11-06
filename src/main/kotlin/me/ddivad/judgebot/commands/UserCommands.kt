@@ -72,7 +72,7 @@ fun createUserCommands(databaseService: DatabaseService,
                 val ban = Ban(target.id.value, reason, author.id.value)
                 databaseService.guilds.addBan(guild, target.id.value, ban).also {
                     loggingService.userBanned(guild, target.asUser(), it)
-                    respond("User ${target.tag} banned")
+                    respond("User ${target.mention} banned")
                 }
             }
         }
@@ -83,10 +83,14 @@ fun createUserCommands(databaseService: DatabaseService,
         requiredPermissionLevel = PermissionLevel.Staff
         execute(UserArg) {
             val user = args.first
-            guild.unban(user.id)
-            banService.unbanUser(guild, user)
-            loggingService.userUnbanned(guild, user)
-            respond("${user.tag} unbanned")
+            guild.getBanOrNull(user.id)?.let {
+                guild.unban(user.id)
+                banService.unbanUser(guild, user)
+                loggingService.userUnbanned(guild, user)
+                respond("${user.tag} unbanned")
+                return@execute
+            }
+            respond("${user.mention} isn't banned from this guild.")
         }
     }
 
@@ -112,8 +116,13 @@ fun createUserCommands(databaseService: DatabaseService,
         description = "Get a ban reason for a banned user"
         requiredPermissionLevel = PermissionLevel.Staff
         execute(UserArg) {
-            val reason = guild.getBan(args.first.id).reason ?: "No ban reason logged."
-            respond(reason)
+            val user = args.first
+            guild.getBanOrNull(user.id)?.let {
+                val reason = guild.getBan(args.first.id).reason ?: "No ban reason logged."
+                respond(reason)
+                return@execute
+            }
+           respond("${user.mention} isn't banned from this guild.")
         }
     }
 

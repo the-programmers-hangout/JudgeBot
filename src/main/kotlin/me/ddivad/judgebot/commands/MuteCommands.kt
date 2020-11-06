@@ -3,9 +3,11 @@ package me.ddivad.judgebot.commands
 import me.ddivad.judgebot.arguments.LowerMemberArg
 import me.ddivad.judgebot.dataclasses.InfractionType
 import me.ddivad.judgebot.services.*
+import me.ddivad.judgebot.util.timeToString
 import me.jakejmattson.discordkt.api.arguments.EveryArg
 import me.jakejmattson.discordkt.api.arguments.TimeArg
 import me.jakejmattson.discordkt.api.dsl.commands
+import me.jakejmattson.discordkt.api.extensions.toTimeString
 import kotlin.math.roundToLong
 
 fun createMuteCommands(muteService: MuteService) = commands("Mute") {
@@ -28,7 +30,6 @@ fun createMuteCommands(muteService: MuteService) = commands("Mute") {
                 return@execute
             }
 
-            guild.getBan(targetMember.id).reason
             muteService.removeMute(targetMember)
             respond("User ${args.first.username} has been unmuted")
         }
@@ -38,10 +39,18 @@ fun createMuteCommands(muteService: MuteService) = commands("Mute") {
         description = "Mute a user for 5 minutes while you deal with something"
         requiredPermissionLevel = PermissionLevel.Staff
         execute(LowerMemberArg) {
+            val targetMember = args.first
+            if (muteService.checkRoleState(guild, targetMember, InfractionType.Mute) == RoleState.Tracked) {
+                respond("User ${targetMember.mention} is already muted")
+                return@execute
+            }
+            val time = 1000L * 60 * 5
             muteService.applyMute(
                     args.first,
-                    1000 * 60 * 5,
+                    time,
                     "You've been muted temporarily so that a mod can handle something.")
+
+            respond("${targetMember.mention} has been muted for ${timeToString(time)}")
         }
     }
 }
