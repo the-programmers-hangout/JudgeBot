@@ -9,14 +9,10 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import me.ddivad.judgebot.dataclasses.Infraction
 import me.ddivad.judgebot.embeds.createBadPfpEmbed
-import me.ddivad.judgebot.services.GuildID
 import me.ddivad.judgebot.services.LoggingService
-import me.ddivad.judgebot.services.MuteService
-import me.ddivad.judgebot.services.UserId
 import me.jakejmattson.discordkt.api.Discord
 import me.jakejmattson.discordkt.api.annotations.Service
 import me.jakejmattson.discordkt.api.extensions.sendPrivateMessage
-import kotlin.math.log
 
 @Service
 class BadPfpService(private val muteService: MuteService,

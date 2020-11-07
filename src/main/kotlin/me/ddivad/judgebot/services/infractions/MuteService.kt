@@ -1,4 +1,4 @@
-package me.ddivad.judgebot.services
+package me.ddivad.judgebot.services.infractions
 
 import com.gitlab.kordlib.common.entity.Permission
 import com.gitlab.kordlib.common.entity.Permissions
@@ -13,6 +13,8 @@ import me.ddivad.judgebot.dataclasses.InfractionType
 import me.ddivad.judgebot.dataclasses.Punishment
 import me.ddivad.judgebot.embeds.createMuteEmbed
 import me.ddivad.judgebot.embeds.createUnmuteEmbed
+import me.ddivad.judgebot.services.DatabaseService
+import me.ddivad.judgebot.services.LoggingService
 import me.ddivad.judgebot.util.applyRoleWithTimer
 import me.jakejmattson.discordkt.api.Discord
 import me.jakejmattson.discordkt.api.annotations.Service

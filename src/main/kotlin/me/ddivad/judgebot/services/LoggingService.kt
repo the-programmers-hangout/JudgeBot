@@ -10,13 +10,17 @@ import com.gitlab.kordlib.core.entity.channel.TextChannel
 import me.ddivad.judgebot.dataclasses.Ban
 import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.dataclasses.Infraction
+import me.ddivad.judgebot.dataclasses.Punishment
+import me.ddivad.judgebot.services.infractions.RoleState
+import me.ddivad.judgebot.util.timeBetween
 import me.jakejmattson.discordkt.api.annotations.Service
+import org.joda.time.DateTime
 
 @Service
 class LoggingService(private val configuration: Configuration) {
 
     suspend fun roleApplied(guild: Guild, user: User, role: Role) =
-        log(guild, "**Info ::** Role ${role.mention} :: ${role.id.value} added to ${user.mention} :: ${user.tag}")
+            log(guild, "**Info ::** Role ${role.mention} :: ${role.id.value} added to ${user.mention} :: ${user.tag}")
 
     suspend fun muteOverwritten(guild: Guild, user: User) =
             log(guild, "**Info ::** User ${user.mention} :: ${user.tag} had an active mute, but has received another mute. Active mute will be replaced.")
@@ -25,7 +29,7 @@ class LoggingService(private val configuration: Configuration) {
             log(guild, "**Info ::** Role ${role.mention} :: ${role.id.value} removed from ${user.mention} :: ${user.tag}")
 
     suspend fun rejoinMute(guild: Guild, user: User, roleState: RoleState) =
-            log(guild, "**Info ::** User ${user.mention} :: ${user.tag} joined the server with ${if(roleState == RoleState.Tracked) "an infraction" else "a manual"} mute remaining")
+            log(guild, "**Info ::** User ${user.mention} :: ${user.tag} joined the server with ${if (roleState == RoleState.Tracked) "an infraction" else "a manual"} mute remaining")
 
     suspend fun channelOverrideAdded(guild: Guild, channel: TextChannel) =
             log(guild, "**Info ::** Channel overrides for muted role added to ${channel.name}")
@@ -37,6 +41,13 @@ class LoggingService(private val configuration: Configuration) {
 
     suspend fun userUnbanned(guild: Guild, user: User) =
             log(guild, "**Info ::** User ${user.mention} :: ${user.tag} unbanned")
+
+    suspend fun userBannedWithTimer(guild: Guild, user: User, punishment: Punishment) {
+        val moderator = guild.kord.getUser(Snowflake(punishment.moderator))
+
+        log(guild, "**Info ::** User ${user.mention} :: ${user.tag} **temporarily** banned by ${moderator?.username} for reason: ${punishment.reason}. Unban scheduled in ${timeBetween(DateTime(punishment.clearTime))}")
+    }
+
 
     suspend fun infractionApplied(guild: Guild, user: User, infraction: Infraction) {
         val moderator = guild.kord.getUser(Snowflake(infraction.moderator))
@@ -58,7 +69,8 @@ class LoggingService(private val configuration: Configuration) {
     private suspend fun log(guild: Guild, message: String) = getLoggingChannel(guild)?.createMessage(message)
 
     private suspend fun getLoggingChannel(guild: Guild): TextChannel? {
-        val channelId = configuration[guild.id.longValue]?.loggingConfiguration?.loggingChannel.takeIf { it!!.isNotEmpty() } ?: return null
+        val channelId = configuration[guild.id.longValue]?.loggingConfiguration?.loggingChannel.takeIf { it!!.isNotEmpty() }
+                ?: return null
         return guild.getChannelOf<TextChannel>(Snowflake(channelId))
     }
 }
