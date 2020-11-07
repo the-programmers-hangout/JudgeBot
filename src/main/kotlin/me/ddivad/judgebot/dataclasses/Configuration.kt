@@ -52,7 +52,8 @@ data class GuildConfiguration(
         var mutedRole: String = "",
         var loggingConfiguration: LoggingConfiguration = LoggingConfiguration(),
         var infractionConfiguration: InfractionConfiguration = InfractionConfiguration(),
-        var punishments: MutableList<PunishmentLevel> = mutableListOf()
+        var punishments: MutableList<PunishmentLevel> = mutableListOf(),
+        var reactions: ReactionConfiguration = ReactionConfiguration()
 )
 
 data class LoggingConfiguration(
@@ -67,11 +68,19 @@ data class InfractionConfiguration(
         var pointCeiling: Int = 50,
         var strikePoints: Int = 10,
         var warnPoints: Int = 0,
-        var pointDecayPerWeek: Int = 2
+        var pointDecayPerWeek: Int = 2,
 )
 
 data class PunishmentLevel(
         var points: Int = 0,
         var punishment: PunishmentType,
         var duration: Long? = null
+)
+
+data class ReactionConfiguration(
+        var enabled: Boolean = true,
+        var gagReaction: String = "",
+        var historyReaction: String = "",
+        var deleteMessageReaction: String = "",
+        var flagMessageReaction: String = ""
 )
