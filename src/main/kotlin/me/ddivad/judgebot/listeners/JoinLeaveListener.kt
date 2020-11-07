@@ -1,6 +1,7 @@
 package me.ddivad.judgebot.listeners
 
 import com.gitlab.kordlib.core.event.guild.GuildCreateEvent
+import com.gitlab.kordlib.core.event.guild.MemberJoinEvent
 import com.gitlab.kordlib.core.event.guild.MemberLeaveEvent
 import com.gitlab.kordlib.gateway.RequestGuildMembers
 import me.ddivad.judgebot.services.DatabaseService
@@ -14,9 +15,13 @@ fun onGuildMemberLeave(loggingService: LoggingService, databaseService: Database
     }
 
     on<MemberLeaveEvent> {
-        val member = this.user.asMemberOrNull(guildId)
         val userRecord = databaseService.users.getOrCreateUser(this.user.asUser(), this.guild.asGuild())
-        val leaveTime = DateTime.now().millis
-        databaseService.users.insertGuildLeave(userRecord, this.getGuild(), member?.joinedAt!!.toEpochMilli(), leaveTime)
+        databaseService.users.addGuildLeave(userRecord, this.getGuild(), DateTime.now().millis)
+    }
+
+    on<MemberJoinEvent> {
+        databaseService.users.getUserOrNull(this.member, this.guild.asGuild())?.let {
+            databaseService.users.addGuildJoin(guild.asGuild(), it, this.member.joinedAt.toEpochMilli())
+        }
     }
 }

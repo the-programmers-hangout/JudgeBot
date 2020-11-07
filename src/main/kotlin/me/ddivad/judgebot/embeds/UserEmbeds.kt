@@ -38,7 +38,7 @@ suspend fun MenuBuilder.createHistoryEmbed(
     val notes = userGuildDetails.notes
     val infractions = userGuildDetails.infractions
     val paginatedNotes = notes.chunked(4)
-    val totalMenuPages = 1 + 1 + if (paginatedNotes.isNotEmpty()) paginatedNotes.size else 1
+    val totalMenuPages = 1 + 1 + 1 + if (paginatedNotes.isNotEmpty()) paginatedNotes.size else 1
     val maxPoints = config[guild.id.longValue]?.infractionConfiguration?.pointCeiling
     page {
         color = Color.MAGENTA
@@ -185,6 +185,31 @@ suspend fun MenuBuilder.createHistoryEmbed(
                 icon = guild.getIconUrl(Image.Format.PNG) ?: ""
                 text = "Page ${3 + index} of $totalMenuPages"
             }
+        }
+    }
+
+    page {
+        val history = userGuildDetails.leaveHistory
+        val leaves = history.filter { it.leaveDate != null }
+        color = Color.MAGENTA
+        title = "${target.asUser().tag}: Join / Leave"
+        thumbnail {
+            url = target.asUser().avatar.url
+        }
+
+        addInlineField("Joins:", history.size.toString())
+        addInlineField("","")
+        addInlineField("Leaves:", leaves.size.toString())
+        addField("","")
+        userGuildDetails.leaveHistory.forEachIndexed { index, record ->
+            addInlineField("Record", "#${index + 1}")
+            addInlineField("Joined", SimpleDateFormat("dd/MM/yyyy").format(Date(record.joinDate!!)))
+            addInlineField("Left", if (record.leaveDate == null) "-" else SimpleDateFormat("dd/MM/yyyy").format(Date(record.joinDate)))
+
+        }
+        footer {
+            icon = guild.getIconUrl(Image.Format.PNG) ?: ""
+            text = "Page ${3 + if(paginatedNotes.isEmpty()) 1 else paginatedNotes.size} of $totalMenuPages"
         }
     }
 }

@@ -152,4 +152,8 @@ fun EmbedBuilder.createModeratorInfractionEmbed(guild: Guild, user: Member, infr
     """.trimIndent()
     addField("Reason", "${infraction.reason}")
     addField("Punishment", "${infraction.punishment?.punishment.toString()} ${if (infraction.punishment?.duration != null) "for " + timeToString(infraction.punishment?.duration!!) else "indefinitely"}")
+    footer {
+        icon = guild.getIconUrl(Image.Format.PNG) ?: ""
+        text = guild.name
+    }
 }

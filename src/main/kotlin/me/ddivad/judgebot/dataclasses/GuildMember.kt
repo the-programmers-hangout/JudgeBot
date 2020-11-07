@@ -17,7 +17,7 @@ data class GuildMemberDetails(
 
 data class GuildLeave(
         val joinDate: Long?,
-        val leaveDate: Long?
+        var leaveDate: Long?
 )
 
 data class GuildMember(
@@ -61,9 +61,14 @@ data class GuildMember(
         this.getGuildInfo(guildId).historyCount += 1
     }
 
-    fun addGuildLeave(joinDate: Long, leaveDate: Long, guild: Guild) = with(this.getGuildInfo(guild.id.value)) {
-        this.leaveHistory.add(GuildLeave(joinDate, leaveDate))
-        print("user")
+    fun addGuildLeave( guild: Guild, leaveDate: Long) = with(this.getGuildInfo(guild.id.value)) {
+        val joinRecord = this.leaveHistory.find { it.joinDate != null && it.leaveDate == null }?.let {
+            it.leaveDate = leaveDate
+        }
+    }
+
+    fun addGuildJoinDate(guild: Guild, joinDate: Long) = with(this.getGuildInfo(guild.id.value)){
+        this.leaveHistory.add(GuildLeave(joinDate, null))
     }
 
     fun checkPointDecay(guild: Guild, configuration: GuildConfiguration) = with(this.getGuildInfo(guild.id.value)) {

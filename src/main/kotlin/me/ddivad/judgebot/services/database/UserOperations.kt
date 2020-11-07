@@ -23,9 +23,14 @@ class UserOperations(private val connection: ConnectionService, private val conf
         } else {
             val guildMember = GuildMember(target.id.value)
             guildMember.guilds.add(GuildMemberDetails(guild.id.value))
+            target.asMemberOrNull(guild.id)?.let { guildMember.addGuildJoinDate(guild, it.joinedAt.toEpochMilli()) }
             userCollection.insertOne(guildMember)
             guildMember
         }
+    }
+
+    suspend fun getUserOrNull(target: User, guild: Guild): GuildMember? {
+        return userCollection.findOne(GuildMember::userId eq target.id.value)
     }
 
     suspend fun addNote(guild: Guild, user: GuildMember, note: String, moderator: String): GuildMember {
@@ -65,8 +70,13 @@ class UserOperations(private val connection: ConnectionService, private val conf
         return this.updateUser(user)
     }
 
-    suspend fun insertGuildLeave(user: GuildMember, guild: Guild, joinDateTime: Long, leaveDateTime: Long): GuildMember {
-        user.addGuildLeave(joinDateTime, leaveDateTime, guild)
+    suspend fun addGuildLeave(user: GuildMember, guild: Guild, leaveDateTime: Long): GuildMember {
+        user.addGuildLeave(guild, leaveDateTime)
+        return this.updateUser(user)
+    }
+
+    suspend fun addGuildJoin(guild: Guild, user: GuildMember, joinDateTime: Long): GuildMember {
+        user.addGuildJoinDate(guild, joinDateTime)
         return this.updateUser(user)
     }
 

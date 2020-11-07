@@ -19,6 +19,10 @@ fun EmbedBuilder.createRuleEmbed(guild: Guild, rule: Rule) {
         addField("", "[View this on our website](${rule.link})")
     }
     color = Color.MAGENTA
+    footer {
+        icon = guild.getIconUrl(Image.Format.PNG) ?: ""
+        text = guild.name
+    }
 }
 
 fun EmbedBuilder.createRulesEmbed(guild: Guild, rules: List<Rule>) {
