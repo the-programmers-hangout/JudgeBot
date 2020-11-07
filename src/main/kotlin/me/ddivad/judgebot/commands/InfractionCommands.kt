@@ -39,7 +39,7 @@ fun createInfractonCommands(databaseService: DatabaseService,
 
     guildCommand("warn", "w") {
         description = "Warn a user."
-        requiredPermissionLevel = PermissionLevel.Staff
+        requiredPermissionLevel = PermissionLevel.Moderator
         execute(LowerMemberArg, EveryArg) {
             val (targetMember, reason) = args
             try {

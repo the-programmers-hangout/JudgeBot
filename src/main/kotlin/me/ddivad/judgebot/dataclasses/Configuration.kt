@@ -13,12 +13,13 @@ data class Configuration(
     operator fun get(id: Long) = guildConfigurations[id]
     fun hasGuildConfig(guildId: Long) = guildConfigurations.containsKey(guildId)
 
-    fun setup(guild: Guild, prefix: String, adminRole: Role, staffRole: Role, mutedRole: Role, logging: LoggingConfiguration) {
+    fun setup(guild: Guild, prefix: String, adminRole: Role, staffRole: Role, moderatorRole: Role, mutedRole: Role, logging: LoggingConfiguration) {
         if (guildConfigurations[guild.id.longValue] != null) return
 
         val newConfiguration = GuildConfiguration(
                 guild.id.value,
                 prefix,
+                moderatorRole.id.value,
                 staffRole.id.value,
                 adminRole.id.value,
                 mutedRole.id.value,
@@ -47,6 +48,7 @@ data class DatabaseConfiguration(
 data class GuildConfiguration(
         val id: String = "",
         var prefix: String = "j!",
+        var moderatorRole: String = "",
         var staffRole: String = "",
         var adminRole: String = "",
         var mutedRole: String = "",

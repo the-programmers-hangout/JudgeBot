@@ -27,6 +27,11 @@ class EditConfigConversation(private val configuration: Configuration) {
                 guildConfiguration.adminRole = mutedRole.id.value
                 respond("Muted role set to **${mutedRole.name}**.")
             }
+            "setmoderatorrole" -> {
+                val modRole = promptMessage(RoleArg, "Enter Mute role:")
+                guildConfiguration.moderatorRole = modRole.id.value
+                respond("Moderator role set to **${modRole.name}**.")
+            }
             "setlogchannel" -> {
                 val logChannel = promptMessage(ChannelArg<TextChannel>(), "Enter Logging channel:")
                 guildConfiguration.loggingConfiguration.loggingChannel = logChannel.id.value

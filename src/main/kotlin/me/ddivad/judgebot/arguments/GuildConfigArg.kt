@@ -10,6 +10,7 @@ val validConfigParameters = mutableListOf(
         "setPrefix",
         "setAdminRole",
         "setStaffRole",
+        "setModeratorRole",
         "setMuteRole",
         "setLogChannel",
         "setAlertChannel",

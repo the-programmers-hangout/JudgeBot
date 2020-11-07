@@ -23,7 +23,7 @@ fun onStaffReactionAdd(muteService: MuteService,
         if (!guildConfiguration?.reactions!!.enabled) return@on
 
         user.asMemberOrNull(guild.id)?.let {
-            if (permissionsService.hasPermission(it, PermissionLevel.Staff)) {
+            if (permissionsService.hasPermission(it, PermissionLevel.Moderator)) {
                 val messageAuthor = message.asMessage().author ?: return@on
                 message.deleteReaction(this.emoji)
 
