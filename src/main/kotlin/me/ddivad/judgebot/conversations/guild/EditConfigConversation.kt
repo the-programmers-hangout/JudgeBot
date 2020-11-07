@@ -5,9 +5,7 @@ import com.gitlab.kordlib.core.entity.channel.TextChannel
 import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.embeds.createConfigEmbed
 import me.ddivad.judgebot.embeds.createConfigOptionsEmbed
-import me.jakejmattson.discordkt.api.arguments.ChannelArg
-import me.jakejmattson.discordkt.api.arguments.EveryArg
-import me.jakejmattson.discordkt.api.arguments.RoleArg
+import me.jakejmattson.discordkt.api.arguments.*
 import me.jakejmattson.discordkt.api.dsl.conversation
 
 class EditConfigConversation(private val configuration: Configuration) {
@@ -43,6 +41,31 @@ class EditConfigConversation(private val configuration: Configuration) {
                 val prefix = promptMessage(EveryArg, "Enter Prefix:")
                 guildConfiguration.prefix = prefix
                 respond("Prefix set to **${prefix}**")
+            }
+            "setgagreaction" -> {
+                val reaction = promptMessage(UnicodeEmojiArg, "Enter Reaction:")
+                guildConfiguration.reactions.gagReaction = reaction.unicode
+                respond("Reaction set to ${reaction.unicode}")
+            }
+            "sethistoryreaction" -> {
+                val reaction = promptMessage(UnicodeEmojiArg, "Enter Reaction:")
+                guildConfiguration.reactions.historyReaction = reaction.unicode
+                respond("Reaction set to ${reaction.unicode}")
+            }
+            "setdeletemessagereaction" -> {
+                val reaction = promptMessage(UnicodeEmojiArg, "Enter Reaction:")
+                guildConfiguration.reactions.deleteMessageReaction = reaction.unicode
+                respond("Reaction set to ${reaction.unicode}")
+            }
+            "setflagmessagereaction" -> {
+                val reaction = promptMessage(UnicodeEmojiArg, "Enter Reaction:")
+                guildConfiguration.reactions.flagMessageReaction = reaction.unicode
+                respond("Reaction set to ${reaction.unicode}")
+            }
+            "enablereactions" -> {
+                val enabled = promptMessage(BooleanArg("reaactions", "enable", "disable"), "enable / disable:")
+                guildConfiguration.reactions.enabled = enabled
+                respond("Reactions set to $enabled")
             }
             "view", "list" -> {
                 respond {

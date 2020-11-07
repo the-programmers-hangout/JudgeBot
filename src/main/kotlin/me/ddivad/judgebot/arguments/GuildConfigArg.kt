@@ -13,6 +13,11 @@ val validConfigParameters = mutableListOf(
         "setMuteRole",
         "setLogChannel",
         "setAlertChannel",
+        "setGagReaction",
+        "setHistoryReaction",
+        "setDeleteMessageReaction",
+        "setFlagMessageReaction",
+        "enableReactions",
         "view",
         "options"
 )

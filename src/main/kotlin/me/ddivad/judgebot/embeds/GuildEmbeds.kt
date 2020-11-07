@@ -33,6 +33,15 @@ suspend fun EmbedBuilder.createConfigEmbed(config: GuildConfiguration, guild: Gu
     }
 
     field {
+        name = "**Reactions**"
+        value = "Enabled: ${config.reactions.enabled} \n" +
+                "Gag: ${config.reactions.gagReaction} \n" +
+                "History: ${config.reactions.historyReaction} \n" +
+                "Delete Message: ${config.reactions.deleteMessageReaction} \n" +
+                "Flag Message: ${config.reactions.flagMessageReaction}"
+    }
+
+    field {
         name = "**Punishments:**"
         config.punishments.forEach {
             value += "Punishment Type: ${it.punishment} \n" +
