@@ -46,6 +46,10 @@ suspend fun EmbedBuilder.createConfigEmbed(config: GuildConfiguration, guild: Gu
         value = "Logging Channel: ${guild.getChannelOrNull(config.loggingConfiguration.loggingChannel.toSnowflake())?.mention} \n" +
                 "Alert Channel: ${guild.getChannelOrNull(config.loggingConfiguration.alertChannel.toSnowflake())?.mention}"
     }
+    footer {
+        icon = guild.getIconUrl(Image.Format.PNG) ?: ""
+        text = guild.name
+    }
 }
 
 fun EmbedBuilder.createConfigOptionsEmbed(config: GuildConfiguration, guild: Guild) {
