@@ -1,11 +1,13 @@
 package me.ddivad.judgebot.commands
 
+import com.gitlab.kordlib.common.exception.RequestException
 import me.ddivad.judgebot.arguments.LowerMemberArg
 import me.ddivad.judgebot.conversations.StrikeConversation
 import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.dataclasses.Infraction
 import me.ddivad.judgebot.dataclasses.InfractionType
 import me.ddivad.judgebot.embeds.createHistoryEmbed
+import me.ddivad.judgebot.extensions.testDmStatus
 import me.ddivad.judgebot.services.*
 import me.ddivad.judgebot.services.infractions.BadPfpService
 import me.ddivad.judgebot.services.infractions.InfractionService
@@ -22,9 +24,15 @@ fun createInfractonCommands(databaseService: DatabaseService,
         description = "Strike a user."
         requiredPermissionLevel = PermissionLevel.Staff
         execute(LowerMemberArg, IntegerArg.makeOptional(1), EveryArg) {
-            val (user, weight, reason) = args
+            val (targetMember, weight, reason) = args
+            try {
+                targetMember.testDmStatus()
+            } catch (ex: RequestException) {
+                respond("Unable to contact the target user. Infraction cancelled.")
+                return@execute
+            }
             StrikeConversation(databaseService, config, infractionService)
-                    .createStrikeConversation(guild, user, weight, reason)
+                    .createStrikeConversation(guild, targetMember, weight, reason)
                     .startPublicly(discord, author, channel)
         }
     }
@@ -33,12 +41,19 @@ fun createInfractonCommands(databaseService: DatabaseService,
         description = "Warn a user."
         requiredPermissionLevel = PermissionLevel.Staff
         execute(LowerMemberArg, EveryArg) {
+            val (targetMember, reason) = args
+            try {
+                targetMember.testDmStatus()
+            } catch (ex: RequestException) {
+                respond("Unable to contact the target user. Infraction cancelled.")
+                return@execute
+            }
             val guildConfiguration = config[guild.id.longValue] ?: return@execute
-            val user = databaseService.users.getOrCreateUser(args.first, guild)
-            val infraction = Infraction(this.author.id.value, args.second, InfractionType.Warn, guildConfiguration.infractionConfiguration.warnPoints)
-            infractionService.infract(args.first, guild, user, infraction)
+            val user = databaseService.users.getOrCreateUser(targetMember, guild)
+            val infraction = Infraction(this.author.id.value, reason, InfractionType.Warn, guildConfiguration.infractionConfiguration.warnPoints)
+            infractionService.infract(targetMember, guild, user, infraction)
             respondMenu {
-                createHistoryEmbed(args.first, user, guild, config, databaseService)
+                createHistoryEmbed(targetMember, user, guild, config, databaseService)
             }
         }
     }
@@ -47,24 +62,29 @@ fun createInfractonCommands(databaseService: DatabaseService,
         description = "Notifies the user that they should change their profile pic and applies a 30 minute mute. Bans the user if they don't change picture."
         requiredPermissionLevel = PermissionLevel.Staff
         execute(BooleanArg("cancel", "apply", "cancel").makeOptional(true), LowerMemberArg) {
-            val (cancel, target) = args
+            val (cancel, targetMember) = args
+            try {
+                targetMember.testDmStatus()
+            } catch (ex: RequestException) {
+                respond("Unable to contact the target user. Infraction cancelled.")
+                return@execute
+            }
             val minutesUntilBan = 30L
             val timeLimit = 1000 * 60 * minutesUntilBan
-
             if (!cancel) {
-                when (badPfpService.hasActiveBapPfp(target)) {
+                when (badPfpService.hasActiveBapPfp(targetMember)) {
                     true -> {
-                        badPfpService.cancelBadPfp(guild, target)
-                        respond("Badpfp cancelled for ${target.mention}")
+                        badPfpService.cancelBadPfp(guild, targetMember)
+                        respond("Badpfp cancelled for ${targetMember.mention}")
                     }
-                    false -> respond("${target.mention} does not have a an active badpfp.")
+                    false -> respond("${targetMember.mention} does not have a an active badpfp.")
                 }
                 return@execute
             }
 
             val badPfp = Infraction(author.id.value, "BadPfp", InfractionType.BadPfp)
-            badPfpService.applyBadPfp(target, guild, badPfp, timeLimit)
-            respond("${target.mention} has been muted and a badpfp has been triggered with a time limit of $minutesUntilBan minutes.")
+            badPfpService.applyBadPfp(targetMember, guild, badPfp, timeLimit)
+            respond("${targetMember.mention} has been muted and a badpfp has been triggered with a time limit of $minutesUntilBan minutes.")
         }
     }
 

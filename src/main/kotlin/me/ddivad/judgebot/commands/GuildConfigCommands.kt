@@ -5,7 +5,7 @@ import me.ddivad.judgebot.conversations.guild.GuildSetupConversation
 import me.ddivad.judgebot.conversations.guild.EditConfigConversation
 import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.services.DatabaseService
-import me.ddivad.judgebot.services.MuteService
+import me.ddivad.judgebot.services.infractions.MuteService
 import me.ddivad.judgebot.services.PermissionLevel
 import me.ddivad.judgebot.services.requiredPermissionLevel
 import me.jakejmattson.discordkt.api.dsl.commands

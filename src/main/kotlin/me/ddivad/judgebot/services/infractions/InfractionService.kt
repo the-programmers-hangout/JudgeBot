@@ -6,7 +6,6 @@ import me.ddivad.judgebot.dataclasses.*
 import me.ddivad.judgebot.embeds.createInfractionEmbed
 import me.ddivad.judgebot.services.DatabaseService
 import me.ddivad.judgebot.services.LoggingService
-import me.ddivad.judgebot.services.MuteService
 import me.jakejmattson.discordkt.api.annotations.Service
 import me.jakejmattson.discordkt.api.extensions.sendPrivateMessage
 import org.joda.time.DateTime
@@ -26,8 +25,8 @@ class InfractionService(private val configuration: Configuration,
             target.asUser().sendPrivateMessage {
                 createInfractionEmbed(guild, configuration[guild.id.longValue]!!, target, it, rule)
             }
-            applyPunishment(guild, target, userRecord, it)
             loggingService.infractionApplied(guild, target.asUser(), it)
+            applyPunishment(guild, target, userRecord, it)
         }
     }
 

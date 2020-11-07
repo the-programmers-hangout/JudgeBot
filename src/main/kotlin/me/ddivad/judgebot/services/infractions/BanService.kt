@@ -11,9 +11,7 @@ import kotlinx.coroutines.launch
 import me.ddivad.judgebot.dataclasses.Ban
 import me.ddivad.judgebot.dataclasses.Punishment
 import me.ddivad.judgebot.services.DatabaseService
-import me.ddivad.judgebot.services.GuildID
 import me.ddivad.judgebot.services.LoggingService
-import me.ddivad.judgebot.services.UserId
 import me.jakejmattson.discordkt.api.annotations.Service
 
 @Service
@@ -34,11 +32,13 @@ class BanService(private val databaseService: DatabaseService,
                 delay(punishment.clearTime)
                 guild.unban(target.id)
             }
+            loggingService.userBannedWithTimer(guild, target, punishment)
         }
     }
 
     suspend fun unbanUser(guild: Guild, user: User) {
         databaseService.guilds.removeBan(guild, user.id.value)
         guild.unban(user.id)
+        loggingService.userUnbanned(guild, user)
     }
 }

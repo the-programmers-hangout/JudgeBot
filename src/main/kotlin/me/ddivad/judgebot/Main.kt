@@ -4,7 +4,7 @@ import com.gitlab.kordlib.gateway.Intent
 import com.gitlab.kordlib.gateway.PrivilegedIntent
 import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.services.BotStatsService
-import me.ddivad.judgebot.services.MuteService
+import me.ddivad.judgebot.services.infractions.MuteService
 import me.ddivad.judgebot.services.PermissionsService
 import me.ddivad.judgebot.services.requiredPermissionLevel
 import me.jakejmattson.discordkt.api.dsl.bot
@@ -55,7 +55,7 @@ suspend fun main(args: Array<String>) {
             field {
                 name = "Build Info"
                 value = "```" +
-                        "Version:   1.0.0-Beta-2\n" +
+                        "Version:   1.0.0-Beta-3\n" +
                         "DiscordKt: ${versions.library}\n" +
                         "Kotlin:    $kotlinVersion" +
                         "```"

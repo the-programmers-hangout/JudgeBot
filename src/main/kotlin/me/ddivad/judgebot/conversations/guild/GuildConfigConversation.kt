@@ -3,7 +3,7 @@ package me.ddivad.judgebot.conversations.guild
 import com.gitlab.kordlib.core.entity.Guild
 import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.dataclasses.LoggingConfiguration
-import me.ddivad.judgebot.services.MuteService
+import me.ddivad.judgebot.services.infractions.MuteService
 import me.jakejmattson.discordkt.api.arguments.ChannelArg
 import me.jakejmattson.discordkt.api.arguments.EveryArg
 import me.jakejmattson.discordkt.api.arguments.RoleArg

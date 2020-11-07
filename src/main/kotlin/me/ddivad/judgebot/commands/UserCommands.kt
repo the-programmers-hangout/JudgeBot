@@ -1,5 +1,6 @@
 package me.ddivad.judgebot.commands
 
+import com.gitlab.kordlib.common.exception.RequestException
 import com.gitlab.kordlib.core.behavior.ban
 import me.ddivad.judgebot.arguments.LowerMemberArg
 import me.ddivad.judgebot.dataclasses.Ban
