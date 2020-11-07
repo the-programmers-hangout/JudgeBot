@@ -8,7 +8,7 @@ import me.jakejmattson.discordkt.api.dsl.conversation
 
 class ArchiveRuleConversation(private val configuration: Configuration,
                           private val databaseService: DatabaseService) {
-    fun createArchiveRuleConversation(guild: Guild) = conversation {
+    fun createArchiveRuleConversation(guild: Guild) = conversation("cancel") {
         val ruleToArchive = promptMessage(IntegerArg, "Please enter rule number to archive:")
 
         databaseService.guilds.archiveRule(guild, ruleToArchive)

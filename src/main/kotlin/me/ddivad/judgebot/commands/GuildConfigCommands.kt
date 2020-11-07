@@ -32,7 +32,7 @@ fun guildConfigCommands(configuration: Configuration,
     guildCommand("configuration") {
         description = "Update configuration parameters for this guild (conversation)."
         requiredPermissionLevel = PermissionLevel.Staff
-        execute(GuildConfigArg) {
+        execute(GuildConfigArg.makeOptional("options")) {
             if (!configuration.hasGuildConfig(guild.id.longValue)) {
                 respond("Please run the **setup** command to set this initially.")
                 return@execute

@@ -20,7 +20,7 @@ class GuildOperations(private val connection: ConnectionService) {
         return guildConfig
     }
 
-    suspend fun getRules(guild: Guild): List<Rule>? {
+    suspend fun getRules(guild: Guild): List<Rule> {
         val guildInfo = this.getGuild(guild)
         return runBlocking {
             guildInfo.rules.sortedBy { it.number }

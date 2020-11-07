@@ -4,6 +4,7 @@ import com.gitlab.kordlib.core.entity.Guild
 import com.gitlab.kordlib.core.entity.channel.TextChannel
 import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.embeds.createConfigEmbed
+import me.ddivad.judgebot.embeds.createConfigOptionsEmbed
 import me.jakejmattson.discordkt.api.arguments.ChannelArg
 import me.jakejmattson.discordkt.api.arguments.EveryArg
 import me.jakejmattson.discordkt.api.arguments.RoleArg
@@ -46,6 +47,11 @@ class EditConfigConversation(private val configuration: Configuration) {
             "view", "list" -> {
                 respond {
                     createConfigEmbed(guildConfiguration, guild)
+                }
+            }
+            "options" -> {
+                respond {
+                    createConfigOptionsEmbed(guildConfiguration, guild)
                 }
             }
             else -> {

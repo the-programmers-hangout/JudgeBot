@@ -6,6 +6,7 @@ import me.ddivad.judgebot.conversations.rules.ArchiveRuleConversation
 import me.ddivad.judgebot.conversations.rules.EditRuleConversation
 import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.embeds.createRuleEmbed
+import me.ddivad.judgebot.embeds.createRuleEmbedForStrike
 import me.ddivad.judgebot.embeds.createRulesEmbed
 import me.ddivad.judgebot.services.DatabaseService
 import me.ddivad.judgebot.services.PermissionLevel
@@ -50,7 +51,7 @@ fun ruleCommands(configuration: Configuration,
         requiredPermissionLevel = PermissionLevel.Everyone
         execute {
             respond {
-                createRulesEmbed(guild, databaseService.guilds.getRules(guild)!!)
+                createRulesEmbed(guild, databaseService.guilds.getRules(guild))
             }
         }
     }
