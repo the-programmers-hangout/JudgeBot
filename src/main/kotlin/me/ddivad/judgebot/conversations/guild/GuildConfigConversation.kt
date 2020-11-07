@@ -10,7 +10,7 @@ import me.jakejmattson.discordkt.api.arguments.RoleArg
 import me.jakejmattson.discordkt.api.dsl.conversation
 
 class GuildSetupConversation(private val configuration: Configuration, private val muteService: MuteService) {
-    fun createSetupConversation(guild: Guild) = conversation {
+    fun createSetupConversation(guild: Guild) = conversation("cancel") {
         val prefix = promptMessage(EveryArg, "Bot prefix:")
         val adminRole = promptMessage(RoleArg, "Admin role:")
         val staffRole = promptMessage(RoleArg, "Staff role:")

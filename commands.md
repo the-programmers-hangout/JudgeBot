@@ -6,10 +6,10 @@
 | (Argument)  | Argument is not required.      |
 
 ## Configuration
-| Commands      | Arguments   | Description                                                    |
-| ------------- | ----------- | -------------------------------------------------------------- |
-| configuration | GuildConfig | Update configuration parameters for this guild (conversation). |
-| setup         |             | Configure a guild to use Judgebot.                             |
+| Commands      | Arguments     | Description                                                    |
+| ------------- | ------------- | -------------------------------------------------------------- |
+| configuration | (GuildConfig) | Update configuration parameters for this guild (conversation). |
+| setup         |               | Configure a guild to use Judgebot.                             |
 
 ## Infraction
 | Commands         | Arguments                       | Description                                                                                                                           |

@@ -3,6 +3,7 @@ package me.ddivad.judgebot.embeds
 import com.gitlab.kordlib.core.entity.Guild
 import com.gitlab.kordlib.rest.Image
 import com.gitlab.kordlib.rest.builder.message.EmbedBuilder
+import me.ddivad.judgebot.arguments.validConfigParameters
 import me.ddivad.judgebot.dataclasses.GuildConfiguration
 import me.ddivad.judgebot.util.timeToString
 import me.jakejmattson.discordkt.api.extensions.toSnowflake
@@ -42,7 +43,20 @@ suspend fun EmbedBuilder.createConfigEmbed(config: GuildConfiguration, guild: Gu
 
     field {
         name = "**Logging:**"
-        value = "Logging Channel: ${guild.getChannelOrNull(config.loggingConfiguration.loggingChannel.toSnowflake()!!)?.mention} \n" +
-                "Alert Channel: ${guild.getChannelOrNull(config.loggingConfiguration.alertChannel.toSnowflake()!!)?.mention}"
+        value = "Logging Channel: ${guild.getChannelOrNull(config.loggingConfiguration.loggingChannel.toSnowflake())?.mention} \n" +
+                "Alert Channel: ${guild.getChannelOrNull(config.loggingConfiguration.alertChannel.toSnowflake())?.mention}"
+    }
+}
+
+fun EmbedBuilder.createConfigOptionsEmbed(config: GuildConfiguration, guild: Guild) {
+    title = "Available Configuration Options"
+    color = Color.MAGENTA
+    field {
+        name = "Usage: `${config.prefix}configuration <option>`"
+        value = "```css\n${validConfigParameters.joinToString("\n")}\n```"
+    }
+    footer {
+        icon = guild.getIconUrl(Image.Format.PNG) ?: ""
+        text = guild.name
     }
 }

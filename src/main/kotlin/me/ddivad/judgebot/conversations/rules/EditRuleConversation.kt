@@ -13,7 +13,7 @@ import me.jakejmattson.discordkt.api.dsl.conversation
 
 class EditRuleConversation(private val configuration: Configuration,
                            private val databaseService: DatabaseService) {
-    fun createAddRuleConversation(guild: Guild) = conversation {
+    fun createAddRuleConversation(guild: Guild) = conversation("cancel") {
         val rules = databaseService.guilds.getRules(guild)
         val ruleNumberToUpdate = promptMessage(IntegerArg, "Which rule would you like to update?")
         val ruleToUpdate = rules?.find { it.number == ruleNumberToUpdate } ?: return@conversation
