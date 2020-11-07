@@ -29,7 +29,7 @@ fun onStaffReactionAdd(muteService: MuteService,
 
                 when (this.emoji.name) {
                     guildConfiguration.reactions.gagReaction -> {
-                        muteService.applyMute(message.asMessage().author?.asMemberOrNull(guildId!!)!!, 5000 * 1000L, "Gag")
+                        muteService.gag(messageAuthor.asMember(guild.id))
                         it.sendPrivateMessage("${messageAuthor.mention} gagged.")
                     }
                     guildConfiguration.reactions.historyReaction -> {

@@ -61,10 +61,7 @@ fun createMuteCommands(muteService: MuteService) = commands("Mute") {
                 return@execute
             }
             val time = 1000L * 60 * 5
-            muteService.applyMute(
-                    args.first,
-                    time,
-                    "You've been muted temporarily so that a mod can handle something.")
+            muteService.gag(targetMember)
 
             respond("${targetMember.mention} has been muted for ${timeToString(time)}")
         }
