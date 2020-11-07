@@ -9,6 +9,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import me.ddivad.judgebot.dataclasses.Configuration
+import me.ddivad.judgebot.dataclasses.GuildMember
 import me.ddivad.judgebot.dataclasses.InfractionType
 import me.ddivad.judgebot.dataclasses.Punishment
 import me.ddivad.judgebot.embeds.createMuteEmbed
@@ -71,6 +72,10 @@ class MuteService(val configuration: Configuration,
                 createMuteEmbed(guild, member, reason, time)
             }
         }
+    }
+
+    suspend fun gag(target: Member) {
+        this.applyMute(target, 1000L * 60 * 5, "You've been muted temporarily so that a mod can handle something.")
     }
 
     fun removeMute(member: Member) {
