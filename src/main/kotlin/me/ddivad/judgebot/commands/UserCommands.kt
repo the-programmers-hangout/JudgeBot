@@ -27,7 +27,7 @@ fun createUserCommands(databaseService: DatabaseService,
                        banService: BanService) = commands("User") {
     guildCommand("history", "h") {
         description = "Use this to view a user's record."
-        requiredPermissionLevel = PermissionLevel.Staff
+        requiredPermissionLevel = PermissionLevel.Moderator
         execute(UserArg) {
             val user = databaseService.users.getOrCreateUser(args.first, guild)
             databaseService.users.incrementUserHistory(user, guild)
@@ -39,7 +39,7 @@ fun createUserCommands(databaseService: DatabaseService,
 
     guildCommand("status", "st") {
         description = "Use this to view a user's status card."
-        requiredPermissionLevel = PermissionLevel.Staff
+        requiredPermissionLevel = PermissionLevel.Moderator
         execute(MemberArg) {
             val user = databaseService.users.getOrCreateUser(args.first, guild)
             databaseService.users.incrementUserHistory(user, guild)
@@ -49,7 +49,7 @@ fun createUserCommands(databaseService: DatabaseService,
 
     guildCommand("whatpfp") {
         description = "Perform a reverse image search of a User's profile picture"
-        requiredPermissionLevel = PermissionLevel.Staff
+        requiredPermissionLevel = PermissionLevel.Moderator
         execute(UserArg) {
             val user = args.first
             val reverseSearchUrl = "<https://www.google.com/searchbyimage?&image_url=${user.avatar.url}>"

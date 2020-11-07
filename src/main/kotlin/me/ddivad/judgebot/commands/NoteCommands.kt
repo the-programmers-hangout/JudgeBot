@@ -13,7 +13,7 @@ import me.jakejmattson.discordkt.api.dsl.commands
 fun noteCommands(databaseService: DatabaseService) = commands("Notes") {
     guildCommand("note") {
         description = "Use this to add a note to a user."
-        requiredPermissionLevel = PermissionLevel.Staff
+        requiredPermissionLevel = PermissionLevel.Moderator
         execute(MemberArg, EveryArg("Note Content")) {
             val (target, note) = args
             val user = databaseService.users.getOrCreateUser(target, guild)

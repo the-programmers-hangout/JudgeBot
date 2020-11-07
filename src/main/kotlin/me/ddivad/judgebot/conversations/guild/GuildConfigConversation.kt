@@ -14,6 +14,7 @@ class GuildSetupConversation(private val configuration: Configuration, private v
         val prefix = promptMessage(EveryArg, "Bot prefix:")
         val adminRole = promptMessage(RoleArg, "Admin role:")
         val staffRole = promptMessage(RoleArg, "Staff role:")
+        val moderatorRole = promptMessage(RoleArg, "Moderator role:")
         val logChannel = promptMessage(ChannelArg, "Log Channel:")
         val alertChannel = promptMessage(ChannelArg, "Alert Channel:")
         val mutedRole = promptMessage(RoleArg, "Muted role:")
@@ -23,6 +24,7 @@ class GuildSetupConversation(private val configuration: Configuration, private v
                 prefix,
                 adminRole,
                 staffRole,
+                moderatorRole,
                 mutedRole,
                 LoggingConfiguration(logChannel.id.value, alertChannel.id.value),
         )

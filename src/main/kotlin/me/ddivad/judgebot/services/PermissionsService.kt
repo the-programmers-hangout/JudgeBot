@@ -1,5 +1,6 @@
 package me.ddivad.judgebot.services
 
+import com.gitlab.kordlib.core.any
 import com.gitlab.kordlib.core.entity.Guild
 import com.gitlab.kordlib.core.entity.Member
 import com.gitlab.kordlib.core.entity.User
@@ -11,6 +12,7 @@ import me.jakejmattson.discordkt.api.dsl.Command
 
 enum class PermissionLevel {
     Everyone,
+    Moderator,
     Staff,
     Administrator,
     GuildOwner,
@@ -32,33 +34,23 @@ class PermissionsService(private val configuration: Configuration) {
     }
 
     suspend fun hasPermission(member: Member, level: PermissionLevel) = getPermissionLevel(member) >= level
-
     suspend fun getPermissionRank(member: Member) = getPermissionLevel(member).ordinal
 
-    suspend fun getPermissionLevel(member: Member) =
+    private suspend fun getPermissionLevel(member: Member) =
             when {
                 member.isBotOwner() -> PermissionLevel.BotOwner
                 member.isGuildOwner() -> PermissionLevel.GuildOwner
                 member.isAdministrator() -> PermissionLevel.Administrator
                 member.isStaff() -> PermissionLevel.Staff
+                member.isModerator() -> PermissionLevel.Moderator
                 else -> PermissionLevel.Everyone
             }
 
     private fun Member.isBotOwner() = id.value == configuration.ownerId
     private suspend fun Member.isGuildOwner() = isOwner()
-    private suspend fun Member.isAdministrator(): Boolean {
-        val role = configuration[guild.id.longValue]?.adminRole.let { role ->
-            guild.roles.filter { it.id.value == role }.first().id
-        }
-        return roleIds.contains(role)
-    }
-
-    suspend fun Member.isStaff(): Boolean {
-        val role = configuration[guild.id.longValue]?.staffRole.let { role ->
-            guild.roles.filter { it.id.value == role }.first().id
-        }
-        return roleIds.contains(role)
-    }
+    private suspend fun Member.isAdministrator() = roles.any { it.id.value == configuration[guild.id.longValue]?.adminRole }
+    private suspend fun Member.isStaff() = roles.any { it.id.value == configuration[guild.id.longValue]?.staffRole }
+    private suspend fun Member.isModerator() = roles.any { it.id.value == configuration[guild.id.longValue]?.moderatorRole }
 }
 
 var Command.requiredPermissionLevel: PermissionLevel
