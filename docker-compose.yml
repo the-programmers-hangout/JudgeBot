@@ -17,8 +17,8 @@ services:
     image: theprogrammershangout/judgebot:latest
     volumes:
       - type: bind
-        source: ./config.json
-        target: /config.json
+        source: ./config/config.json
+        target: /config/config.json
     restart: always
     env_file:
       - .env
