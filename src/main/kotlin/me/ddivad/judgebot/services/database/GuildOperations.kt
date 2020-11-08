@@ -86,6 +86,10 @@ class GuildOperations(private val connection: ConnectionService) {
         return this.getGuild(guild).getPunishmentByType(type, member.asUser().id.value)
     }
 
+    suspend fun getPunishmentByType(guild: Guild, userId: String, type: InfractionType): List<Punishment> {
+        return this.getGuild(guild).getPunishmentByType(type, userId)
+    }
+
     suspend fun getPunishmentsForUser(guild: Guild, user: User): List<Punishment> {
         return this.getGuild(guild).getPunishmentsByUser(user.id.value)
     }
