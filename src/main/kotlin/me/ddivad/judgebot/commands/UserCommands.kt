@@ -85,9 +85,7 @@ fun createUserCommands(databaseService: DatabaseService,
         execute(UserArg) {
             val user = args.first
             guild.getBanOrNull(user.id)?.let {
-                guild.unban(user.id)
                 banService.unbanUser(guild, user)
-                loggingService.userUnbanned(guild, user)
                 respond("${user.tag} unbanned")
                 return@execute
             }

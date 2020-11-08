@@ -28,7 +28,8 @@ data class GuildInformation(
     }
 
     fun addPunishment(punishment: Punishment): GuildInformation {
-        punishment.id = this.punishments.size + 1
+        val nextId: Int = if (this.punishments.isEmpty()) 1 else this.punishments.maxByOrNull { it.id }!!.id + 1
+        punishment.id = nextId
         this.punishments.add(punishment)
         return this
     }

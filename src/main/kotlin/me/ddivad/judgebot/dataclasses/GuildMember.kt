@@ -62,7 +62,7 @@ data class GuildMember(
     }
 
     fun addGuildLeave( guild: Guild, leaveDate: Long) = with(this.getGuildInfo(guild.id.value)) {
-        val joinRecord = this.leaveHistory.find { it.joinDate != null && it.leaveDate == null }?.let {
+        this.leaveHistory.find { it.joinDate != null && it.leaveDate == null }?.let {
             it.leaveDate = leaveDate
         }
     }
