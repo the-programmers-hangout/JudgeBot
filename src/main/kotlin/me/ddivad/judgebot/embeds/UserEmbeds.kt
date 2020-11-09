@@ -6,10 +6,7 @@ import com.gitlab.kordlib.core.entity.Member
 import com.gitlab.kordlib.core.entity.User
 import com.gitlab.kordlib.rest.Image
 import com.gitlab.kordlib.rest.builder.message.EmbedBuilder
-import me.ddivad.judgebot.dataclasses.Configuration
-import me.ddivad.judgebot.dataclasses.GuildMember
-import me.ddivad.judgebot.dataclasses.InfractionType
-import me.ddivad.judgebot.dataclasses.PunishmentType
+import me.ddivad.judgebot.dataclasses.*
 import me.ddivad.judgebot.services.DatabaseService
 import me.ddivad.judgebot.util.timeBetween
 import me.ddivad.judgebot.util.timeToString
@@ -81,9 +78,7 @@ suspend fun MenuBuilder.createHistoryEmbed(
                     "Type: **${lastInfraction.type}** :: Weight: **${lastInfraction.points}**\n " +
                             "Issued by **${guild.kord.getUser(Snowflake(lastInfraction.moderator))?.username}** " +
                             "on **${SimpleDateFormat("dd/MM/yyyy").format(Date(lastInfraction.dateTime))}**\n" +
-                            "Punishment: **${lastInfraction.punishment?.punishment}** ${
-                                if (lastInfraction.punishment?.duration != null) "for **" + timeToString(lastInfraction.punishment?.duration!!) + "**" else "indefinitely"
-                            }\n" +
+                            "Punishment: **${lastInfraction.punishment?.punishment}** ${getDurationText(lastInfraction.punishment)}\n" +
                             lastInfraction.reason
             )
         } else addField("", "**User has no recent infractions.**")
@@ -117,9 +112,7 @@ suspend fun MenuBuilder.createHistoryEmbed(
                     "ID :: ${infraction.id} :: Staff :: __${moderator}__",
                     "Type: **${infraction.type} (${infraction.points})** :: " +
                             "Date: **${SimpleDateFormat("dd/MM/yyyy").format(Date(infraction.dateTime))}**\n " +
-                            "Punishment: **${infraction.punishment?.punishment}** ${
-                                if (infraction.punishment?.duration != null) "for **" + timeToString(infraction.punishment?.duration!!) + "**" else "indefinitely"
-                            }\n" +
+                            "Punishment: **${infraction.punishment?.punishment}** ${getDurationText(infraction.punishment)}\n" +
                             infraction.reason
             )
         }
@@ -131,9 +124,7 @@ suspend fun MenuBuilder.createHistoryEmbed(
                     "ID :: ${infraction.id} :: Staff :: __${moderator}__",
                     "Type: **${infraction.type} (${infraction.points})** :: " +
                             "Date: **${SimpleDateFormat("dd/MM/yyyy").format(Date(infraction.dateTime))}**\n " +
-                            "Punishment: **${infraction.punishment?.punishment}** ${
-                                if (infraction.punishment?.duration != null) "for **" + timeToString(infraction.punishment?.duration!!) + "**" else "indefinitely"
-                            }\n" +
+                            "Punishment: **${infraction.punishment?.punishment}** ${getDurationText(infraction.punishment)}\n" +
                             infraction.reason
             )
         }
@@ -198,9 +189,9 @@ suspend fun MenuBuilder.createHistoryEmbed(
         }
 
         addInlineField("Joins:", history.size.toString())
-        addInlineField("","")
+        addInlineField("", "")
         addInlineField("Leaves:", leaves.size.toString())
-        addField("","")
+        addField("", "")
         userGuildDetails.leaveHistory.forEachIndexed { index, record ->
             addInlineField("Record", "#${index + 1}")
             addInlineField("Joined", SimpleDateFormat("dd/MM/yyyy").format(Date(record.joinDate!!)))
@@ -209,7 +200,22 @@ suspend fun MenuBuilder.createHistoryEmbed(
         }
         footer {
             icon = guild.getIconUrl(Image.Format.PNG) ?: ""
-            text = "Page ${3 + if(paginatedNotes.isEmpty()) 1 else paginatedNotes.size} of $totalMenuPages"
+            text = "Page ${3 + if (paginatedNotes.isEmpty()) 1 else paginatedNotes.size} of $totalMenuPages"
+        }
+    }
+}
+
+private fun getDurationText(level: PunishmentLevel?): String {
+    if (level == null) return ""
+    return when {
+        level.punishment == PunishmentType.NONE -> {
+            ""
+        }
+        level.duration != null -> {
+            "for **" + timeToString(level.duration!!) + "**"
+        }
+        else -> {
+            "indefinitely"
         }
     }
 }
@@ -278,7 +284,8 @@ suspend fun EmbedBuilder.createSelfHistoryEmbed(target: User,
                     "Type: **${infraction.type} (${infraction.points})** :: " +
                             "Date: **${SimpleDateFormat("dd/MM/yyyy").format(Date(infraction.dateTime))}**\n " +
                             "Punishment: **${infraction.punishment?.punishment}** ${
-                                if (infraction.punishment?.duration != null) "for **" + timeToString(infraction.punishment?.duration!!) + "**" else "indefinitely"
+                                if (infraction.punishment?.duration != null && infraction.punishment?.punishment !== PunishmentType.NONE)
+                                    "for **" + timeToString(infraction.punishment?.duration!!) + "**" else "indefinitely"
                             }\n" +
                             infraction.reason
             )
@@ -291,7 +298,8 @@ suspend fun EmbedBuilder.createSelfHistoryEmbed(target: User,
                     "Type: **${infraction.type} (${infraction.points})** :: " +
                             "Date: **${SimpleDateFormat("dd/MM/yyyy").format(Date(infraction.dateTime))}**\n " +
                             "Punishment: **${infraction.punishment?.punishment}** ${
-                                if (infraction.punishment?.duration != null) "for **" + timeToString(infraction.punishment?.duration!!) + "**" else "indefinitely"
+                                if (infraction.punishment?.duration != null && infraction.punishment?.punishment !== PunishmentType.NONE)
+                                    "for **" + timeToString(infraction.punishment?.duration!!) + "**" else "indefinitely"
                             }\n" +
                             infraction.reason
             )
