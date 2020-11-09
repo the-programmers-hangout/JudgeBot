@@ -25,18 +25,20 @@ fun onStaffReactionAdd(muteService: MuteService,
         user.asMemberOrNull(guild.id)?.let {
             if (permissionsService.hasPermission(it, PermissionLevel.Moderator)) {
                 val messageAuthor = message.asMessage().author ?: return@on
-                message.deleteReaction(this.emoji)
 
                 when (this.emoji.name) {
                     guildConfiguration.reactions.gagReaction -> {
+                        message.deleteReaction(this.emoji)
                         muteService.gag(messageAuthor.asMember(guild.id))
                         it.sendPrivateMessage("${messageAuthor.mention} gagged.")
                     }
                     guildConfiguration.reactions.historyReaction -> {
+                        message.deleteReaction(this.emoji)
                         val target = databaseService.users.getOrCreateUser(messageAuthor, guild!!.asGuild())
                         it.sendPrivateMessage { createSelfHistoryEmbed(messageAuthor, target, guild!!.asGuild(), configuration) }
                     }
                     guildConfiguration.reactions.deleteMessageReaction -> {
+                        message.deleteReaction(this.emoji)
                         messageAuthor.sendPrivateMessage("Your message with content \n" +
                                 "```${message.asMessage().content}``` " +
                                 "was deleted as it is against our rules.")
