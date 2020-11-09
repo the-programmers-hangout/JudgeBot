@@ -70,3 +70,8 @@ fun EmbedBuilder.createRulesEmbedDetailed(guild: Guild, rules: List<Rule>) {
             inline = false
         }
     }
+    footer {
+        icon = guild.getIconUrl(Image.Format.PNG) ?: ""
+        text = guild.name
+    }
+}
