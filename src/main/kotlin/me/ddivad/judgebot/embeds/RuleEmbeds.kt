@@ -58,7 +58,7 @@ suspend fun EmbedBuilder.createRuleEmbedForStrike(guild: Guild, rules: List<Rule
 }
 
 fun EmbedBuilder.createRulesEmbedDetailed(guild: Guild, rules: List<Rule>) {
-    title = "**__Rules__**"
+    title = "**__Server Rules__**"
     thumbnail {
         url = guild.getIconUrl(Image.Format.PNG) ?: ""
     }
@@ -66,7 +66,7 @@ fun EmbedBuilder.createRulesEmbedDetailed(guild: Guild, rules: List<Rule>) {
 
     for (rule in rules) {
         field {
-            value = "**[${rule.number}: ${rule.title}](${rule.link})**\n${rule.description}"
+            value = "**__[${rule.number}. ${rule.title}](${rule.link})__**\n${rule.description}"
             inline = false
         }
     }
