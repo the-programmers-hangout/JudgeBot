@@ -35,13 +35,14 @@
 | note         | Member, Note Content    | Use this to add a note to a user.                 |
 
 ## Rules
-| Commands    | Arguments | Description                   |
-| ----------- | --------- | ----------------------------- |
-| addRule     |           | Add a rule to this guild.     |
-| archiveRule |           | Archive a rule in this guild. |
-| editRule    |           | Edit a rule in this guild.    |
-| rule        | Rule      | List a rule from this guild.  |
-| rules       |           | List the rules of this guild. |
+| Commands    | Arguments | Description                                       |
+| ----------- | --------- | ------------------------------------------------- |
+| addRule     |           | Add a rule to this guild.                         |
+| archiveRule |           | Archive a rule in this guild.                     |
+| editRule    |           | Edit a rule in this guild.                        |
+| longRules   |           | List the rules (with descriptions) of this guild. |
+| rule        | Rule      | List a rule from this guild.                      |
+| rules       |           | List the rules of this guild.                     |
 
 ## User
 | Commands     | Arguments                                   | Description                                                |

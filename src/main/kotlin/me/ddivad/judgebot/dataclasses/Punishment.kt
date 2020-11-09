@@ -12,5 +12,5 @@ data class Ban(val userId: String,
                var reason: String)
 
 enum class PunishmentType {
-    MUTE, BAN
+    MUTE, BAN, NONE
 }

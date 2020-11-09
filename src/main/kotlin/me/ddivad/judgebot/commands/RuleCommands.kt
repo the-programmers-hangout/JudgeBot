@@ -8,6 +8,7 @@ import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.embeds.createRuleEmbed
 import me.ddivad.judgebot.embeds.createRuleEmbedForStrike
 import me.ddivad.judgebot.embeds.createRulesEmbed
+import me.ddivad.judgebot.embeds.createRulesEmbedDetailed
 import me.ddivad.judgebot.services.DatabaseService
 import me.ddivad.judgebot.services.PermissionLevel
 import me.ddivad.judgebot.services.requiredPermissionLevel
@@ -52,6 +53,16 @@ fun ruleCommands(configuration: Configuration,
         execute {
             respond {
                 createRulesEmbed(guild, databaseService.guilds.getRules(guild))
+            }
+        }
+    }
+
+    guildCommand("longRules") {
+        description = "List the rules (with descriptions) of this guild."
+        requiredPermissionLevel = PermissionLevel.Staff
+        execute {
+            respond {
+                createRulesEmbedDetailed(guild, databaseService.guilds.getRules(guild)!!)
             }
         }
     }
