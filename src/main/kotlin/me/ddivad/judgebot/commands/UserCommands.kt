@@ -2,6 +2,7 @@ package me.ddivad.judgebot.commands
 
 import com.gitlab.kordlib.common.exception.RequestException
 import com.gitlab.kordlib.core.behavior.ban
+import com.gitlab.kordlib.core.entity.User
 import me.ddivad.judgebot.arguments.LowerMemberArg
 import me.ddivad.judgebot.dataclasses.Ban
 import me.ddivad.judgebot.dataclasses.Configuration
@@ -40,7 +41,7 @@ fun createUserCommands(databaseService: DatabaseService,
     guildCommand("status", "st") {
         description = "Use this to view a user's status card."
         requiredPermissionLevel = PermissionLevel.Moderator
-        execute(MemberArg) {
+        execute(UserArg) {
             val user = databaseService.users.getOrCreateUser(args.first, guild)
             databaseService.users.incrementUserHistory(user, guild)
             createStatusEmbed(args.first, user, guild, config)

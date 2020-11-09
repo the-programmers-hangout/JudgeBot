@@ -2,7 +2,6 @@ package me.ddivad.judgebot.embeds
 
 import com.gitlab.kordlib.common.entity.Snowflake
 import com.gitlab.kordlib.core.entity.Guild
-import com.gitlab.kordlib.core.entity.Member
 import com.gitlab.kordlib.core.entity.User
 import com.gitlab.kordlib.rest.Image
 import com.gitlab.kordlib.rest.builder.message.EmbedBuilder
@@ -19,10 +18,10 @@ import java.awt.Color
 import java.text.SimpleDateFormat
 import java.time.Instant
 import java.time.ZoneOffset
-import java.util.*
-import java.util.concurrent.TimeUnit
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
+import java.util.*
+import java.util.concurrent.TimeUnit
 
 suspend fun MenuBuilder.createHistoryEmbed(
         target: User,
@@ -96,8 +95,6 @@ suspend fun MenuBuilder.createHistoryEmbed(
         }
         val warnings = infractions.filter { it.type == InfractionType.Warn }
         val strikes = infractions.filter { it.type == InfractionType.Strike }
-        val mutes = infractions.filter { it.type == InfractionType.Mute }
-        val badpfps = infractions.filter { it.type == InfractionType.BadPfp }
         val bans = infractions.filter { it.punishment?.punishment == PunishmentType.BAN }
 
         addInlineField("Warns", "${warnings.size}")
@@ -220,7 +217,7 @@ private fun getDurationText(level: PunishmentLevel?): String {
     }
 }
 
-suspend fun CommandEvent<*>.createStatusEmbed(target: Member,
+suspend fun CommandEvent<*>.createStatusEmbed(target: User,
                                               member: GuildMember,
                                               guild: Guild,
                                               config: Configuration) = respond {
@@ -228,6 +225,7 @@ suspend fun CommandEvent<*>.createStatusEmbed(target: Member,
     val notes = userGuildDetails.notes
     val infractions = userGuildDetails.infractions
     val maxPoints = config[guild.id.longValue]?.infractionConfiguration?.pointCeiling
+    val memberInGuild = target.asMemberOrNull(guild.id)
 
     color = discord.configuration.theme
     title = "${target.asUser().tag}'s Record"
@@ -235,17 +233,18 @@ suspend fun CommandEvent<*>.createStatusEmbed(target: Member,
         url = target.asUser().avatar.url
     }
 
+    if (memberInGuild == null) addField("**__User not currently in this guild__**", "")
     addInlineField("Notes", "${notes.size}")
     addInlineField("Infractions", "${infractions.size}")
     addInlineField("Points", "**${member.getPoints(guild)} / $maxPoints**")
-    addInlineField("Join date", formatOffsetTime(target.joinedAt))
+    if (memberInGuild != null) addInlineField("Join date", formatOffsetTime(memberInGuild.joinedAt))
     addInlineField("Creation date", formatOffsetTime(target.id.timeStamp))
     addInlineField("History Invokes", "${userGuildDetails.historyCount}")
 }
 
 private fun formatOffsetTime(time: Instant): String {
     val days = TimeUnit.MILLISECONDS.toDays(DateTime.now().millis - time.toEpochMilli())
-    val formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).withLocale(Locale.UK).withZone(ZoneOffset.UTC);
+    val formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).withLocale(Locale.UK).withZone(ZoneOffset.UTC)
     return if (days > 4) {
         "${formatter.format(time)}\n($days days ago)"
     } else {
