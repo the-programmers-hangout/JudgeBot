@@ -130,11 +130,16 @@ class MuteService(val configuration: Configuration,
         guild.channels.toList().forEach {
             val deniedPermissions = it.getPermissionOverwritesForRole(mutedRole.id)?.denied ?: Permissions()
             if (!deniedPermissions.contains(Permission.SendMessages) || !deniedPermissions.contains(Permission.AddReactions)) {
-                it.addOverwrite(
-                        PermissionOverwrite.forRole(
-                                mutedRole.id,
-                                denied = deniedPermissions.plus(Permission.SendMessages).plus(Permission.AddReactions))
-                )
+                try {
+                    it.addOverwrite(
+                            PermissionOverwrite.forRole(
+                                    mutedRole.id,
+                                    denied = deniedPermissions.plus(Permission.SendMessages).plus(Permission.AddReactions))
+                    )
+                } catch (ex: RequestException) {
+                    println("No permssions to add overwrite to ${it.id.value}")
+                }
+                
             }
         }
     }
