@@ -26,7 +26,7 @@ class GuildSetupConversation(private val configuration: Configuration, private v
                 staffRole,
                 moderatorRole,
                 mutedRole,
-                LoggingConfiguration(logChannel.id.value, alertChannel.id.value),
+                LoggingConfiguration(alertChannel.id.value, logChannel.id.value),
         )
         muteService.initGuilds()
     }
