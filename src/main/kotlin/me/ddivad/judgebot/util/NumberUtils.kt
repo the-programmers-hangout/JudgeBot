@@ -19,7 +19,7 @@ fun timeToString(milliseconds: Long): String {
 
 fun timeBetween(endTime: DateTime): String {
     val now = DateTime()
-    val days = Days.daysBetween(DateTime().withTimeAtStartOfDay(), endTime).days
+    val days = Days.daysBetween(now, endTime).days
     val hours = Hours.hoursBetween(now, endTime).hours
     val minutes = Minutes.minutesBetween(now, endTime).minutes
 
