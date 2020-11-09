@@ -28,7 +28,7 @@ data class Configuration(
 
         // Setup default punishments
         // TODO: Add configuration commands for this
-        newConfiguration.punishments.add(PunishmentLevel(0, PunishmentType.MUTE, 1000L * 60 * 60 * 1))
+        newConfiguration.punishments.add(PunishmentLevel(0, PunishmentType.NONE, 0L))
         newConfiguration.punishments.add(PunishmentLevel(10, PunishmentType.MUTE, 1000L * 60 * 60 * 1))
         newConfiguration.punishments.add(PunishmentLevel(20, PunishmentType.MUTE, 1000L * 60 * 60 * 12))
         newConfiguration.punishments.add(PunishmentLevel(30, PunishmentType.MUTE, 1000L * 60 * 60 * 24))
