@@ -70,7 +70,7 @@ class GuildOperations(private val connection: ConnectionService) {
 
     suspend fun editBanReason(guild: Guild, userId: String, reason: String) {
         val guildInfo = this.getGuild(guild)
-        guildInfo.bans.find { it.userId == userId }?.reason
+        guildInfo.bans.find { it.userId == userId }?.reason = reason
         updateGuild(guildInfo)
     }
 
@@ -92,6 +92,10 @@ class GuildOperations(private val connection: ConnectionService) {
 
     suspend fun getPunishmentsForUser(guild: Guild, user: User): List<Punishment> {
         return this.getGuild(guild).getPunishmentsByUser(user.id.value)
+    }
+
+    suspend fun getBanOrNull(guild: Guild, userId: String): Ban? {
+        return this.getGuild(guild).bans.find {it.userId == userId}
     }
 
     suspend fun getPunishmentsForGuild(guild: Guild, type: InfractionType): List<Punishment> {

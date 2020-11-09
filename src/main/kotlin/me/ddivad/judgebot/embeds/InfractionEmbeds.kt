@@ -5,17 +5,14 @@ import com.gitlab.kordlib.core.entity.Member
 import com.gitlab.kordlib.core.entity.User
 import com.gitlab.kordlib.rest.Image
 import com.gitlab.kordlib.rest.builder.message.EmbedBuilder
-import me.ddivad.judgebot.dataclasses.GuildConfiguration
-import me.ddivad.judgebot.dataclasses.Infraction
-import me.ddivad.judgebot.dataclasses.InfractionType
-import me.ddivad.judgebot.dataclasses.Rule
+import me.ddivad.judgebot.dataclasses.*
 import me.ddivad.judgebot.util.timeToString
 import me.jakejmattson.discordkt.api.extensions.addField
 import java.awt.Color
 
-fun EmbedBuilder.createInfractionEmbed(guild: Guild, configuration: GuildConfiguration, user: User, infraction: Infraction, rule: Rule?) {
+fun EmbedBuilder.createInfractionEmbed(guild: Guild, configuration: GuildConfiguration, user: User, guildMember: GuildMember, infraction: Infraction, rule: Rule?) {
     if (infraction.type == InfractionType.Warn) createWarnEmbed(guild, user, infraction)
-    else if (infraction.type == InfractionType.Strike) createStrikeEmbed(guild, configuration, user, infraction, rule)
+    else if (infraction.type == InfractionType.Strike) createStrikeEmbed(guild, configuration, user, guildMember, infraction, rule)
 }
 
 fun EmbedBuilder.createWarnEmbed(guild: Guild, user: User, infraction: Infraction) {
@@ -40,7 +37,7 @@ fun EmbedBuilder.createWarnEmbed(guild: Guild, user: User, infraction: Infractio
     }
 }
 
-fun EmbedBuilder.createStrikeEmbed(guild: Guild, configuration: GuildConfiguration, user: User, infraction: Infraction, rule: Rule?) {
+fun EmbedBuilder.createStrikeEmbed(guild: Guild, configuration: GuildConfiguration, user: User, guildMember: GuildMember, infraction: Infraction, rule: Rule?) {
     title = "Strike"
     description = """
                     | ${user.mention}, you have received a **strike** from **${guild.name}**. A strike is a formal warning for breaking the rules.
@@ -68,7 +65,7 @@ fun EmbedBuilder.createStrikeEmbed(guild: Guild, configuration: GuildConfigurati
 
     field {
         name = "__Points Count__"
-        value = "${infraction.points} / ${configuration.infractionConfiguration.pointCeiling}"
+        value = "${guildMember.getPoints(guild)} / ${configuration.infractionConfiguration.pointCeiling}"
         inline = true
     }
 

@@ -23,7 +23,7 @@ class InfractionService(private val configuration: Configuration,
         }
         return databaseService.users.addInfraction(guild, userRecord, infraction).also {
             target.asUser().sendPrivateMessage {
-                createInfractionEmbed(guild, configuration[guild.id.longValue]!!, target, it, rule)
+                createInfractionEmbed(guild, configuration[guild.id.longValue]!!, target, userRecord, it, rule)
             }
             loggingService.infractionApplied(guild, target.asUser(), it)
             applyPunishment(guild, target, userRecord, it)

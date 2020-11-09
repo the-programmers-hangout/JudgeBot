@@ -15,6 +15,7 @@ fun onMemberReactionAdd(configuration: Configuration) = listeners {
         if (!guildConfiguration?.reactions!!.enabled) return@on
 
         if(this.emoji.name == guildConfiguration.reactions.flagMessageReaction) {
+            message.deleteReaction(this.emoji)
             guild.asGuild().getChannelOf<TextChannel>(guildConfiguration.loggingConfiguration.alertChannel.toSnowflake())
                     .asChannel().createMessage("User ${user.mention} flagged the message: " +
                             "${this.message.asMessage().jumpLink(guild.id.value)} in: ${this.channel.mention}")

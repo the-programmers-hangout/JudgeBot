@@ -105,8 +105,8 @@ fun createUserCommands(databaseService: DatabaseService,
                 } else {
                     databaseService.guilds.editBanReason(guild, user.id.value, reason)
                 }
-                respond("Ban reason for ${user.mention} set to: $reason")
-            } else respond("User ${user.mention} isn't banned")
+                respond("Ban reason for ${user.username} set to: $reason")
+            } else respond("User ${user.username} isn't banned")
 
         }
     }
@@ -117,11 +117,12 @@ fun createUserCommands(databaseService: DatabaseService,
         execute(UserArg) {
             val user = args.first
             guild.getBanOrNull(user.id)?.let {
-                val reason = guild.getBan(args.first.id).reason ?: "No ban reason logged."
-                respond(reason)
+                val reason = databaseService.guilds.getBanOrNull(guild, user.id.value)?.reason
+                        ?: guild.getBan(args.first.id).reason
+                respond(reason ?: "No reason logged")
                 return@execute
             }
-           respond("${user.mention} isn't banned from this guild.")
+            respond("${user.username} isn't banned from this guild.")
         }
     }
 

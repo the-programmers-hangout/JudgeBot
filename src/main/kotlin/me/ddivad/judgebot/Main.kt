@@ -48,6 +48,7 @@ suspend fun main(args: Array<String>) {
             }
 
             addInlineField("Prefix", it.prefix())
+            addInlineField("Ping", botStats.ping)
             addInlineField("Contributors", "ddivad#0001")
 
             val kotlinVersion = KotlinVersion.CURRENT
@@ -55,19 +56,18 @@ suspend fun main(args: Array<String>) {
             field {
                 name = "Build Info"
                 value = "```" +
-                        "Version:   1.0.0\n" +
+                        "Version:   1.1.0\n" +
                         "DiscordKt: ${versions.library}\n" +
                         "Kotlin:    $kotlinVersion" +
                         "```"
             }
-
             field {
                 name = "Uptime"
                 value = botStats.uptime
             }
             field {
-                name = "Ping"
-                value = botStats.ping
+                name = "Source"
+                value = "[Github](https://github.com/the-programmers-hangout/judgebot)"
             }
         }
 
