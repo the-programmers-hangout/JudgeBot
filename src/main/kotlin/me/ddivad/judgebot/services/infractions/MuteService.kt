@@ -1,5 +1,6 @@
 package me.ddivad.judgebot.services.infractions
 
+import com.gitlab.kordlib.common.exception.RequestException
 import com.gitlab.kordlib.common.entity.Permission
 import com.gitlab.kordlib.common.entity.Permissions
 import com.gitlab.kordlib.core.entity.Guild
