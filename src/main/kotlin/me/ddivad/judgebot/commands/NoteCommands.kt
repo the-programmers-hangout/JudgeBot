@@ -8,13 +8,14 @@ import me.ddivad.judgebot.services.requiredPermissionLevel
 import me.jakejmattson.discordkt.api.arguments.EveryArg
 import me.jakejmattson.discordkt.api.arguments.IntegerArg
 import me.jakejmattson.discordkt.api.arguments.MemberArg
+import me.jakejmattson.discordkt.api.arguments.UserArg
 import me.jakejmattson.discordkt.api.dsl.commands
 
 fun noteCommands(databaseService: DatabaseService) = commands("Notes") {
     guildCommand("note") {
         description = "Use this to add a note to a user."
         requiredPermissionLevel = PermissionLevel.Moderator
-        execute(MemberArg, EveryArg("Note Content")) {
+        execute(UserArg, EveryArg("Note Content")) {
             val (target, note) = args
             val user = databaseService.users.getOrCreateUser(target, guild)
             databaseService.users.addNote(guild, user, note, author.id.value)

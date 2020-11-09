@@ -32,7 +32,7 @@
 | ------------ | ----------------------- | ------------------------------------------------- |
 | cleansenotes | LowerMemberArg          | Use this to delete (permanently) as user's notes. |
 | deleteNote   | LowerMemberArg, Integer | Use this to add a delete a note from a user.      |
-| note         | Member, Note Content    | Use this to add a note to a user.                 |
+| note         | User, Note Content      | Use this to add a note to a user.                 |
 
 ## Rules
 | Commands    | Arguments | Description                                       |
@@ -52,7 +52,7 @@
 | history, h   | User                                        | Use this to view a user's record.                          |
 | selfHistory  |                                             | View your infraction history (contents will be DM'd)       |
 | setBanReason | User, Text                                  | Set a ban reason for a banned user                         |
-| status, st   | Member                                      | Use this to view a user's status card.                     |
+| status, st   | User                                        | Use this to view a user's status card.                     |
 | unban        | User                                        | Unban a banned member from this guild.                     |
 | whatpfp      | User                                        | Perform a reverse image search of a User's profile picture |
 
