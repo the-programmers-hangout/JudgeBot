@@ -4,6 +4,7 @@ import com.gitlab.kordlib.core.event.message.ReactionAddEvent
 import com.gitlab.kordlib.kordx.emoji.Emojis
 import com.gitlab.kordlib.rest.route.Route
 import me.ddivad.judgebot.dataclasses.Configuration
+import me.ddivad.judgebot.embeds.createMessageDeleteEmbed
 import me.ddivad.judgebot.embeds.createSelfHistoryEmbed
 import me.ddivad.judgebot.services.DatabaseService
 import me.ddivad.judgebot.services.LoggingService
@@ -11,6 +12,7 @@ import me.ddivad.judgebot.services.PermissionLevel
 import me.ddivad.judgebot.services.PermissionsService
 import me.ddivad.judgebot.services.infractions.MuteService
 import me.jakejmattson.discordkt.api.dsl.listeners
+import me.jakejmattson.discordkt.api.extensions.isImagePost
 import me.jakejmattson.discordkt.api.extensions.sendPrivateMessage
 
 fun onStaffReactionAdd(muteService: MuteService,
@@ -39,9 +41,9 @@ fun onStaffReactionAdd(muteService: MuteService,
                     }
                     guildConfiguration.reactions.deleteMessageReaction -> {
                         message.deleteReaction(this.emoji)
-                        messageAuthor.sendPrivateMessage("Your message with content \n" +
-                                "```${message.asMessage().content}``` " +
-                                "was deleted as it is against our rules.")
+                        messageAuthor.sendPrivateMessage {
+                            createMessageDeleteEmbed(guild, messageAuthor, message.asMessage())
+                        }
                         message.delete()
                     }
                 }

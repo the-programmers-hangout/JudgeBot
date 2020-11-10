@@ -2,6 +2,7 @@ package me.ddivad.judgebot.embeds
 
 import com.gitlab.kordlib.core.entity.Guild
 import com.gitlab.kordlib.core.entity.Member
+import com.gitlab.kordlib.core.entity.Message
 import com.gitlab.kordlib.core.entity.User
 import com.gitlab.kordlib.rest.Image
 import com.gitlab.kordlib.rest.builder.message.EmbedBuilder
@@ -149,6 +150,26 @@ fun EmbedBuilder.createModeratorInfractionEmbed(guild: Guild, user: Member, infr
     """.trimIndent()
     addField("Reason", "${infraction.reason}")
     addField("Punishment", "${infraction.punishment?.punishment.toString()} ${if (infraction.punishment?.duration != null) "for " + timeToString(infraction.punishment?.duration!!) else "indefinitely"}")
+    footer {
+        icon = guild.getIconUrl(Image.Format.PNG) ?: ""
+        text = guild.name
+    }
+}
+
+fun EmbedBuilder.createMessageDeleteEmbed(guild: Guild, user: User, message: Message) {
+    title = "Message Deleted"
+    thumbnail {
+        url = guild.getIconUrl(Image.Format.PNG) ?: ""
+    }
+    color = Color.RED
+    description = """
+        Your ${if (message.attachments.isNotEmpty()) "image" else "message"} was deleted from ${message.channel.mention} 
+        as it is against our server rules.
+    """.trimIndent()
+    addField("Message", "```${message.content}```")
+    if (message.attachments.isNotEmpty()) {
+        addField("Filename", "```${message.attachments.first().filename}```")
+    }
     footer {
         icon = guild.getIconUrl(Image.Format.PNG) ?: ""
         text = guild.name
