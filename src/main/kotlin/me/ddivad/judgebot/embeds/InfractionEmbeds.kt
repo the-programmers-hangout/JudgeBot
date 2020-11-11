@@ -113,7 +113,7 @@ fun EmbedBuilder.createMuteEmbed(guild: Guild, user: User, reason: String, lengt
     }
 }
 
-fun EmbedBuilder.createUnmuteEmbed(guild: Guild, user: Member) {
+fun EmbedBuilder.createUnmuteEmbed(guild: Guild, user: User) {
     color = Color.GREEN
     title = "Mute Removed"
     description = "${user.mention} you have been unmuted from **${guild.name}**."
