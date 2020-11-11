@@ -156,7 +156,10 @@ fun EmbedBuilder.createModeratorInfractionEmbed(guild: Guild, user: Member, infr
     }
 }
 
-fun EmbedBuilder.createMessageDeleteEmbed(guild: Guild, user: User, message: Message) {
+fun EmbedBuilder.createMessageDeleteEmbed(guild: Guild, message: Message) {
+    var messageContent = message.content.take(1010)
+    if (message.content.length > 1024) messageContent += " ..."
+
     title = "Message Deleted"
     thumbnail {
         url = guild.getIconUrl(Image.Format.PNG) ?: ""
@@ -166,7 +169,7 @@ fun EmbedBuilder.createMessageDeleteEmbed(guild: Guild, user: User, message: Mes
         Your ${if (message.attachments.isNotEmpty()) "image" else "message"} was deleted from ${message.channel.mention} 
         as it is against our server rules.
     """.trimIndent()
-    addField("Message", "```${message.content}```")
+    addField("Message", "```${messageContent}```")
     if (message.attachments.isNotEmpty()) {
         addField("Filename", "```${message.attachments.first().filename}```")
     }
