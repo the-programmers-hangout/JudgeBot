@@ -54,7 +54,7 @@ class BadPfpService(private val muteService: MuteService,
             badPfpTracker[key]?.cancel()
             badPfpTracker.remove(key)
             loggingService.badPfpCancelled(guild, target)
-            muteService.removeMute(target)
+            muteService.removeMute(guild, target.asUser())
         }
     }
 }
