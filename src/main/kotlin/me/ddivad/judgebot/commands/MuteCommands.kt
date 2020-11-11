@@ -40,7 +40,7 @@ fun createMuteCommands(muteService: MuteService) = commands("Mute") {
                 return@execute
             }
 
-            muteService.removeMute(targetMember)
+            muteService.removeMute(guild, targetMember.asUser())
             respond("User ${args.first.username} has been unmuted")
         }
     }
