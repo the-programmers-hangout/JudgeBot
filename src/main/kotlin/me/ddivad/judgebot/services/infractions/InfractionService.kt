@@ -37,7 +37,7 @@ class InfractionService(private val configuration: Configuration,
             PunishmentType.BAN -> {
                 val clearTime = infraction.punishment!!.duration?.let { DateTime().millis.plus(it) }
                 val punishment = Punishment(target.id.value, InfractionType.Ban, infraction.reason, infraction.moderator, clearTime)
-                banService.banUser(target, guild, infraction.moderator, punishment)
+                banService.banUser(target, guild, punishment)
             }
         }
     }

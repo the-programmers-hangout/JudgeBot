@@ -34,7 +34,7 @@ class LoggingService(private val configuration: Configuration) {
     suspend fun channelOverrideAdded(guild: Guild, channel: TextChannel) =
             log(guild, "**Info ::** Channel overrides for muted role added to ${channel.name}")
 
-    suspend fun userBanned(guild: Guild, user: User, ban: Ban) {
+    suspend fun userBanned(guild: Guild, user: User, ban: Punishment) {
         val moderator = guild.kord.getUser(Snowflake(ban.moderator))
         log(guild, "**Info ::** User ${user.mention} :: ${user.tag} banned by ${moderator?.username} for reason: ${ban.reason}")
     }

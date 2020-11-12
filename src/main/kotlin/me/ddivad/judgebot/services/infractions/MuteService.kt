@@ -81,19 +81,18 @@ class MuteService(val configuration: Configuration,
     fun removeMute(guild: Guild, user: User) {
         runBlocking {
             val muteRole = getMutedRole(guild)
-            databaseService.guilds.removePunishment(guild, user.id.value, InfractionType.Mute)
             val key = toKey(user, guild)
-            muteTimerMap[key]?.cancel()
-            muteTimerMap.remove(key)
-
             guild.getMemberOrNull(user.id)?.let {
                 it.removeRole(muteRole.id)
                 it.sendPrivateMessage {
                     createUnmuteEmbed(guild, user)
                 }
+                loggingService.roleRemoved(guild, user, muteRole)
+                if (checkRoleState(guild, it) == RoleState.Untracked) return@runBlocking
             }
-
-            loggingService.roleRemoved(guild, user, muteRole)
+            databaseService.guilds.removePunishment(guild, user.id.value, InfractionType.Mute)
+            muteTimerMap[key]?.cancel()
+            muteTimerMap.remove(key)
         }
     }
 
@@ -123,8 +122,8 @@ class MuteService(val configuration: Configuration,
         }
     }
 
-    suspend fun checkRoleState(guild: Guild, member: Member, type: InfractionType) = when {
-        databaseService.guilds.checkPunishmentExists(guild, member, type).isNotEmpty() -> RoleState.Tracked
+    suspend fun checkRoleState(guild: Guild, member: Member) = when {
+        databaseService.guilds.checkPunishmentExists(guild, member, InfractionType.Mute).isNotEmpty() -> RoleState.Tracked
         member.roles.toList().contains(getMutedRole(member.getGuild())) -> RoleState.Untracked
         else -> RoleState.None
     }

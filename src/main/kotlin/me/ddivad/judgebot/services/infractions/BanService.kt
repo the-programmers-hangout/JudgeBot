@@ -21,9 +21,9 @@ class BanService(private val databaseService: DatabaseService,
     private val banTracker = hashMapOf<Int, Job>()
     private suspend fun toKey(member: Member): Pair<GuildID, UserId> = member.guild.id.value to member.asUser().id.value
 
-    suspend fun banUser(target: Member, guild: Guild, moderator: String, punishment: Punishment) {
+    suspend fun banUser(target: Member, guild: Guild, punishment: Punishment, deleteDays: Int = 1) {
         guild.ban(target.id) {
-            deleteMessagesDays = 1
+            deleteMessagesDays = deleteDays
             reason = punishment.reason
         }
         databaseService.guilds.addBan(guild, target.id.value, Ban(target.id.value, punishment.moderator, punishment.reason))

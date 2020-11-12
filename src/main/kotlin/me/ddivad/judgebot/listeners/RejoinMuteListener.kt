@@ -11,7 +11,7 @@ fun onMemberRejoinWithMute(muteService: MuteService, loggingService: LoggingServ
     on<MemberJoinEvent> {
         val member = this.member
         val guild = this.getGuild()
-        if (muteService.checkRoleState(guild, member, InfractionType.Mute) == RoleState.Tracked) {
+        if (muteService.checkRoleState(guild, member) == RoleState.Tracked) {
             muteService.handleRejoinMute(guild, member)
             loggingService.rejoinMute(guild, member.asUser(), RoleState.Tracked)
         }
