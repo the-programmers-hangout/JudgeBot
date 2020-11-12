@@ -6,6 +6,8 @@ import com.gitlab.kordlib.core.entity.User
 import me.ddivad.judgebot.arguments.LowerMemberArg
 import me.ddivad.judgebot.dataclasses.Ban
 import me.ddivad.judgebot.dataclasses.Configuration
+import me.ddivad.judgebot.dataclasses.InfractionType
+import me.ddivad.judgebot.dataclasses.Punishment
 import me.ddivad.judgebot.embeds.createHistoryEmbed
 import me.ddivad.judgebot.embeds.createSelfHistoryEmbed
 import me.ddivad.judgebot.embeds.createStatusEmbed
@@ -68,14 +70,10 @@ fun createUserCommands(databaseService: DatabaseService,
         requiredPermissionLevel = PermissionLevel.Staff
         execute(LowerMemberArg, IntegerArg("Delete message days").makeOptional(1), EveryArg) {
             val (target, deleteDays, reason) = args
-            guild.ban(target.id) {
-                this.reason = reason
-                this.deleteMessagesDays = deleteDays
-                val ban = Ban(target.id.value, reason, author.id.value)
-                databaseService.guilds.addBan(guild, target.id.value, ban).also {
-                    loggingService.userBanned(guild, target.asUser(), it)
-                    respond("User ${target.mention} banned")
-                }
+            val ban = Punishment(target.id.value, InfractionType.Ban , reason, author.id.value)
+            banService.banUser(target, guild, ban, deleteDays).also {
+                loggingService.userBanned(guild, target.asUser(), ban)
+                respond("User ${target.mention} banned")
             }
         }
     }

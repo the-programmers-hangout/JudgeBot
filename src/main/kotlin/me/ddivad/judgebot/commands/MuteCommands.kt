@@ -35,13 +35,13 @@ fun createMuteCommands(muteService: MuteService) = commands("Mute") {
         requiredPermissionLevel = PermissionLevel.Moderator
         execute(LowerMemberArg) {
             val targetMember = args.first
-            if (muteService.checkRoleState(guild, targetMember, InfractionType.Mute) == RoleState.None) {
+            if (muteService.checkRoleState(guild, targetMember) == RoleState.None) {
                 respond("User ${targetMember.mention} isn't muted")
                 return@execute
             }
 
             muteService.removeMute(guild, targetMember.asUser())
-            respond("User ${args.first.username} has been unmuted")
+            respond("User ${args.first.mention} has been unmuted")
         }
     }
 
@@ -56,7 +56,7 @@ fun createMuteCommands(muteService: MuteService) = commands("Mute") {
                 respond("Unable to contact the target user. Infraction cancelled.")
                 return@execute
             }
-            if (muteService.checkRoleState(guild, targetMember, InfractionType.Mute) == RoleState.Tracked) {
+            if (muteService.checkRoleState(guild, targetMember) == RoleState.Tracked) {
                 respond("User ${targetMember.mention} is already muted")
                 return@execute
             }
