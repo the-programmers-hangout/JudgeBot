@@ -4,7 +4,10 @@ import com.gitlab.kordlib.core.event.guild.GuildCreateEvent
 import com.gitlab.kordlib.core.event.guild.MemberJoinEvent
 import com.gitlab.kordlib.core.event.guild.MemberLeaveEvent
 import com.gitlab.kordlib.gateway.RequestGuildMembers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
 import me.ddivad.judgebot.services.DatabaseService
 import me.ddivad.judgebot.services.LoggingService
 import me.jakejmattson.discordkt.api.dsl.listeners
@@ -22,10 +25,16 @@ fun onGuildMemberLeave(loggingService: LoggingService, databaseService: Database
     }
 
     on<MemberJoinEvent> {
-        databaseService.users.getUserOrNull(this.member.asUser(), this.guild.asGuild())?.let {
-            databaseService.users.addGuildJoin(this.getGuild(), it, this.member.joinedAt.toEpochMilli())
+        val user = this.member.asUser()
+        val guild = this.getGuild()
+        databaseService.users.getUserOrNull(user, guild)?.let {
+            databaseService.users.addGuildJoin(guild, it, this.member.joinedAt.toEpochMilli())
             return@on
         }
-        databaseService.users.getOrCreateUser(this.member.asUser(), this.getGuild())
+        // Add delay before creating user in case they are banned (raid, etc...)
+        GlobalScope.launch {
+            delay(1000 * 60 * 5)
+            databaseService.users.getOrCreateUser(member, guild)
+        }
     }
 }
