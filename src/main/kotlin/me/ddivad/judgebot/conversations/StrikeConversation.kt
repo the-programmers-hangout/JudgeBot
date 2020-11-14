@@ -5,7 +5,6 @@ import com.gitlab.kordlib.core.entity.Member
 import me.ddivad.judgebot.arguments.RuleArg
 import me.ddivad.judgebot.dataclasses.*
 import me.ddivad.judgebot.embeds.createHistoryEmbed
-import me.ddivad.judgebot.embeds.createModeratorInfractionEmbed
 import me.ddivad.judgebot.embeds.createRuleEmbedForStrike
 import me.ddivad.judgebot.services.DatabaseService
 import me.ddivad.judgebot.services.infractions.InfractionService

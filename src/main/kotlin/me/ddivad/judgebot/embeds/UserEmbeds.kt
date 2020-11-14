@@ -32,9 +32,10 @@ suspend fun MenuBuilder.createHistoryEmbed(
 ) {
     val userGuildDetails = member.getGuildInfo(guild.id.value)
     val notes = userGuildDetails.notes
+    val information = userGuildDetails.info
     val infractions = userGuildDetails.infractions
     val paginatedNotes = notes.chunked(4)
-    val totalMenuPages = 1 + 1 + 1 + if (paginatedNotes.isNotEmpty()) paginatedNotes.size else 1
+    val totalMenuPages = 1 + 1 + 1 + 1 + if (paginatedNotes.isNotEmpty()) paginatedNotes.size else 1
     val maxPoints = config[guild.id.longValue]?.infractionConfiguration?.pointCeiling
     page {
         color = Color.MAGENTA
@@ -141,7 +142,7 @@ suspend fun MenuBuilder.createHistoryEmbed(
             }
 
             addInlineField("Notes", "${notes.size}")
-            addInlineField("Infractions", "${infractions.size}")
+            addInlineField("Information", "${information.size}")
             addInlineField("Points", "**${member.getPoints(guild)} / $maxPoints**")
 
             addField("", "**__Notes:__**")
@@ -160,6 +161,10 @@ suspend fun MenuBuilder.createHistoryEmbed(
             thumbnail {
                 url = target.asUser().avatar.url
             }
+            addInlineField("Notes", "${notes.size}")
+            addInlineField("Information", "${information.size}")
+            addInlineField("Points", "**${member.getPoints(guild)} / $maxPoints**")
+
             list.forEachIndexed { _, note ->
                 val moderator = guild.kord.getUser(Snowflake(note.moderator))?.username
 
@@ -172,6 +177,52 @@ suspend fun MenuBuilder.createHistoryEmbed(
             footer {
                 icon = guild.getIconUrl(Image.Format.PNG) ?: ""
                 text = "Page ${3 + index} of $totalMenuPages"
+            }
+        }
+    }
+
+    if (information.isEmpty()) {
+        page {
+            color = Color.MAGENTA
+            title = "${target.asUser().tag}: Information"
+            thumbnail {
+                url = target.asUser().avatar.url
+            }
+
+            addInlineField("Notes", "${notes.size}")
+            addInlineField("Information", "${information.size}")
+            addInlineField("Points", "**${member.getPoints(guild)} / $maxPoints**")
+
+            addField("", "**__Information:__**")
+            addField("**No Information**", "User has no information records.")
+            footer {
+                icon = guild.getIconUrl(Image.Format.PNG) ?: ""
+                text = "Page ${3 + if (paginatedNotes.isEmpty()) 1 else paginatedNotes.size} of $totalMenuPages"
+            }
+        }
+    } else {
+        page {
+            color = Color.MAGENTA
+            title = "${target.asUser().tag}: Information"
+            thumbnail {
+                url = target.asUser().avatar.url
+            }
+            addInlineField("Notes", "${notes.size}")
+            addInlineField("Information", "${information.size}")
+            addInlineField("Points", "**${member.getPoints(guild)} / $maxPoints**")
+
+            information.forEachIndexed { _, info ->
+                val moderator = guild.kord.getUser(Snowflake(info.moderator))?.username
+
+                addField(
+                        "ID :: ${info.id} :: Staff :: __${moderator}__",
+                        "Sent by **${moderator}** on **${SimpleDateFormat("dd/MM/yyyy").format(Date(info.dateTime))}**\n" +
+                                info.message
+                )
+            }
+            footer {
+                icon = guild.getIconUrl(Image.Format.PNG) ?: ""
+                text = "Page ${3 + if (paginatedNotes.isEmpty()) 1 else paginatedNotes.size} of $totalMenuPages"
             }
         }
     }
@@ -197,7 +248,7 @@ suspend fun MenuBuilder.createHistoryEmbed(
         }
         footer {
             icon = guild.getIconUrl(Image.Format.PNG) ?: ""
-            text = "Page ${3 + if (paginatedNotes.isEmpty()) 1 else paginatedNotes.size} of $totalMenuPages"
+            text = "Page ${4 + if (paginatedNotes.isEmpty()) 1 else paginatedNotes.size} of $totalMenuPages"
         }
     }
 }

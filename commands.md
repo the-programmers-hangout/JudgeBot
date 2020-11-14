@@ -50,6 +50,8 @@
 | ban          | LowerMemberArg, (Delete message days), Text | Ban a member from this guild.                              |
 | getBanReason | User                                        | Get a ban reason for a banned user                         |
 | history, h   | User                                        | Use this to view a user's record.                          |
+| info         | LowerMemberArg, Info Content                | Send an information message to a guild member              |
+| removeInfo   | LowerMemberArg, Integer                     | Remove an information message from a member record.        |
 | selfHistory  |                                             | View your infraction history (contents will be DM'd)       |
 | setBanReason | User, Text                                  | Set a ban reason for a banned user                         |
 | status, st   | User                                        | Use this to view a user's status card.                     |
