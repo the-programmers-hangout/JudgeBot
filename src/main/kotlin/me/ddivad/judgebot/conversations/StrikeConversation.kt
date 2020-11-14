@@ -30,8 +30,7 @@ class StrikeConversation(private val databaseService: DatabaseService,
         } else null
         val infraction = Infraction(this.user.id.value, infractionReason, InfractionType.Strike, points, rule)
 
-        val infractionRecord = infractionService.infract(targetUser, guild, user, infraction)
+        infractionService.infract(targetUser, guild, user, infraction)
         respondMenu { createHistoryEmbed(targetUser, user, guild, configuration, databaseService) }
-        this.user.sendPrivateMessage{ createModeratorInfractionEmbed(guild, targetUser, infractionRecord) }
     }
 }
