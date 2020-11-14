@@ -8,18 +8,17 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import me.ddivad.judgebot.services.DatabaseService
-import me.ddivad.judgebot.services.LoggingService
 import me.jakejmattson.discordkt.api.dsl.listeners
 import org.joda.time.DateTime
 
 @Suppress("unused")
-fun onGuildMemberLeave(loggingService: LoggingService, databaseService: DatabaseService) = listeners {
+fun onGuildMemberLeave(databaseService: DatabaseService) = listeners {
     on<GuildCreateEvent> {
         gateway.send(RequestGuildMembers(guildId = listOf(guild.id.value)))
     }
 
     on<MemberLeaveEvent> {
-        databaseService.users.getUserOrNull(this.user.asUser(), this.guild.asGuild())?.let {
+        databaseService.users.getUserOrNull(this.user.asUser())?.let {
             databaseService.users.addGuildLeave(it, guild.asGuild(), DateTime.now().millis)
         }
     }
@@ -27,7 +26,7 @@ fun onGuildMemberLeave(loggingService: LoggingService, databaseService: Database
     on<MemberJoinEvent> {
         val user = this.member.asUser()
         val guild = this.getGuild()
-        databaseService.users.getUserOrNull(user, guild)?.let {
+        databaseService.users.getUserOrNull(user)?.let {
             databaseService.users.addGuildJoin(guild, it, this.member.joinedAt.toEpochMilli())
             return@on
         }

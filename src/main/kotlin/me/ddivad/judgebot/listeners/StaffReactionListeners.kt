@@ -5,7 +5,6 @@ import com.gitlab.kordlib.core.event.message.ReactionAddEvent
 import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.embeds.createMessageDeleteEmbed
 import me.ddivad.judgebot.embeds.createSelfHistoryEmbed
-import me.ddivad.judgebot.extensions.testDmStatus
 import me.ddivad.judgebot.services.DatabaseService
 import me.ddivad.judgebot.services.PermissionLevel
 import me.ddivad.judgebot.services.PermissionsService

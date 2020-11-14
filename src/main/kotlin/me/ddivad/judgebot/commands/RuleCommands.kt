@@ -21,7 +21,7 @@ fun ruleCommands(configuration: Configuration,
         description = "Add a rule to this guild."
         requiredPermissionLevel = PermissionLevel.Administrator
         execute {
-            AddRuleConversation(configuration, databaseService)
+            AddRuleConversation(databaseService)
                     .createAddRuleConversation(guild)
                     .startPublicly(discord, author, channel)
         }
@@ -31,7 +31,7 @@ fun ruleCommands(configuration: Configuration,
         description = "Edit a rule in this guild."
         requiredPermissionLevel = PermissionLevel.Administrator
         execute {
-            EditRuleConversation(configuration, databaseService)
+            EditRuleConversation(databaseService)
                     .createAddRuleConversation(guild)
                     .startPublicly(discord, author, channel)
         }
@@ -41,7 +41,7 @@ fun ruleCommands(configuration: Configuration,
         description = "Archive a rule in this guild."
         requiredPermissionLevel = PermissionLevel.Administrator
         execute {
-            ArchiveRuleConversation(configuration, databaseService)
+            ArchiveRuleConversation(databaseService)
                     .createArchiveRuleConversation(guild)
                     .startPublicly(discord, author, channel)
         }

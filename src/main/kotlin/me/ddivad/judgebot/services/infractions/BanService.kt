@@ -26,7 +26,7 @@ class BanService(private val databaseService: DatabaseService,
             deleteMessagesDays = deleteDays
             reason = punishment.reason
         }
-        databaseService.guilds.addBan(guild, target.id.value, Ban(target.id.value, punishment.moderator, punishment.reason))
+        databaseService.guilds.addBan(guild, Ban(target.id.value, punishment.moderator, punishment.reason))
         if (punishment.clearTime != null) {
             databaseService.guilds.addPunishment(guild.asGuild(), punishment)
             banTracker[punishment.id] = GlobalScope.launch {

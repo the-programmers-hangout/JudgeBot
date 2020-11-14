@@ -29,7 +29,7 @@ class UserOperations(connection: ConnectionService, private val configuration: C
         }
     }
 
-    suspend fun getUserOrNull(target: User, guild: Guild): GuildMember? {
+    suspend fun getUserOrNull(target: User): GuildMember? {
         return userCollection.findOne(GuildMember::userId eq target.id.value)
     }
 
