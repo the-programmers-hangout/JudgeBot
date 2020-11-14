@@ -11,7 +11,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import me.ddivad.judgebot.dataclasses.Configuration
-import me.ddivad.judgebot.dataclasses.GuildMember
 import me.ddivad.judgebot.dataclasses.InfractionType
 import me.ddivad.judgebot.dataclasses.Punishment
 import me.ddivad.judgebot.embeds.createMuteEmbed

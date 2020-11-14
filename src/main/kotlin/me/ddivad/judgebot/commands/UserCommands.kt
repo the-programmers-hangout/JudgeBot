@@ -3,7 +3,6 @@ package me.ddivad.judgebot.commands
 import me.ddivad.judgebot.arguments.LowerMemberArg
 import me.ddivad.judgebot.dataclasses.*
 import me.ddivad.judgebot.embeds.createHistoryEmbed
-import me.ddivad.judgebot.embeds.createInformationEmbed
 import me.ddivad.judgebot.embeds.createSelfHistoryEmbed
 import me.ddivad.judgebot.embeds.createStatusEmbed
 import me.ddivad.judgebot.services.DatabaseService
@@ -95,7 +94,7 @@ fun createUserCommands(databaseService: DatabaseService,
             val ban = Ban(user.id.value, author.id.value, reason)
             if (guild.getBanOrNull(user.id) != null) {
                 if (!databaseService.guilds.checkBanExists(guild, user.id.value)) {
-                    databaseService.guilds.addBan(guild, user.id.value, ban)
+                    databaseService.guilds.addBan(guild, ban)
                 } else {
                     databaseService.guilds.editBanReason(guild, user.id.value, reason)
                 }
@@ -130,36 +129,6 @@ fun createUserCommands(databaseService: DatabaseService,
             user.sendPrivateMessage {
                 createSelfHistoryEmbed(user, guildMember, guild, config)
             }
-        }
-    }
-
-    guildCommand("info") {
-        description = "Send an information message to a guild member"
-        requiredPermissionLevel = PermissionLevel.Moderator
-        execute(LowerMemberArg, EveryArg("Info Content")) {
-            val (target, content) = args
-            val user = databaseService.users.getOrCreateUser(target, guild)
-            val information = Info(content, author.id.value)
-            databaseService.users.addInfo(guild, user, information)
-            target.sendPrivateMessage {
-                createInformationEmbed(guild, target, information)
-            }
-            respond("Info added and sent to user.")
-        }
-    }
-
-    guildCommand("removeInfo") {
-        description = "Remove an information message from a member record."
-        requiredPermissionLevel = PermissionLevel.Staff
-        execute(LowerMemberArg, IntegerArg) {
-            val (target, id) = args
-            val user = databaseService.users.getOrCreateUser(target, guild)
-            if (user.getGuildInfo(guild.id.value).info.isEmpty()) {
-                respond("User has no information records.")
-                return@execute
-            }
-            databaseService.users.removeInfo(guild, user, id)
-            respond("Information record removed.")
         }
     }
 }

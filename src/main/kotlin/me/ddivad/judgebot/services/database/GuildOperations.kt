@@ -63,7 +63,7 @@ class GuildOperations(connection: ConnectionService) {
         this.getGuild(guild).removePunishment(userId, type).let { updateGuild(it) }
     }
 
-    suspend fun addBan(guild: Guild, userId: String, ban: Ban): Ban {
+    suspend fun addBan(guild: Guild, ban: Ban): Ban {
         this.getGuild(guild).addBan(ban).let { updateGuild(it) }
         return ban
     }

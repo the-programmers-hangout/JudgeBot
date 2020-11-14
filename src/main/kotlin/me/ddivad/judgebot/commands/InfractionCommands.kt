@@ -84,7 +84,7 @@ fun createInfractionCommands(databaseService: DatabaseService,
             }
 
             val badPfp = Infraction(author.id.value, "BadPfp", InfractionType.BadPfp)
-            badPfpService.applyBadPfp(targetMember, guild, badPfp, timeLimit)
+            badPfpService.applyBadPfp(targetMember, guild, timeLimit)
             respond("${targetMember.mention} has been muted and a badpfp has been triggered with a time limit of $minutesUntilBan minutes.")
         }
     }

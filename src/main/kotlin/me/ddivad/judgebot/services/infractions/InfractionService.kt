@@ -26,11 +26,11 @@ class InfractionService(private val configuration: Configuration,
                 createInfractionEmbed(guild, configuration[guild.id.longValue]!!, target, userRecord, it, rule)
             }
             loggingService.infractionApplied(guild, target.asUser(), it)
-            applyPunishment(guild, target, userRecord, it)
+            applyPunishment(guild, target, it)
         }
     }
 
-    private suspend fun applyPunishment(guild: Guild, target: Member, guildMember: GuildMember, infraction: Infraction) {
+    private suspend fun applyPunishment(guild: Guild, target: Member, infraction: Infraction) {
         when (infraction.punishment?.punishment) {
             PunishmentType.NONE -> return
             PunishmentType.MUTE -> muteService.applyMute(target, infraction.punishment?.duration!!, infraction.reason)

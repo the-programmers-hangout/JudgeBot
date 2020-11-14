@@ -10,8 +10,7 @@ import me.jakejmattson.discordkt.api.arguments.EveryArg
 import me.jakejmattson.discordkt.api.arguments.UrlArg
 import me.jakejmattson.discordkt.api.dsl.conversation
 
-class AddRuleConversation(private val configuration: Configuration,
-                          private val databaseService: DatabaseService) {
+class AddRuleConversation(private val databaseService: DatabaseService) {
     fun createAddRuleConversation(guild: Guild) = conversation("cancel") {
         val rules = databaseService.guilds.getRules(guild)
         val nextId = rules.size.plus(1)

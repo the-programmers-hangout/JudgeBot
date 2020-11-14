@@ -42,7 +42,7 @@ fun noteCommands(databaseService: DatabaseService) = commands("Notes") {
         requiredPermissionLevel = PermissionLevel.Administrator
         execute(LowerMemberArg) {
             val user = databaseService.users.getOrCreateUser(args.first, guild)
-            if (user.getGuildInfo(guild.id.value)!!.notes.isEmpty()) {
+            if (user.getGuildInfo(guild.id.value).notes.isEmpty()) {
                 respond("User has no notes.")
                 return@execute
             }

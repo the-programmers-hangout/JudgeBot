@@ -8,7 +8,7 @@ import org.litote.kmongo.coroutine.coroutine
 import org.litote.kmongo.reactivestreams.KMongo
 
 @Service
-class ConnectionService(val config: Configuration) {
+class ConnectionService(config: Configuration) {
     private val client: CoroutineClient = KMongo.createClient(config.dbConfiguration.address).coroutine
     val db: CoroutineDatabase = client.getDatabase(config.dbConfiguration.databaseName)
 }
