@@ -16,7 +16,8 @@ import me.jakejmattson.discordkt.api.arguments.EveryArg
 import me.jakejmattson.discordkt.api.arguments.IntegerArg
 import me.jakejmattson.discordkt.api.dsl.commands
 
-fun createInfractonCommands(databaseService: DatabaseService,
+@Suppress("unused")
+fun createInfractionCommands(databaseService: DatabaseService,
                             config: Configuration,
                             infractionService: InfractionService,
                             badPfpService: BadPfpService) = commands("Infraction") {

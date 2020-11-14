@@ -7,6 +7,7 @@ import me.ddivad.judgebot.services.infractions.MuteService
 import me.ddivad.judgebot.services.infractions.RoleState
 import me.jakejmattson.discordkt.api.dsl.listeners
 
+@Suppress("unused")
 fun onMemberRejoinWithMute(muteService: MuteService, loggingService: LoggingService) = listeners {
     on<MemberJoinEvent> {
         val member = this.member

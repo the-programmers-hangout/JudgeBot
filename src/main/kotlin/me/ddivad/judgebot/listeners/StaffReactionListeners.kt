@@ -13,6 +13,7 @@ import me.ddivad.judgebot.services.infractions.MuteService
 import me.jakejmattson.discordkt.api.dsl.listeners
 import me.jakejmattson.discordkt.api.extensions.sendPrivateMessage
 
+@Suppress("unused")
 fun onStaffReactionAdd(muteService: MuteService,
                        databaseService: DatabaseService,
                        permissionsService: PermissionsService,

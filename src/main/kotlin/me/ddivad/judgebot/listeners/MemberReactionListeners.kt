@@ -8,6 +8,7 @@ import me.ddivad.judgebot.extensions.jumpLink
 import me.jakejmattson.discordkt.api.dsl.listeners
 import me.jakejmattson.discordkt.api.extensions.toSnowflake
 
+@Suppress("unused")
 fun onMemberReactionAdd(configuration: Configuration) = listeners {
     on<ReactionAddEvent> {
         val guild = guild?.asGuildOrNull() ?: return@on

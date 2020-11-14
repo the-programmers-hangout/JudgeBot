@@ -12,10 +12,6 @@ data class GuildInformation(
         return this
     }
 
-    fun getRuleById(ruleNumber: Int): Rule? {
-        return this.rules.firstOrNull { it.number == ruleNumber }
-    }
-
     fun archiveRule(ruleNumber: Int): GuildInformation {
         this.rules.find { it.number == ruleNumber }!!.archived = true
         return this
