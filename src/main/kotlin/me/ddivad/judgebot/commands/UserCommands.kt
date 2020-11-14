@@ -4,11 +4,9 @@ import com.gitlab.kordlib.common.exception.RequestException
 import com.gitlab.kordlib.core.behavior.ban
 import com.gitlab.kordlib.core.entity.User
 import me.ddivad.judgebot.arguments.LowerMemberArg
-import me.ddivad.judgebot.dataclasses.Ban
-import me.ddivad.judgebot.dataclasses.Configuration
-import me.ddivad.judgebot.dataclasses.InfractionType
-import me.ddivad.judgebot.dataclasses.Punishment
+import me.ddivad.judgebot.dataclasses.*
 import me.ddivad.judgebot.embeds.createHistoryEmbed
+import me.ddivad.judgebot.embeds.createInformationEmbed
 import me.ddivad.judgebot.embeds.createSelfHistoryEmbed
 import me.ddivad.judgebot.embeds.createStatusEmbed
 import me.ddivad.judgebot.services.DatabaseService
@@ -135,6 +133,36 @@ fun createUserCommands(databaseService: DatabaseService,
             user.sendPrivateMessage {
                 createSelfHistoryEmbed(user, guildMember, guild, config)
             }
+        }
+    }
+
+    guildCommand("info") {
+        description = "Send an information message to a guild member"
+        requiredPermissionLevel = PermissionLevel.Moderator
+        execute(LowerMemberArg, EveryArg("Info Content")) {
+            val (target, content) = args
+            val user = databaseService.users.getOrCreateUser(target, guild)
+            val information = Info(content, author.id.value)
+            databaseService.users.addInfo(guild, user, information)
+            target.sendPrivateMessage {
+                createInformationEmbed(guild, target, information)
+            }
+            respond("Info added and sent to user.")
+        }
+    }
+
+    guildCommand("removeInfo") {
+        description = "Remove an information message from a member record."
+        requiredPermissionLevel = PermissionLevel.Staff
+        execute(LowerMemberArg, IntegerArg) {
+            val (target, id) = args
+            val user = databaseService.users.getOrCreateUser(target, guild)
+            if (user.getGuildInfo(guild.id.value).info.isEmpty()) {
+                respond("User has no information records.")
+                return@execute
+            }
+            databaseService.users.removeInfo(guild, user, id)
+            respond("Information record removed.")
         }
     }
 }

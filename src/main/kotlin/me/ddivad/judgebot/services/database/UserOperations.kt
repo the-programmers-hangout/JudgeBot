@@ -43,6 +43,16 @@ class UserOperations(private val connection: ConnectionService, private val conf
         return this.updateUser(user)
     }
 
+    suspend fun addInfo(guild: Guild, user: GuildMember, information: Info): GuildMember {
+        user.addInfo(information, guild)
+        return this.updateUser(user)
+    }
+
+    suspend fun removeInfo(guild: Guild, user: GuildMember, noteId: Int): GuildMember {
+        user.removeInfo(noteId, guild)
+        return this.updateUser(user)
+    }
+
     suspend fun cleanseNotes(guild: Guild, user: GuildMember): GuildMember {
         user.cleanseNotes(guild)
         return this.updateUser(user)
