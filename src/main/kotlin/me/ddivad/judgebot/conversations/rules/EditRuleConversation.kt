@@ -16,7 +16,7 @@ class EditRuleConversation(private val configuration: Configuration,
     fun createAddRuleConversation(guild: Guild) = conversation("cancel") {
         val rules = databaseService.guilds.getRules(guild)
         val ruleNumberToUpdate = promptMessage(IntegerArg, "Which rule would you like to update?")
-        val ruleToUpdate = rules?.find { it.number == ruleNumberToUpdate } ?: return@conversation
+        val ruleToUpdate = rules.find { it.number == ruleNumberToUpdate } ?: return@conversation
         respond("Current Rule:")
         respond {
             createRuleEmbed(guild, ruleToUpdate)
@@ -28,10 +28,10 @@ class EditRuleConversation(private val configuration: Configuration,
             updateNumber -> promptUntil(
                     argumentType = IntegerArg,
                     prompt = "Please enter rule number:",
-                    isValid = { number -> !rules?.any { it.number == number } },
+                    isValid = { number -> !rules.any { it.number == number } },
                     error = "Rule with that number already exists"
             )
-            else -> ruleToUpdate!!.number
+            else -> ruleToUpdate.number
         }
         val updateName = promptMessage(BooleanArg(truthValue = "y", falseValue = "n"),
                 "Update Rule name? (Y/N)")
@@ -40,7 +40,7 @@ class EditRuleConversation(private val configuration: Configuration,
                     EveryArg,
                     "Please enter rule name:",
                     "Rule with that name already exists",
-                    isValid = { name -> !rules?.any { it.title == name } }
+                    isValid = { name -> !rules.any { it.title == name } }
             )
             else -> ruleToUpdate.title
         }

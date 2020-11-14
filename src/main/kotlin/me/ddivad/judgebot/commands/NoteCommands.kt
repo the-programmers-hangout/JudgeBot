@@ -1,16 +1,15 @@
 package me.ddivad.judgebot.commands
 
 import me.ddivad.judgebot.arguments.LowerMemberArg
-import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.services.DatabaseService
 import me.ddivad.judgebot.services.PermissionLevel
 import me.ddivad.judgebot.services.requiredPermissionLevel
 import me.jakejmattson.discordkt.api.arguments.EveryArg
 import me.jakejmattson.discordkt.api.arguments.IntegerArg
-import me.jakejmattson.discordkt.api.arguments.MemberArg
 import me.jakejmattson.discordkt.api.arguments.UserArg
 import me.jakejmattson.discordkt.api.dsl.commands
 
+@Suppress("unused")
 fun noteCommands(databaseService: DatabaseService) = commands("Notes") {
     guildCommand("note") {
         description = "Use this to add a note to a user."

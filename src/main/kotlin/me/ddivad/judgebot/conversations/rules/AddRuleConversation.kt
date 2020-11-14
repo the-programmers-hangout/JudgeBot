@@ -14,7 +14,7 @@ class AddRuleConversation(private val configuration: Configuration,
                           private val databaseService: DatabaseService) {
     fun createAddRuleConversation(guild: Guild) = conversation("cancel") {
         val rules = databaseService.guilds.getRules(guild)
-        val nextId = rules?.size?.plus(1)!!
+        val nextId = rules.size.plus(1)
 
         val ruleName = promptMessage(EveryArg, "Please enter rule name:")
         val ruleText = promptMessage(EveryArg, "Please enter rule text")

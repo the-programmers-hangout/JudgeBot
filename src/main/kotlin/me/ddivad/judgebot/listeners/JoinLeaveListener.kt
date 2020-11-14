@@ -6,13 +6,13 @@ import com.gitlab.kordlib.core.event.guild.MemberLeaveEvent
 import com.gitlab.kordlib.gateway.RequestGuildMembers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import me.ddivad.judgebot.services.DatabaseService
 import me.ddivad.judgebot.services.LoggingService
 import me.jakejmattson.discordkt.api.dsl.listeners
 import org.joda.time.DateTime
 
+@Suppress("unused")
 fun onGuildMemberLeave(loggingService: LoggingService, databaseService: DatabaseService) = listeners {
     on<GuildCreateEvent> {
         gateway.send(RequestGuildMembers(guildId = listOf(guild.id.value)))

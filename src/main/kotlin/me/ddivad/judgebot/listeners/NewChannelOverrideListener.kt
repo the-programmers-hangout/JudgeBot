@@ -9,6 +9,7 @@ import me.ddivad.judgebot.services.LoggingService
 import me.jakejmattson.discordkt.api.dsl.listeners
 import me.jakejmattson.discordkt.api.extensions.toSnowflake
 
+@Suppress("unused")
 fun onChannelCreated(configuration: Configuration, loggingService: LoggingService) = listeners {
     on<TextChannelCreateEvent> {
         val channel = this.channel

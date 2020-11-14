@@ -11,7 +11,7 @@ import me.jakejmattson.discordkt.api.annotations.Service
 import org.litote.kmongo.eq
 
 @Service
-class UserOperations(private val connection: ConnectionService, private val configuration: Configuration) {
+class UserOperations(connection: ConnectionService, private val configuration: Configuration) {
     private val userCollection = connection.db.getCollection<GuildMember>("Users")
 
     suspend fun getOrCreateUser(target: User, guild: Guild): GuildMember {
