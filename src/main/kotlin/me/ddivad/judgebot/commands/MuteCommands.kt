@@ -2,7 +2,6 @@ package me.ddivad.judgebot.commands
 
 import com.gitlab.kordlib.common.exception.RequestException
 import me.ddivad.judgebot.arguments.LowerMemberArg
-import me.ddivad.judgebot.dataclasses.InfractionType
 import me.ddivad.judgebot.extensions.testDmStatus
 import me.ddivad.judgebot.services.*
 import me.ddivad.judgebot.services.infractions.MuteService
@@ -13,6 +12,7 @@ import me.jakejmattson.discordkt.api.arguments.TimeArg
 import me.jakejmattson.discordkt.api.dsl.commands
 import kotlin.math.roundToLong
 
+@Suppress("unused")
 fun createMuteCommands(muteService: MuteService) = commands("Mute") {
     guildCommand("mute") {
         description = "Mute a user for a specified time."

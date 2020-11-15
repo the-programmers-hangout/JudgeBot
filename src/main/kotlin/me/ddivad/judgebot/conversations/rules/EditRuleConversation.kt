@@ -1,7 +1,6 @@
 package me.ddivad.judgebot.conversations.rules
 
 import com.gitlab.kordlib.core.entity.Guild
-import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.dataclasses.Rule
 import me.ddivad.judgebot.embeds.createRuleEmbed
 import me.ddivad.judgebot.services.DatabaseService
@@ -11,12 +10,11 @@ import me.jakejmattson.discordkt.api.arguments.IntegerArg
 import me.jakejmattson.discordkt.api.arguments.UrlArg
 import me.jakejmattson.discordkt.api.dsl.conversation
 
-class EditRuleConversation(private val configuration: Configuration,
-                           private val databaseService: DatabaseService) {
+class EditRuleConversation(private val databaseService: DatabaseService) {
     fun createAddRuleConversation(guild: Guild) = conversation("cancel") {
         val rules = databaseService.guilds.getRules(guild)
         val ruleNumberToUpdate = promptMessage(IntegerArg, "Which rule would you like to update?")
-        val ruleToUpdate = rules?.find { it.number == ruleNumberToUpdate } ?: return@conversation
+        val ruleToUpdate = rules.find { it.number == ruleNumberToUpdate } ?: return@conversation
         respond("Current Rule:")
         respond {
             createRuleEmbed(guild, ruleToUpdate)
@@ -28,10 +26,10 @@ class EditRuleConversation(private val configuration: Configuration,
             updateNumber -> promptUntil(
                     argumentType = IntegerArg,
                     prompt = "Please enter rule number:",
-                    isValid = { number -> !rules?.any { it.number == number } },
+                    isValid = { number -> !rules.any { it.number == number } },
                     error = "Rule with that number already exists"
             )
-            else -> ruleToUpdate!!.number
+            else -> ruleToUpdate.number
         }
         val updateName = promptMessage(BooleanArg(truthValue = "y", falseValue = "n"),
                 "Update Rule name? (Y/N)")
@@ -40,7 +38,7 @@ class EditRuleConversation(private val configuration: Configuration,
                     EveryArg,
                     "Please enter rule name:",
                     "Rule with that name already exists",
-                    isValid = { name -> !rules?.any { it.title == name } }
+                    isValid = { name -> !rules.any { it.title == name } }
             )
             else -> ruleToUpdate.title
         }

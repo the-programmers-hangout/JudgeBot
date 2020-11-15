@@ -11,7 +11,7 @@ import org.litote.kmongo.eq
 // Note: RunBlocking is needed for DB operations in this service, as they are used in a conversation (which does not support "suspend" functions)
 
 @Service
-class GuildOperations(private val connection: ConnectionService) {
+class GuildOperations(connection: ConnectionService) {
     private val guildCollection = connection.db.getCollection<GuildInformation>("Guilds")
 
     suspend fun setupGuild(guild: Guild): GuildInformation {
@@ -63,7 +63,7 @@ class GuildOperations(private val connection: ConnectionService) {
         this.getGuild(guild).removePunishment(userId, type).let { updateGuild(it) }
     }
 
-    suspend fun addBan(guild: Guild, userId: String, ban: Ban): Ban {
+    suspend fun addBan(guild: Guild, ban: Ban): Ban {
         this.getGuild(guild).addBan(ban).let { updateGuild(it) }
         return ban
     }

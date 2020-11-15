@@ -7,7 +7,6 @@ import com.gitlab.kordlib.core.entity.Member
 import com.gitlab.kordlib.core.entity.Role
 import com.gitlab.kordlib.core.entity.User
 import com.gitlab.kordlib.core.entity.channel.TextChannel
-import me.ddivad.judgebot.dataclasses.Ban
 import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.dataclasses.Infraction
 import me.ddivad.judgebot.dataclasses.Punishment
@@ -71,6 +70,6 @@ class LoggingService(private val configuration: Configuration) {
     private suspend fun getLoggingChannel(guild: Guild): TextChannel? {
         val channelId = configuration[guild.id.longValue]?.loggingConfiguration?.loggingChannel.takeIf { it!!.isNotEmpty() }
                 ?: return null
-        return guild.getChannelOf<TextChannel>(Snowflake(channelId))
+        return guild.getChannelOf(Snowflake(channelId))
     }
 }

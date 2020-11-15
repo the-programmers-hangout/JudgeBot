@@ -6,7 +6,6 @@ import me.ddivad.judgebot.conversations.rules.ArchiveRuleConversation
 import me.ddivad.judgebot.conversations.rules.EditRuleConversation
 import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.embeds.createRuleEmbed
-import me.ddivad.judgebot.embeds.createRuleEmbedForStrike
 import me.ddivad.judgebot.embeds.createRulesEmbed
 import me.ddivad.judgebot.embeds.createRulesEmbedDetailed
 import me.ddivad.judgebot.services.DatabaseService
@@ -14,6 +13,7 @@ import me.ddivad.judgebot.services.PermissionLevel
 import me.ddivad.judgebot.services.requiredPermissionLevel
 import me.jakejmattson.discordkt.api.dsl.commands
 
+@Suppress("unused")
 fun ruleCommands(configuration: Configuration,
                  databaseService: DatabaseService) = commands("Rules") {
 
@@ -21,7 +21,7 @@ fun ruleCommands(configuration: Configuration,
         description = "Add a rule to this guild."
         requiredPermissionLevel = PermissionLevel.Administrator
         execute {
-            AddRuleConversation(configuration, databaseService)
+            AddRuleConversation(databaseService)
                     .createAddRuleConversation(guild)
                     .startPublicly(discord, author, channel)
         }
@@ -31,7 +31,7 @@ fun ruleCommands(configuration: Configuration,
         description = "Edit a rule in this guild."
         requiredPermissionLevel = PermissionLevel.Administrator
         execute {
-            EditRuleConversation(configuration, databaseService)
+            EditRuleConversation(databaseService)
                     .createAddRuleConversation(guild)
                     .startPublicly(discord, author, channel)
         }
@@ -41,7 +41,7 @@ fun ruleCommands(configuration: Configuration,
         description = "Archive a rule in this guild."
         requiredPermissionLevel = PermissionLevel.Administrator
         execute {
-            ArchiveRuleConversation(configuration, databaseService)
+            ArchiveRuleConversation(databaseService)
                     .createArchiveRuleConversation(guild)
                     .startPublicly(discord, author, channel)
         }
@@ -62,7 +62,7 @@ fun ruleCommands(configuration: Configuration,
         requiredPermissionLevel = PermissionLevel.Staff
         execute {
             respond {
-                createRulesEmbedDetailed(guild, databaseService.guilds.getRules(guild)!!)
+                createRulesEmbedDetailed(guild, databaseService.guilds.getRules(guild))
             }
         }
     }

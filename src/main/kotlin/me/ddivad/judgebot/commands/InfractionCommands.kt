@@ -16,7 +16,8 @@ import me.jakejmattson.discordkt.api.arguments.EveryArg
 import me.jakejmattson.discordkt.api.arguments.IntegerArg
 import me.jakejmattson.discordkt.api.dsl.commands
 
-fun createInfractonCommands(databaseService: DatabaseService,
+@Suppress("unused")
+fun createInfractionCommands(databaseService: DatabaseService,
                             config: Configuration,
                             infractionService: InfractionService,
                             badPfpService: BadPfpService) = commands("Infraction") {
@@ -83,7 +84,7 @@ fun createInfractonCommands(databaseService: DatabaseService,
             }
 
             val badPfp = Infraction(author.id.value, "BadPfp", InfractionType.BadPfp)
-            badPfpService.applyBadPfp(targetMember, guild, badPfp, timeLimit)
+            badPfpService.applyBadPfp(targetMember, guild, timeLimit)
             respond("${targetMember.mention} has been muted and a badpfp has been triggered with a time limit of $minutesUntilBan minutes.")
         }
     }

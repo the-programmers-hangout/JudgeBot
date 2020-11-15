@@ -4,8 +4,6 @@ import com.gitlab.kordlib.core.any
 import com.gitlab.kordlib.core.entity.Guild
 import com.gitlab.kordlib.core.entity.Member
 import com.gitlab.kordlib.core.entity.User
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.first
 import me.ddivad.judgebot.dataclasses.Configuration
 import me.jakejmattson.discordkt.api.annotations.Service
 import me.jakejmattson.discordkt.api.dsl.Command

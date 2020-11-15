@@ -11,7 +11,7 @@ import me.jakejmattson.discordkt.api.annotations.Service
 import org.litote.kmongo.eq
 
 @Service
-class UserOperations(private val connection: ConnectionService, private val configuration: Configuration) {
+class UserOperations(connection: ConnectionService, private val configuration: Configuration) {
     private val userCollection = connection.db.getCollection<GuildMember>("Users")
 
     suspend fun getOrCreateUser(target: User, guild: Guild): GuildMember {
@@ -29,7 +29,7 @@ class UserOperations(private val connection: ConnectionService, private val conf
         }
     }
 
-    suspend fun getUserOrNull(target: User, guild: Guild): GuildMember? {
+    suspend fun getUserOrNull(target: User): GuildMember? {
         return userCollection.findOne(GuildMember::userId eq target.id.value)
     }
 
@@ -40,6 +40,16 @@ class UserOperations(private val connection: ConnectionService, private val conf
 
     suspend fun deleteNote(guild: Guild, user: GuildMember, noteId: Int): GuildMember {
         user.deleteNote(noteId, guild)
+        return this.updateUser(user)
+    }
+
+    suspend fun addInfo(guild: Guild, user: GuildMember, information: Info): GuildMember {
+        user.addInfo(information, guild)
+        return this.updateUser(user)
+    }
+
+    suspend fun removeInfo(guild: Guild, user: GuildMember, noteId: Int): GuildMember {
+        user.removeInfo(noteId, guild)
         return this.updateUser(user)
     }
 

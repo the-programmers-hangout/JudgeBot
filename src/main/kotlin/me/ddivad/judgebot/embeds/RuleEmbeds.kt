@@ -6,8 +6,6 @@ import me.ddivad.judgebot.dataclasses.Rule
 import me.jakejmattson.discordkt.api.extensions.addField
 import java.awt.Color
 import com.gitlab.kordlib.rest.Image
-import me.ddivad.judgebot.arguments.validConfigParameters
-import me.jakejmattson.discordkt.api.dsl.MenuBuilder
 
 fun EmbedBuilder.createRuleEmbed(guild: Guild, rule: Rule) {
     title = "__${rule.number}: ${rule.title}__"
@@ -43,7 +41,7 @@ fun EmbedBuilder.createRulesEmbed(guild: Guild, rules: List<Rule>) {
     }
 }
 
-suspend fun EmbedBuilder.createRuleEmbedForStrike(guild: Guild, rules: List<Rule>) {
+fun EmbedBuilder.createRuleEmbedForStrike(guild: Guild, rules: List<Rule>) {
     title = "**__Available Rules__**"
     color = Color.MAGENTA
     description = ""

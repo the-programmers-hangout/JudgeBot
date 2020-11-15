@@ -1,13 +1,7 @@
 package me.ddivad.judgebot.commands
 
-import com.gitlab.kordlib.common.exception.RequestException
-import com.gitlab.kordlib.core.behavior.ban
-import com.gitlab.kordlib.core.entity.User
 import me.ddivad.judgebot.arguments.LowerMemberArg
-import me.ddivad.judgebot.dataclasses.Ban
-import me.ddivad.judgebot.dataclasses.Configuration
-import me.ddivad.judgebot.dataclasses.InfractionType
-import me.ddivad.judgebot.dataclasses.Punishment
+import me.ddivad.judgebot.dataclasses.*
 import me.ddivad.judgebot.embeds.createHistoryEmbed
 import me.ddivad.judgebot.embeds.createSelfHistoryEmbed
 import me.ddivad.judgebot.embeds.createStatusEmbed
@@ -18,12 +12,12 @@ import me.ddivad.judgebot.services.infractions.BanService
 import me.ddivad.judgebot.services.requiredPermissionLevel
 import me.jakejmattson.discordkt.api.arguments.EveryArg
 import me.jakejmattson.discordkt.api.arguments.IntegerArg
-import me.jakejmattson.discordkt.api.arguments.MemberArg
 import me.jakejmattson.discordkt.api.arguments.UserArg
 import me.jakejmattson.discordkt.api.dsl.commands
 import me.jakejmattson.discordkt.api.extensions.sendPrivateMessage
 import java.awt.Color
 
+@Suppress("unused")
 fun createUserCommands(databaseService: DatabaseService,
                        config: Configuration,
                        loggingService: LoggingService,
@@ -100,7 +94,7 @@ fun createUserCommands(databaseService: DatabaseService,
             val ban = Ban(user.id.value, author.id.value, reason)
             if (guild.getBanOrNull(user.id) != null) {
                 if (!databaseService.guilds.checkBanExists(guild, user.id.value)) {
-                    databaseService.guilds.addBan(guild, user.id.value, ban)
+                    databaseService.guilds.addBan(guild, ban)
                 } else {
                     databaseService.guilds.editBanReason(guild, user.id.value, reason)
                 }

@@ -11,6 +11,12 @@
 | configuration | (GuildConfig) | Update configuration parameters for this guild (conversation). |
 | setup         |               | Configure a guild to use Judgebot.                             |
 
+## Information
+| Commands   | Arguments                    | Description                                         |
+| ---------- | ---------------------------- | --------------------------------------------------- |
+| info       | LowerMemberArg, Info Content | Send an information message to a guild member       |
+| removeInfo | LowerMemberArg, Integer      | Remove an information message from a member record. |
+
 ## Infraction
 | Commands         | Arguments                       | Description                                                                                                                           |
 | ---------------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |

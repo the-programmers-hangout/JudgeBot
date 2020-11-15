@@ -139,23 +139,6 @@ fun EmbedBuilder.createBadPfpEmbed(guild: Guild, user: Member) {
     }
 }
 
-fun EmbedBuilder.createModeratorInfractionEmbed(guild: Guild, user: Member, infraction: Infraction) {
-    title = "User Infracted"
-    thumbnail {
-        url = user.avatar.url
-    }
-    color = Color.MAGENTA
-    description = """
-        User ${user.mention} infracted **(${infraction.type})** with weight **${infraction.points}** 
-    """.trimIndent()
-    addField("Reason", "${infraction.reason}")
-    addField("Punishment", "${infraction.punishment?.punishment.toString()} ${if (infraction.punishment?.duration != null) "for " + timeToString(infraction.punishment?.duration!!) else "indefinitely"}")
-    footer {
-        icon = guild.getIconUrl(Image.Format.PNG) ?: ""
-        text = guild.name
-    }
-}
-
 fun EmbedBuilder.createMessageDeleteEmbed(guild: Guild, message: Message) {
     var messageContent = message.content.take(1010)
     if (message.content.length > 1024) messageContent += " ..."
