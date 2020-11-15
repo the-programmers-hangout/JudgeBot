@@ -12,11 +12,11 @@ import me.jakejmattson.discordkt.api.extensions.addField
 import java.awt.Color
 
 fun EmbedBuilder.createInfractionEmbed(guild: Guild, configuration: GuildConfiguration, user: User, guildMember: GuildMember, infraction: Infraction, rule: Rule?) {
-    if (infraction.type == InfractionType.Warn) createWarnEmbed(guild, user, infraction)
+    if (infraction.type == InfractionType.Warn) createWarnEmbed(guild, configuration, user, guildMember, infraction)
     else if (infraction.type == InfractionType.Strike) createStrikeEmbed(guild, configuration, user, guildMember, infraction, rule)
 }
 
-fun EmbedBuilder.createWarnEmbed(guild: Guild, user: User, infraction: Infraction) {
+fun EmbedBuilder.createWarnEmbed(guild: Guild, configuration: GuildConfiguration, user: User, guildMember: GuildMember, infraction: Infraction) {
     title = "Warn"
     description = """
                     | ${user.mention}, you have received a **warning** from **${guild.name}**. A warning is a way for staff to inform you that your behaviour needs to change or further infractions will follow.
@@ -26,8 +26,23 @@ fun EmbedBuilder.createWarnEmbed(guild: Guild, user: User, infraction: Infractio
     field {
         name = "__Reason__"
         value = infraction.reason
-        inline = false
+        inline = true
     }
+
+    if (configuration.infractionConfiguration.warnPoints > 0) {
+        field {
+            name = "__Points__"
+            value = "${infraction.points}"
+            inline = true
+        }
+
+        field {
+            name = "__Points Count__"
+            value = "${guildMember.getPoints(guild)} / ${configuration.infractionConfiguration.pointCeiling}"
+            inline = true
+        }
+    }
+
     color = Color.RED
     thumbnail {
         url = guild.getIconUrl(Image.Format.PNG) ?: ""
