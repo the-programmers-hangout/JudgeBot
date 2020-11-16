@@ -44,7 +44,7 @@ class MuteService(val configuration: Configuration,
     suspend fun initGuilds() {
         configuration.guildConfigurations.forEach { config ->
             val guild = config.value.id.toSnowflake().let { discord.api.getGuild(it) } ?: return@forEach
-            handleExistingMutes(guild)
+            initialiseMuteTimers(guild)
             setupMutedRole(guild)
         }
     }
@@ -95,7 +95,7 @@ class MuteService(val configuration: Configuration,
         }
     }
 
-    private suspend fun handleExistingMutes(guild: Guild) {
+    private suspend fun initialiseMuteTimers(guild: Guild) {
         databaseService.guilds.getPunishmentsForGuild(guild, InfractionType.Mute).forEach {
             if (it.clearTime != null) {
                 val difference = it.clearTime - DateTime.now().millis
@@ -106,6 +106,7 @@ class MuteService(val configuration: Configuration,
                     removeMute(guild, user)
                 }
             }
+            loggingService.initialiseMutes(guild, getMutedRole(guild))
         }
     }
 
@@ -129,7 +130,6 @@ class MuteService(val configuration: Configuration,
 
     private suspend fun setupMutedRole(guild: Guild) {
         val mutedRole = guild.getRole(configuration[guild.id.longValue]!!.mutedRole.toSnowflake())
-        loggingService.muteSetup(guild, mutedRole)
         guild.channels.toList().forEach {
             val deniedPermissions = it.getPermissionOverwritesForRole(mutedRole.id)?.denied ?: Permissions()
             if (!deniedPermissions.contains(Permission.SendMessages) || !deniedPermissions.contains(Permission.AddReactions)) {
@@ -140,7 +140,7 @@ class MuteService(val configuration: Configuration,
                                     denied = deniedPermissions.plus(Permission.SendMessages).plus(Permission.AddReactions))
                     )
                 } catch (ex: RequestException) {
-                    println("No permssions to add overwrite to ${it.id.value}")
+                    println("No permssions to add overwrite to ${it.id.value} - ${it.name}")
                 }
 
             }

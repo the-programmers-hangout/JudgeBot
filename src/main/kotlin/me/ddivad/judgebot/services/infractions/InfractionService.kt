@@ -2,6 +2,7 @@ package me.ddivad.judgebot.services.infractions
 
 import com.gitlab.kordlib.core.entity.Guild
 import com.gitlab.kordlib.core.entity.Member
+import kotlinx.coroutines.Job
 import me.ddivad.judgebot.dataclasses.*
 import me.ddivad.judgebot.embeds.createInfractionEmbed
 import me.ddivad.judgebot.services.DatabaseService
@@ -16,6 +17,10 @@ class InfractionService(private val configuration: Configuration,
                         private val loggingService: LoggingService,
                         private val banService: BanService,
                         private val muteService: MuteService) {
+
+    private val punishmentTimerMap = hashMapOf<Pair<Int, GuildID>, Job>()
+    private fun toKey(punishment: Punishment, guild: Guild) = punishment.id to guild.id.value
+
     suspend fun infract(target: Member, guild: Guild, userRecord: GuildMember, infraction: Infraction): Infraction {
         var rule: Rule? = null
         if (infraction.ruleNumber != null) {
