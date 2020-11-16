@@ -62,8 +62,11 @@ class LoggingService(private val configuration: Configuration) {
     suspend fun badPfpBan(guild: Guild, user: Member) =
             log(guild, "**Info ::** User ${user.mention} banned for not changing their avatar")
 
-    suspend fun muteSetup(guild: Guild, role: Role) =
-            log(guild, "**Info ::** Adding muted role overrides for ${role.mention} :: ${role.id.value}")
+    suspend fun initialiseMutes(guild: Guild, role: Role) =
+            log(guild, "**Info ::** Existing mute timers initialized using ${role.mention} :: ${role.id}")
+
+    suspend fun initialiseBans(guild: Guild) =
+            log(guild, "**Info ::** Existing ban timers initialized.")
 
     private suspend fun log(guild: Guild, message: String) = getLoggingChannel(guild)?.createMessage(message)
 
