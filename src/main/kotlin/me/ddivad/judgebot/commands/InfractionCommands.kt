@@ -18,18 +18,24 @@ import me.jakejmattson.discordkt.api.dsl.commands
 
 @Suppress("unused")
 fun createInfractionCommands(databaseService: DatabaseService,
-                            config: Configuration,
-                            infractionService: InfractionService,
-                            badPfpService: BadPfpService) = commands("Infraction") {
+                             config: Configuration,
+                             infractionService: InfractionService,
+                             badPfpService: BadPfpService) = commands("Infraction") {
     guildCommand("strike", "s") {
         description = "Strike a user."
         requiredPermissionLevel = PermissionLevel.Staff
         execute(LowerMemberArg, IntegerArg.makeOptional(1), EveryArg) {
             val (targetMember, weight, reason) = args
+            val guildConfiguration = config[guild.id.longValue] ?: return@execute
+            val maxStrikes = guildConfiguration.infractionConfiguration.pointCeiling / 10
+            if (weight > maxStrikes) {
+                respond("Maximum strike weight is **$maxStrikes (${guildConfiguration.infractionConfiguration.pointCeiling} points)**")
+                return@execute
+            }
             try {
                 targetMember.testDmStatus()
             } catch (ex: RequestException) {
-                respond("Unable to contact the target user. Infraction cancelled.")
+                respond("Target user has DM's disabled. Infraction cancelled.")
                 return@execute
             }
             StrikeConversation(databaseService, config, infractionService)
@@ -46,7 +52,7 @@ fun createInfractionCommands(databaseService: DatabaseService,
             try {
                 targetMember.testDmStatus()
             } catch (ex: RequestException) {
-                respond("Unable to contact the target user. Infraction cancelled.")
+                respond("Target user has DM's disabled. Infraction cancelled.")
                 return@execute
             }
             val guildConfiguration = config[guild.id.longValue] ?: return@execute
@@ -67,7 +73,7 @@ fun createInfractionCommands(databaseService: DatabaseService,
             try {
                 targetMember.testDmStatus()
             } catch (ex: RequestException) {
-                respond("Unable to contact the target user. Infraction cancelled.")
+                respond("Target user has DM's disabled. Infraction cancelled.")
                 return@execute
             }
             val minutesUntilBan = 30L
