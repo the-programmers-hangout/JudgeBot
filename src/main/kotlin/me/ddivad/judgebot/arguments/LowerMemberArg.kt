@@ -29,6 +29,6 @@ open class LowerMemberArg(override val name: String = "LowerMemberArg") : Argume
     override fun formatData(data: Member) = "@${data.tag}"
 }
 
-private suspend fun Member.isHigherRankedThan(permissions: PermissionsService, targetMember: Member) =
+suspend fun Member.isHigherRankedThan(permissions: PermissionsService, targetMember: Member) =
         permissions.getPermissionRank(this) < permissions.getPermissionRank(targetMember)
 
