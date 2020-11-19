@@ -2,6 +2,7 @@ package me.ddivad.judgebot.listeners
 
 import com.gitlab.kordlib.common.exception.RequestException
 import com.gitlab.kordlib.core.event.message.ReactionAddEvent
+import me.ddivad.judgebot.arguments.isHigherRankedThan
 import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.embeds.createMessageDeleteEmbed
 import me.ddivad.judgebot.embeds.createSelfHistoryEmbed
@@ -23,9 +24,8 @@ fun onStaffReactionAdd(muteService: MuteService,
         if (!guildConfiguration?.reactions!!.enabled) return@on
 
         user.asMemberOrNull(guild.id)?.let {
-            if (permissionsService.hasPermission(it, PermissionLevel.Moderator)) {
-                val messageAuthor = message.asMessage().author ?: return@on
-
+            val messageAuthor = message.asMessage().author?.asMemberOrNull(guild.id) ?: return@on
+            if (permissionsService.hasPermission(it, PermissionLevel.Moderator) && !it.isHigherRankedThan(permissionsService, messageAuthor)) {
                 when (this.emoji.name) {
                     guildConfiguration.reactions.gagReaction -> {
                         message.deleteReaction(this.emoji)
