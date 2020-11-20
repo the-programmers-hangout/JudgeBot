@@ -1,16 +1,13 @@
 package me.ddivad.judgebot.listeners
 
-import com.gitlab.kordlib.core.behavior.channel.createEmbed
 import com.gitlab.kordlib.core.behavior.getChannelOf
 import com.gitlab.kordlib.core.entity.channel.TextChannel
 import com.gitlab.kordlib.core.event.message.ReactionAddEvent
 import com.gitlab.kordlib.kordx.emoji.Emojis
 import com.gitlab.kordlib.kordx.emoji.addReaction
 import me.ddivad.judgebot.dataclasses.Configuration
-import me.ddivad.judgebot.embeds.createAlertMessageEmbed
 import me.ddivad.judgebot.extensions.jumpLink
 import me.jakejmattson.discordkt.api.dsl.listeners
-import me.jakejmattson.discordkt.api.extensions.isSelf
 import me.jakejmattson.discordkt.api.extensions.toSnowflake
 
 @Suppress("unused")
