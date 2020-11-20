@@ -12,16 +12,23 @@ import me.jakejmattson.discordkt.api.extensions.addField
 import java.awt.Color
 
 fun EmbedBuilder.createInfractionEmbed(guild: Guild, configuration: GuildConfiguration, user: User, guildMember: GuildMember, infraction: Infraction, rule: Rule?) {
-    if (infraction.type == InfractionType.Warn) createWarnEmbed(guild, configuration, user, guildMember, infraction)
+    if (infraction.type == InfractionType.Warn) createWarnEmbed(guild, configuration, user, guildMember, infraction, rule)
     else if (infraction.type == InfractionType.Strike) createStrikeEmbed(guild, configuration, user, guildMember, infraction, rule)
 }
 
-fun EmbedBuilder.createWarnEmbed(guild: Guild, configuration: GuildConfiguration, user: User, guildMember: GuildMember, infraction: Infraction) {
+fun EmbedBuilder.createWarnEmbed(guild: Guild, configuration: GuildConfiguration, user: User, guildMember: GuildMember, infraction: Infraction, rule: Rule?) {
     title = "Warn"
     description = """
                     | ${user.mention}, you have received a **warning** from **${guild.name}**. A warning is a way for staff to inform you that your behaviour needs to change or further infractions will follow.
                     | If you think this to be unjustified, please **do not** post about it in a public channel but take it up with **Modmail**.
                 """.trimMargin()
+
+    if (infraction.ruleNumber != null) {
+        field {
+            name = "__Rule Broken__"
+            value = "**[${rule?.title}](${rule?.link})** \n${rule?.description}"
+        }
+    }
 
     field {
         name = "__Reason__"
