@@ -2,10 +2,14 @@ package me.ddivad.judgebot.embeds
 
 import com.gitlab.kordlib.core.entity.Guild
 import com.gitlab.kordlib.core.entity.Member
+import com.gitlab.kordlib.core.entity.Message
+import com.gitlab.kordlib.core.entity.User
 import com.gitlab.kordlib.rest.Image
 import com.gitlab.kordlib.rest.builder.message.EmbedBuilder
 import me.ddivad.judgebot.dataclasses.*
+import me.ddivad.judgebot.extensions.jumpLink
 import me.jakejmattson.discordkt.api.extensions.addField
+import me.jakejmattson.discordkt.api.extensions.addInlineField
 import java.awt.Color
 
 fun EmbedBuilder.createInformationEmbed(guild: Guild, user: Member, information: Info) {
