@@ -64,7 +64,8 @@ fun EmbedBuilder.createRulesEmbedDetailed(guild: Guild, rules: List<Rule>) {
 
     for (rule in rules) {
         field {
-            value = "**__[${rule.number}. ${rule.title}](${rule.link})__**\n${rule.description}"
+            value = if (rule.link != "") "**__[${rule.number}. ${rule.title}](${rule.link})__**\n${rule.description}"
+            else "**__${rule.number}. ${rule.title}__**\n${rule.description}"
             inline = false
         }
     }
