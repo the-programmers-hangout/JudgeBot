@@ -1,5 +1,6 @@
 package me.ddivad.judgebot.commands
 
+import com.gitlab.kordlib.core.behavior.edit
 import me.ddivad.judgebot.arguments.RuleArg
 import me.ddivad.judgebot.conversations.rules.AddRuleConversation
 import me.ddivad.judgebot.conversations.rules.ArchiveRuleConversation
@@ -8,9 +9,11 @@ import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.embeds.createRuleEmbed
 import me.ddivad.judgebot.embeds.createRulesEmbed
 import me.ddivad.judgebot.embeds.createRulesEmbedDetailed
+import me.ddivad.judgebot.extensions.jumpLink
 import me.ddivad.judgebot.services.DatabaseService
 import me.ddivad.judgebot.services.PermissionLevel
 import me.ddivad.judgebot.services.requiredPermissionLevel
+import me.jakejmattson.discordkt.api.arguments.MessageArg
 import me.jakejmattson.discordkt.api.dsl.commands
 
 @Suppress("unused")
@@ -48,21 +51,33 @@ fun ruleCommands(configuration: Configuration,
     }
 
     guildCommand("rules") {
-        description = "List the rules of this guild."
+        description = "List the rules of this guild. Pass a message ID to edit existing rules embed."
         requiredPermissionLevel = PermissionLevel.Everyone
-        execute {
-            respond {
-                createRulesEmbed(guild, databaseService.guilds.getRules(guild))
+        execute(MessageArg.makeNullableOptional(null)) {
+            val messageToEdit = args.first
+            if (messageToEdit != null) {
+                messageToEdit.edit { this.embed { createRulesEmbed(guild, databaseService.guilds.getRules(guild)) } }
+                respond("Existing embed updated: ${messageToEdit.jumpLink(guild.id.value)}")
+            } else {
+                respond {
+                    createRulesEmbed(guild, databaseService.guilds.getRules(guild))
+                }
             }
         }
     }
 
     guildCommand("longRules") {
-        description = "List the rules (with descriptions) of this guild."
+        description = "List the rules (with descriptions) of this guild. Pass a message ID to edit existing rules embed."
         requiredPermissionLevel = PermissionLevel.Staff
-        execute {
-            respond {
-                createRulesEmbedDetailed(guild, databaseService.guilds.getRules(guild))
+        execute(MessageArg.makeNullableOptional(null)) {
+            val messageToEdit = args.first
+            if (messageToEdit != null) {
+                messageToEdit.edit { this.embed { createRulesEmbedDetailed(guild, databaseService.guilds.getRules(guild)) } }
+                respond("Existing embed updated: ${messageToEdit.jumpLink(guild.id.value)}")
+            } else {
+                respond {
+                    createRulesEmbedDetailed(guild, databaseService.guilds.getRules(guild))
+                }
             }
         }
     }

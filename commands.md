@@ -41,14 +41,14 @@
 | note         | User, Note Content      | Use this to add a note to a user.                 |
 
 ## Rules
-| Commands    | Arguments | Description                                       |
-| ----------- | --------- | ------------------------------------------------- |
-| addRule     |           | Add a rule to this guild.                         |
-| archiveRule |           | Archive a rule in this guild.                     |
-| editRule    |           | Edit a rule in this guild.                        |
-| longRules   |           | List the rules (with descriptions) of this guild. |
-| rule        | Rule      | List a rule from this guild.                      |
-| rules       |           | List the rules of this guild.                     |
+| Commands    | Arguments | Description                                                                                       |
+| ----------- | --------- | ------------------------------------------------------------------------------------------------- |
+| addRule     |           | Add a rule to this guild.                                                                         |
+| archiveRule |           | Archive a rule in this guild.                                                                     |
+| editRule    |           | Edit a rule in this guild.                                                                        |
+| longRules   | (Message) | List the rules (with descriptions) of this guild. Pass a message ID to edit existing rules embed. |
+| rule        | Rule      | List a rule from this guild.                                                                      |
+| rules       | (Message) | List the rules of this guild. Pass a message ID to edit existing rules embed.                     |
 
 ## User
 | Commands     | Arguments                                   | Description                                                |

@@ -41,7 +41,7 @@ fun EmbedBuilder.createRulesEmbed(guild: Guild, rules: List<Rule>) {
     }
 }
 
-fun EmbedBuilder.createRuleEmbedForStrike(guild: Guild, rules: List<Rule>) {
+fun EmbedBuilder.createInfractionRuleEmbed(guild: Guild, rules: List<Rule>) {
     title = "**__Available Rules__**"
     color = Color.MAGENTA
     description = ""
