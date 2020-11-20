@@ -30,16 +30,3 @@ fun EmbedBuilder.createInformationEmbed(guild: Guild, user: Member, information:
         text = guild.name
     }
 }
-
-fun EmbedBuilder.createAlertMessageEmbed(guild: Guild, message: Message, user: User) {
-    color = Color.MAGENTA
-//    author {
-//        name = "Message Flagged"
-//        icon = user.avatar.url
-//    }
-    title = "Message Flagged"
-    addInlineField("Flagged by:", user.mention)
-    addInlineField("Sent by:", message.author!!.mention)
-    addInlineField("Channel:", message.channel.mention)
-    addField("Link to message:", message.jumpLink(guild.id.value))
-}
