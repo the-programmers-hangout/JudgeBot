@@ -98,6 +98,7 @@ class MuteService(val configuration: Configuration,
     private suspend fun initialiseMuteTimers(guild: Guild) {
         databaseService.guilds.getPunishmentsForGuild(guild, InfractionType.Mute).forEach {
             if (it.clearTime != null) {
+                println("Adding Existing Timer :: UserId: ${it.userId}, GuildId: ${guild.id.value}, PunishmentId: ${it.id}")
                 val difference = it.clearTime - DateTime.now().millis
                 val member = guild.getMemberOrNull(it.userId.toSnowflake()) ?: return
                 val user = member.asUser()

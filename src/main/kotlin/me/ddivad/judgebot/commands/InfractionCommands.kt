@@ -2,7 +2,7 @@ package me.ddivad.judgebot.commands
 
 import com.gitlab.kordlib.common.exception.RequestException
 import me.ddivad.judgebot.arguments.LowerMemberArg
-import me.ddivad.judgebot.conversations.StrikeConversation
+import me.ddivad.judgebot.conversations.InfractionConversation
 import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.dataclasses.Infraction
 import me.ddivad.judgebot.dataclasses.InfractionType
@@ -38,8 +38,8 @@ fun createInfractionCommands(databaseService: DatabaseService,
                 respond("Target user has DM's disabled. Infraction cancelled.")
                 return@execute
             }
-            StrikeConversation(databaseService, config, infractionService)
-                    .createStrikeConversation(guild, targetMember, weight, reason)
+            InfractionConversation(databaseService, config, infractionService)
+                    .createInfractionConversation(guild, targetMember, weight, reason, InfractionType.Strike)
                     .startPublicly(discord, author, channel)
         }
     }
@@ -55,13 +55,9 @@ fun createInfractionCommands(databaseService: DatabaseService,
                 respond("Target user has DM's disabled. Infraction cancelled.")
                 return@execute
             }
-            val guildConfiguration = config[guild.id.longValue] ?: return@execute
-            val user = databaseService.users.getOrCreateUser(targetMember, guild)
-            val infraction = Infraction(this.author.id.value, reason, InfractionType.Warn, guildConfiguration.infractionConfiguration.warnPoints)
-            infractionService.infract(targetMember, guild, user, infraction)
-            respondMenu {
-                createHistoryEmbed(targetMember, user, guild, config, databaseService)
-            }
+            InfractionConversation(databaseService, config, infractionService)
+                    .createInfractionConversation(guild, targetMember, 1, reason, InfractionType.Warn)
+                    .startPublicly(discord, author, channel)
         }
     }
 
