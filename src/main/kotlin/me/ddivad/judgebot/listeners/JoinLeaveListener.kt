@@ -33,7 +33,9 @@ fun onGuildMemberLeave(databaseService: DatabaseService) = listeners {
         // Add delay before creating user in case they are banned (raid, etc...)
         GlobalScope.launch {
             delay(1000 * 60 * 5)
-            databaseService.users.getOrCreateUser(member, guild)
+            guild.kord.getUser(member.id)?.let {
+                databaseService.users.getOrCreateUser(member, guild)
+            }
         }
     }
 }
