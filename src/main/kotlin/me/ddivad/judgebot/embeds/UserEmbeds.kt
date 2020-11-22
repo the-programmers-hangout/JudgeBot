@@ -44,20 +44,15 @@ suspend fun MenuBuilder.createHistoryEmbed(
             url = target.asUser().avatar.url
         }
         val memberInGuild = target.asMemberOrNull(guild.id)
+        addInlineField("Notes", "${notes.size}")
+        addInlineField("Infractions", "${infractions.size}")
+        addInlineField("Points", "**${member.getPoints(guild)} / $maxPoints**")
+        addInlineField("History Invokes", "${userGuildDetails.historyCount}")
+        addInlineField("Creation date", formatOffsetTime(target.id.timeStamp))
         if (memberInGuild != null) {
-            addInlineField("Notes", "${notes.size}")
-            addInlineField("Infractions", "${infractions.size}")
-            addInlineField("Points", "**${member.getPoints(guild)} / $maxPoints**")
             addInlineField("Join date", formatOffsetTime(memberInGuild.joinedAt))
-            addInlineField("Creation date", formatOffsetTime(target.id.timeStamp))
-            addInlineField("History Invokes", "${userGuildDetails.historyCount}")
         } else {
-            addField("**__User not currently in this guild__**", "")
-            addInlineField("Notes", "${notes.size}")
-            addInlineField("Infractions", "${infractions.size}")
-            addInlineField("Points", "**${member.getPoints(guild)} / $maxPoints**")
-            addInlineField("Creation date", formatOffsetTime(target.id.timeStamp))
-            addInlineField("History Invokes", "${userGuildDetails.historyCount}")
+            addField("Status", "```User is not in this guild```")
         }
 
         val currentPunishments = databaseService.guilds.getPunishmentsForUser(guild, target.asUser())
