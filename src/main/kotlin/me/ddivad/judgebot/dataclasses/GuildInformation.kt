@@ -7,14 +7,12 @@ data class GuildInformation(
         val bans: MutableList<Ban> = mutableListOf(),
         val punishments: MutableList<Punishment> = mutableListOf()
 ) {
-    fun addRule(rule: Rule): GuildInformation {
-        this.rules.add(rule).let { this }
-        return this
+    fun addRule(rule: Rule): GuildInformation = this.apply {
+        this.rules.add(rule)
     }
 
-    fun archiveRule(ruleNumber: Int): GuildInformation {
-        this.rules.find { it.number == ruleNumber }!!.archived = true
-        return this
+    fun archiveRule(ruleNumber: Int): GuildInformation = this.apply {
+        this.rules.find { it.number == ruleNumber }?.archived = true
     }
 
     fun editRule(oldRule: Rule, updatedRule: Rule): Rule {
@@ -23,17 +21,15 @@ data class GuildInformation(
         return updatedRule
     }
 
-    fun addPunishment(punishment: Punishment): GuildInformation {
+    fun addPunishment(punishment: Punishment): GuildInformation = this.apply {
         val nextId: Int = if (this.punishments.isEmpty()) 1 else this.punishments.maxByOrNull { it.id }!!.id + 1
         punishment.id = nextId
         this.punishments.add(punishment)
-        return this
     }
 
-    fun removePunishment(userId: String, type: InfractionType): GuildInformation {
+    fun removePunishment(userId: String, type: InfractionType): GuildInformation = this.apply {
         val punishment = this.getPunishmentByType(type, userId).first()
         this.punishments.remove(punishment)
-        return this
     }
 
     fun getPunishmentByType(type: InfractionType, userId: String): List<Punishment> {
@@ -48,15 +44,13 @@ data class GuildInformation(
         return this.bans.any { it.userId == userId }
     }
 
-    fun addBan(ban: Ban): GuildInformation {
+    fun addBan(ban: Ban): GuildInformation = this.apply {
         this.bans.add(ban)
-        return this
     }
 
-    fun removeBan(userId: String): GuildInformation {
+    fun removeBan(userId: String): GuildInformation = this.apply {
         val ban = this.bans.find { it.userId == userId }
         this.bans.remove(ban)
-        return this
     }
 }
 
