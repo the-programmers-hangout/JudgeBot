@@ -67,8 +67,12 @@ class MuteService(val configuration: Configuration,
             removeMute(guild, user)
         }.also {
             loggingService.roleApplied(guild, member.asUser(), muteRole)
-            member.sendPrivateMessage {
-                createMuteEmbed(guild, member, reason, time)
+            try {
+                member.sendPrivateMessage {
+                    createMuteEmbed(guild, member, reason, time)
+                }
+            } catch (ex: RequestException) {
+                loggingService.dmDisabled(guild, user)
             }
         }
     }
@@ -83,8 +87,12 @@ class MuteService(val configuration: Configuration,
             val key = toKey(user, guild)
             guild.getMemberOrNull(user.id)?.let {
                 it.removeRole(muteRole.id)
-                it.sendPrivateMessage {
-                    createUnmuteEmbed(guild, user)
+                try {
+                    it.sendPrivateMessage {
+                        createUnmuteEmbed(guild, user)
+                    }
+                } catch (ex: RequestException) {
+                    loggingService.dmDisabled(guild, user)
                 }
                 loggingService.roleRemoved(guild, user, muteRole)
                 if (checkRoleState(guild, it) == RoleState.Untracked) return@runBlocking

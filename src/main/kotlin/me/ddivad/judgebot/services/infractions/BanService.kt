@@ -24,7 +24,7 @@ class BanService(private val databaseService: DatabaseService,
     private val banTracker = hashMapOf<Pair<UserId, GuildID>, Job>()
     private fun toKey(user: User, guild: Guild): Pair<GuildID, UserId> = user.id.value to guild.id.value
 
-    suspend fun banUser(target: Member, guild: Guild, punishment: Punishment, deleteDays: Int = 1) {
+    suspend fun banUser(target: User, guild: Guild, punishment: Punishment, deleteDays: Int = 1) {
         guild.ban(target.id) {
             deleteMessagesDays = deleteDays
             reason = punishment.reason
@@ -32,7 +32,7 @@ class BanService(private val databaseService: DatabaseService,
         databaseService.guilds.addBan(guild, Ban(target.id.value, punishment.moderator, punishment.reason))
         if (punishment.clearTime != null) {
             databaseService.guilds.addPunishment(guild.asGuild(), punishment)
-            val key = toKey(target.asUser(), guild)
+            val key = toKey(target, guild)
             banTracker[key] = GlobalScope.launch {
                 delay(punishment.clearTime)
                 guild.unban(target.id)

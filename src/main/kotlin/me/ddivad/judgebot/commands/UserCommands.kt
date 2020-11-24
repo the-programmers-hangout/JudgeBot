@@ -1,15 +1,16 @@
 package me.ddivad.judgebot.commands
 
 import me.ddivad.judgebot.arguments.LowerMemberArg
+import me.ddivad.judgebot.arguments.LowerUserArg
 import me.ddivad.judgebot.dataclasses.*
 import me.ddivad.judgebot.embeds.createHistoryEmbed
 import me.ddivad.judgebot.embeds.createSelfHistoryEmbed
-import me.ddivad.judgebot.embeds.createStatusEmbed
 import me.ddivad.judgebot.services.DatabaseService
 import me.ddivad.judgebot.services.LoggingService
 import me.ddivad.judgebot.services.PermissionLevel
 import me.ddivad.judgebot.services.infractions.BanService
 import me.ddivad.judgebot.services.requiredPermissionLevel
+import me.jakejmattson.discordkt.api.arguments.EitherArg
 import me.jakejmattson.discordkt.api.arguments.EveryArg
 import me.jakejmattson.discordkt.api.arguments.IntegerArg
 import me.jakejmattson.discordkt.api.arguments.UserArg
@@ -34,16 +35,6 @@ fun createUserCommands(databaseService: DatabaseService,
         }
     }
 
-    guildCommand("status", "st") {
-        description = "Use this to view a user's status card."
-        requiredPermissionLevel = PermissionLevel.Moderator
-        execute(UserArg) {
-            val user = databaseService.users.getOrCreateUser(args.first, guild)
-            databaseService.users.incrementUserHistory(user, guild)
-            createStatusEmbed(args.first, user, guild, config)
-        }
-    }
-
     guildCommand("whatpfp") {
         description = "Perform a reverse image search of a User's profile picture"
         requiredPermissionLevel = PermissionLevel.Moderator
@@ -62,11 +53,11 @@ fun createUserCommands(databaseService: DatabaseService,
     guildCommand("ban") {
         description = "Ban a member from this guild."
         requiredPermissionLevel = PermissionLevel.Staff
-        execute(LowerMemberArg, IntegerArg("Delete message days").makeOptional(1), EveryArg) {
+        execute(LowerUserArg, IntegerArg("Delete message days").makeOptional(1), EveryArg) {
             val (target, deleteDays, reason) = args
             val ban = Punishment(target.id.value, InfractionType.Ban , reason, author.id.value)
             banService.banUser(target, guild, ban, deleteDays).also {
-                loggingService.userBanned(guild, target.asUser(), ban)
+                loggingService.userBanned(guild, target, ban)
                 respond("User ${target.mention} banned")
             }
         }
