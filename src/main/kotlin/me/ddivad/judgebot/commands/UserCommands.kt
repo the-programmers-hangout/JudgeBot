@@ -101,8 +101,7 @@ fun createUserCommands(databaseService: DatabaseService,
         execute(UserArg) {
             val user = args.first
             guild.getBanOrNull(user.id)?.let {
-                val reason = databaseService.guilds.getBanOrNull(guild, user.id.value)?.reason
-                        ?: guild.getBan(args.first.id).reason
+                val reason = databaseService.guilds.getBanOrNull(guild, user.id.value)?.reason ?: it.reason
                 respond(reason ?: "No reason logged")
                 return@execute
             }

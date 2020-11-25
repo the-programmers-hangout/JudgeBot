@@ -285,7 +285,8 @@ private suspend fun getEmbedColour(guild: Guild, target: User, databaseService: 
 
 private suspend fun getStatus(guild: Guild, target: User, databaseService: DatabaseService): String? {
     guild.getBanOrNull(target.id)?.let {
-        return "```css\nUser is banned with reason:\n${it.reason}```"
+        val reason = databaseService.guilds.getBanOrNull(guild, target.id.value)?.reason ?: it.reason
+        return "```css\nUser is banned with reason:\n${reason}```"
     }
     if (target.asMemberOrNull(guild.id) == null) return "```css\nUser not currently in this guild```"
     databaseService.guilds.getPunishmentsForUser(guild, target).firstOrNull()?.let {
