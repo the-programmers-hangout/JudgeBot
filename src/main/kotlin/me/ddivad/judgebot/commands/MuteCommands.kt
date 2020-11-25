@@ -1,6 +1,8 @@
 package me.ddivad.judgebot.commands
 
 import com.gitlab.kordlib.common.exception.RequestException
+import com.gitlab.kordlib.kordx.emoji.Emojis
+import com.gitlab.kordlib.kordx.emoji.addReaction
 import me.ddivad.judgebot.arguments.LowerMemberArg
 import me.ddivad.judgebot.extensions.testDmStatus
 import me.ddivad.judgebot.services.*
@@ -21,9 +23,10 @@ fun createMuteCommands(muteService: MuteService) = commands("Mute") {
             val (targetMember, length, reason) = args
             try {
                 targetMember.testDmStatus()
+                this.message.addReaction(Emojis.whiteCheckMark)
             } catch (ex: RequestException) {
-                respond("Unable to contact the target user. Infraction cancelled.")
-                return@execute
+                this.message.addReaction(Emojis.x)
+                respond("User has DM's disabled and won't receive message.")
             }
             muteService.applyMute(targetMember, length.roundToLong() * 1000, reason)
             respond("User ${targetMember.mention} has been muted")
@@ -50,12 +53,6 @@ fun createMuteCommands(muteService: MuteService) = commands("Mute") {
         requiredPermissionLevel = PermissionLevel.Moderator
         execute(LowerMemberArg) {
             val targetMember = args.first
-            try {
-                targetMember.testDmStatus()
-            } catch (ex: RequestException) {
-                respond("Unable to contact the target user. Infraction cancelled.")
-                return@execute
-            }
             if (muteService.checkRoleState(guild, targetMember) == RoleState.Tracked) {
                 respond("User ${targetMember.mention} is already muted")
                 return@execute

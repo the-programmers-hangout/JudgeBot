@@ -7,21 +7,14 @@ import com.gitlab.kordlib.rest.Image
 import com.gitlab.kordlib.rest.builder.message.EmbedBuilder
 import me.ddivad.judgebot.dataclasses.*
 import me.ddivad.judgebot.services.DatabaseService
-import me.ddivad.judgebot.util.timeBetween
-import me.ddivad.judgebot.util.timeToString
-import me.jakejmattson.discordkt.api.dsl.CommandEvent
+import me.ddivad.judgebot.util.*
 import me.jakejmattson.discordkt.api.dsl.MenuBuilder
 import me.jakejmattson.discordkt.api.extensions.addField
 import me.jakejmattson.discordkt.api.extensions.addInlineField
 import org.joda.time.DateTime
 import java.awt.Color
 import java.text.SimpleDateFormat
-import java.time.Instant
-import java.time.ZoneOffset
-import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
 import java.util.*
-import java.util.concurrent.TimeUnit
 
 suspend fun MenuBuilder.createHistoryEmbed(
         target: User,
@@ -30,49 +23,48 @@ suspend fun MenuBuilder.createHistoryEmbed(
         config: Configuration,
         databaseService: DatabaseService
 ) {
-    val userGuildDetails = member.getGuildInfo(guild.id.value)
-    val notes = userGuildDetails.notes
-    val information = userGuildDetails.info
-    val infractions = userGuildDetails.infractions
-    val paginatedNotes = notes.chunked(4)
+    val userRecord = member.getGuildInfo(guild.id.value)
+    val paginatedNotes = userRecord.notes.chunked(4)
     val totalMenuPages = 1 + 1 + 1 + 1 + if (paginatedNotes.isNotEmpty()) paginatedNotes.size else 1
-    val maxPoints = config[guild.id.longValue]?.infractionConfiguration?.pointCeiling
+    val guildConfiguration = config[guild.id.longValue]!!
+    val embedColor = getEmbedColour(guild, target, databaseService)
+    this.apply {
+        buildOverviewPage(guild, guildConfiguration, target, userRecord, embedColor, totalMenuPages, databaseService)
+        buildInfractionPage(guild, target, userRecord, embedColor, totalMenuPages)
+        buildNotesPages(guild, guildConfiguration, target, userRecord, embedColor, totalMenuPages)
+        buildInformationPage(guild, guildConfiguration, target, userRecord, embedColor, totalMenuPages)
+        buildJoinLeavePage(guild, target, userRecord, embedColor, totalMenuPages)
+    }
+}
+
+private suspend fun MenuBuilder.buildOverviewPage(
+        guild: Guild,
+        config: GuildConfiguration,
+        target: User,
+        userRecord: GuildMemberDetails,
+        embedColor: Color,
+        totalPages: Int,
+        databaseService: DatabaseService) {
     page {
-        color = Color.MAGENTA
+        color = embedColor
         title = "${target.asUser().tag}: Overview"
         thumbnail {
             url = target.asUser().avatar.url
         }
         val memberInGuild = target.asMemberOrNull(guild.id)
+        addInlineField("Notes", "${userRecord.notes.size}")
+        addInlineField("Infractions", "${userRecord.infractions.size}")
+        addInlineField("Points", "**${userRecord.points} / ${config.infractionConfiguration.pointCeiling}**")
+        addInlineField("History Invokes", "${userRecord.historyCount}")
+        addInlineField("Creation date", formatOffsetTime(target.id.timeStamp))
         if (memberInGuild != null) {
-            addInlineField("Notes", "${notes.size}")
-            addInlineField("Infractions", "${infractions.size}")
-            addInlineField("Points", "**${member.getPoints(guild)} / $maxPoints**")
             addInlineField("Join date", formatOffsetTime(memberInGuild.joinedAt))
-            addInlineField("Creation date", formatOffsetTime(target.id.timeStamp))
-            addInlineField("History Invokes", "${userGuildDetails.historyCount}")
-        } else {
-            addField("**__User not currently in this guild__**", "")
-            addInlineField("Notes", "${notes.size}")
-            addInlineField("Infractions", "${infractions.size}")
-            addInlineField("Points", "**${member.getPoints(guild)} / $maxPoints**")
-            addInlineField("Creation date", formatOffsetTime(target.id.timeStamp))
-            addInlineField("History Invokes", "${userGuildDetails.historyCount}")
-        }
+        } else addInlineField("", "")
 
-        val currentPunishments = databaseService.guilds.getPunishmentsForUser(guild, target.asUser())
-        if (currentPunishments.isNotEmpty()) {
-            addField("", "**__Active Punishments__**")
-            currentPunishments.forEach {
-                addField(
-                        "**${it.type}** with **${timeBetween(DateTime(it.clearTime))}** left.",
-                        ""
-                )
-            }
-        } else addField("", "")
+        getStatus(guild, target, databaseService)?.let { addField("Status", it) }
 
-        if (infractions.size > 0) {
-            val lastInfraction = userGuildDetails.infractions[userGuildDetails.infractions.size - 1]
+        if (userRecord.infractions.size > 0) {
+            val lastInfraction = userRecord.infractions[userRecord.infractions.size - 1]
             addField(
                     "**__Most Recent Infraction__**",
                     "Type: **${lastInfraction.type}** :: Weight: **${lastInfraction.points}**\n " +
@@ -81,28 +73,36 @@ suspend fun MenuBuilder.createHistoryEmbed(
                             "Punishment: **${lastInfraction.punishment?.punishment}** ${getDurationText(lastInfraction.punishment)}\n" +
                             lastInfraction.reason
             )
-        } else addField("", "**User has no recent infractions.**")
+        } else addField("", "**User has no recent infractions**")
         footer {
             icon = guild.getIconUrl(Image.Format.PNG) ?: ""
-            text = "Page 1 of $totalMenuPages"
+            text = "Page 1 of $totalPages"
         }
     }
+}
 
+private suspend fun MenuBuilder.buildInfractionPage(
+        guild: Guild,
+        target: User,
+        userRecord: GuildMemberDetails,
+        embedColor: Color,
+        totalPages: Int
+) {
     page {
-        color = Color.MAGENTA
+        color = embedColor
         title = "${target.asUser().tag}: Infractions"
         thumbnail {
             url = target.asUser().avatar.url
         }
-        val warnings = infractions.filter { it.type == InfractionType.Warn }
-        val strikes = infractions.filter { it.type == InfractionType.Strike }
-        val bans = infractions.filter { it.punishment?.punishment == PunishmentType.BAN }
+        val warnings = userRecord.infractions.filter { it.type == InfractionType.Warn }
+        val strikes = userRecord.infractions.filter { it.type == InfractionType.Strike }
+        val bans = userRecord.infractions.filter { it.punishment?.punishment == PunishmentType.BAN }
 
         addInlineField("Warns", "${warnings.size}")
         addInlineField("Strikes", "${strikes.size}")
         addInlineField("Bans", "${bans.size}")
 
-        if (infractions.isEmpty()) addField("", "**User has no infractions.**")
+        if (userRecord.infractions.isEmpty()) addField("", "**User has no infractions**")
         if (warnings.isNotEmpty()) addField("", "**__Warnings__**")
         warnings.forEachIndexed { _, infraction ->
             val moderator = guild.kord.getUser(Snowflake(infraction.moderator))?.username
@@ -129,41 +129,50 @@ suspend fun MenuBuilder.createHistoryEmbed(
 
         footer {
             icon = guild.getIconUrl(Image.Format.PNG) ?: ""
-            text = "Page 2 of $totalMenuPages"
+            text = "Page 2 of $totalPages"
         }
     }
+}
 
-    if (notes.isEmpty()) {
+private suspend fun MenuBuilder.buildNotesPages(
+        guild: Guild,
+        config: GuildConfiguration,
+        target: User,
+        userRecord: GuildMemberDetails,
+        embedColor: Color,
+        totalPages: Int
+) {
+    val paginatedNotes = userRecord.notes.chunked(4)
+    if (userRecord.notes.isEmpty()) {
         page {
-            color = Color.MAGENTA
+            color = embedColor
             title = "${target.asUser().tag}: Notes"
             thumbnail {
                 url = target.asUser().avatar.url
             }
 
-            addInlineField("Notes", "${notes.size}")
-            addInlineField("Information", "${information.size}")
-            addInlineField("Points", "**${member.getPoints(guild)} / $maxPoints**")
+            addInlineField("Notes", "${userRecord.notes.size}")
+            addInlineField("Information", "${userRecord.info.size}")
+            addInlineField("Points", "**${userRecord.points} / ${config.infractionConfiguration.pointCeiling}**")
 
-            addField("", "**__Notes:__**")
-            addField("**No Notes**", "User has no notes written.")
+            addField("", "**User has no notes**")
             footer {
                 icon = guild.getIconUrl(Image.Format.PNG) ?: ""
-                text = "Page 3 of $totalMenuPages"
+                text = "Page 3 of $totalPages"
             }
         }
     }
 
     paginatedNotes.forEachIndexed { index, list ->
         page {
-            color = Color.MAGENTA
+            color = embedColor
             title = "${target.asUser().tag}: Notes" + if (paginatedNotes.size > 1) "(${index + 1})" else ""
             thumbnail {
                 url = target.asUser().avatar.url
             }
-            addInlineField("Notes", "${notes.size}")
-            addInlineField("Information", "${information.size}")
-            addInlineField("Points", "**${member.getPoints(guild)} / $maxPoints**")
+            addInlineField("Notes", "${userRecord.notes.size}")
+            addInlineField("Information", "${userRecord.info.size}")
+            addInlineField("Points", "**${userRecord.points} / ${config.infractionConfiguration.pointCeiling}**")
 
             list.forEachIndexed { _, note ->
                 val moderator = guild.kord.getUser(Snowflake(note.moderator))?.username
@@ -176,61 +185,60 @@ suspend fun MenuBuilder.createHistoryEmbed(
             }
             footer {
                 icon = guild.getIconUrl(Image.Format.PNG) ?: ""
-                text = "Page ${3 + index} of $totalMenuPages"
+                text = "Page ${3 + index} of $totalPages"
             }
         }
     }
+}
 
-    if (information.isEmpty()) {
-        page {
-            color = Color.MAGENTA
-            title = "${target.asUser().tag}: Information"
-            thumbnail {
-                url = target.asUser().avatar.url
-            }
-
-            addInlineField("Notes", "${notes.size}")
-            addInlineField("Information", "${information.size}")
-            addInlineField("Points", "**${member.getPoints(guild)} / $maxPoints**")
-
-            addField("", "**__Information:__**")
-            addField("**No Information**", "User has no information records.")
-            footer {
-                icon = guild.getIconUrl(Image.Format.PNG) ?: ""
-                text = "Page ${3 + if (paginatedNotes.isEmpty()) 1 else paginatedNotes.size} of $totalMenuPages"
-            }
-        }
-    } else {
-        page {
-            color = Color.MAGENTA
-            title = "${target.asUser().tag}: Information"
-            thumbnail {
-                url = target.asUser().avatar.url
-            }
-            addInlineField("Notes", "${notes.size}")
-            addInlineField("Information", "${information.size}")
-            addInlineField("Points", "**${member.getPoints(guild)} / $maxPoints**")
-
-            information.forEachIndexed { _, info ->
-                val moderator = guild.kord.getUser(Snowflake(info.moderator))?.username
-
-                addField(
-                        "ID :: ${info.id} :: Staff :: __${moderator}__",
-                        "Sent by **${moderator}** on **${SimpleDateFormat("dd/MM/yyyy").format(Date(info.dateTime))}**\n" +
-                                info.message
-                )
-            }
-            footer {
-                icon = guild.getIconUrl(Image.Format.PNG) ?: ""
-                text = "Page ${3 + if (paginatedNotes.isEmpty()) 1 else paginatedNotes.size} of $totalMenuPages"
-            }
-        }
-    }
-
+private suspend fun MenuBuilder.buildInformationPage(
+        guild: Guild,
+        config: GuildConfiguration,
+        target: User,
+        userRecord: GuildMemberDetails,
+        embedColor: Color,
+        totalPages: Int
+) {
+    val paginatedNotes = userRecord.notes.chunked(4)
     page {
-        val history = userGuildDetails.leaveHistory
+        color = embedColor
+        title = "${target.asUser().tag}: Information"
+        thumbnail {
+            url = target.asUser().avatar.url
+        }
+        addInlineField("Notes", "${userRecord.notes.size}")
+        addInlineField("Information", "${userRecord.info.size}")
+        addInlineField("Points", "**${userRecord.points} / ${config.infractionConfiguration.pointCeiling}**")
+
+        if (userRecord.info.isEmpty()) addField("", "**User has no information**")
+        userRecord.info.forEachIndexed { _, info ->
+            val moderator = guild.kord.getUser(Snowflake(info.moderator))?.username
+            addField(
+                    "ID :: ${info.id} :: Staff :: __${moderator}__",
+                    "Sent by **${moderator}** on **${SimpleDateFormat("dd/MM/yyyy").format(Date(info.dateTime))}**\n" +
+                            info.message
+            )
+        }
+        footer {
+            icon = guild.getIconUrl(Image.Format.PNG) ?: ""
+            text = "Page ${3 + if (paginatedNotes.isEmpty()) 1 else paginatedNotes.size} of $totalPages"
+        }
+    }
+}
+
+private suspend fun MenuBuilder.buildJoinLeavePage(
+        guild: Guild,
+        target: User,
+        userRecord: GuildMemberDetails,
+        embedColor: Color,
+        totalPages: Int
+) {
+    page {
+        val history = userRecord.leaveHistory
         val leaves = history.filter { it.leaveDate != null }
-        color = Color.MAGENTA
+        val paginatedNotes = userRecord.notes.chunked(4)
+
+        color = embedColor
         title = "${target.asUser().tag}: Join / Leave"
         thumbnail {
             url = target.asUser().avatar.url
@@ -240,7 +248,7 @@ suspend fun MenuBuilder.createHistoryEmbed(
         addInlineField("", "")
         addInlineField("Leaves:", leaves.size.toString())
         addField("", "")
-        userGuildDetails.leaveHistory.forEachIndexed { index, record ->
+        userRecord.leaveHistory.forEachIndexed { index, record ->
             addInlineField("Record", "#${index + 1}")
             addInlineField("Joined", SimpleDateFormat("dd/MM/yyyy").format(Date(record.joinDate!!)))
             addInlineField("Left", if (record.leaveDate == null) "-" else SimpleDateFormat("dd/MM/yyyy").format(Date(record.joinDate)))
@@ -248,7 +256,7 @@ suspend fun MenuBuilder.createHistoryEmbed(
         }
         footer {
             icon = guild.getIconUrl(Image.Format.PNG) ?: ""
-            text = "Page ${4 + if (paginatedNotes.isEmpty()) 1 else paginatedNotes.size} of $totalMenuPages"
+            text = "Page ${4 + if (paginatedNotes.isEmpty()) 1 else paginatedNotes.size} of $totalPages"
         }
     }
 }
@@ -268,40 +276,23 @@ private fun getDurationText(level: PunishmentLevel?): String {
     }
 }
 
-suspend fun CommandEvent<*>.createStatusEmbed(target: User,
-                                              member: GuildMember,
-                                              guild: Guild,
-                                              config: Configuration) = respond {
-    val userGuildDetails = member.getGuildInfo(guild.id.value)
-    val notes = userGuildDetails.notes
-    val infractions = userGuildDetails.infractions
-    val maxPoints = config[guild.id.longValue]?.infractionConfiguration?.pointCeiling
-    val memberInGuild = target.asMemberOrNull(guild.id)
-
-    color = discord.configuration.theme
-    title = "${target.asUser().tag}'s Record"
-    thumbnail {
-        url = target.asUser().avatar.url
-    }
-
-    if (memberInGuild == null) addField("**__User not currently in this guild__**", "")
-    addInlineField("Notes", "${notes.size}")
-    addInlineField("Infractions", "${infractions.size}")
-    addInlineField("Points", "**${member.getPoints(guild)} / $maxPoints**")
-    if (memberInGuild != null) addInlineField("Join date", formatOffsetTime(memberInGuild.joinedAt))
-    addInlineField("Creation date", formatOffsetTime(target.id.timeStamp))
-    addInlineField("History Invokes", "${userGuildDetails.historyCount}")
+private suspend fun getEmbedColour(guild: Guild, target: User, databaseService: DatabaseService): Color {
+    if (guild.getBanOrNull(target.id) != null) return Color.RED
+    if (target.asMemberOrNull(guild.id) == null) return Color.BLACK
+    if (databaseService.guilds.getPunishmentsForUser(guild, target).isNotEmpty()) return Color.ORANGE
+    return Color.MAGENTA
 }
 
-private fun formatOffsetTime(time: Instant): String {
-    val days = TimeUnit.MILLISECONDS.toDays(DateTime.now().millis - time.toEpochMilli())
-    val formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).withLocale(Locale.UK).withZone(ZoneOffset.UTC)
-    return if (days > 4) {
-        "${formatter.format(time)}\n($days days ago)"
-    } else {
-        val hours = TimeUnit.MILLISECONDS.toHours(DateTime.now().millis - time.toEpochMilli())
-        "${formatter.format(time)}\n($hours hours ago)"
+private suspend fun getStatus(guild: Guild, target: User, databaseService: DatabaseService): String? {
+    guild.getBanOrNull(target.id)?.let {
+        val reason = databaseService.guilds.getBanOrNull(guild, target.id.value)?.reason ?: it.reason
+        return "```css\nUser is banned with reason:\n${reason}```"
     }
+    if (target.asMemberOrNull(guild.id) == null) return "```css\nUser not currently in this guild```"
+    databaseService.guilds.getPunishmentsForUser(guild, target).firstOrNull()?.let {
+        return "```css\nActive ${it.type} with ${timeBetween(DateTime(it.clearTime))} left```"
+    }
+    return null
 }
 
 suspend fun EmbedBuilder.createSelfHistoryEmbed(target: User,
@@ -323,7 +314,7 @@ suspend fun EmbedBuilder.createSelfHistoryEmbed(target: User,
     addInlineField("Infractions", "${infractions.size}")
     addInlineField("Points", "**${member.getPoints(guild)} / $maxPoints**")
 
-    if (infractions.size == 0) {
+    if (infractions.isEmpty()) {
         addField("", "")
         addField("No infractions issued.", "")
     } else {
@@ -341,7 +332,7 @@ suspend fun EmbedBuilder.createSelfHistoryEmbed(target: User,
             )
         }
 
-        if (warnings.isNotEmpty()) addField("", "**__Strikes__**")
+        if (strikes.isNotEmpty()) addField("", "**__Strikes__**")
         strikes.forEachIndexed { index, infraction ->
             addField(
                     "ID :: $index :: Weight :: ${infraction.points}",

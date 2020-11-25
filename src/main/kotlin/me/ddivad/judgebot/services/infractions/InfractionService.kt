@@ -1,10 +1,12 @@
 package me.ddivad.judgebot.services.infractions
 
+import com.gitlab.kordlib.common.exception.RequestException
 import com.gitlab.kordlib.core.entity.Guild
 import com.gitlab.kordlib.core.entity.Member
 import kotlinx.coroutines.Job
 import me.ddivad.judgebot.dataclasses.*
 import me.ddivad.judgebot.embeds.createInfractionEmbed
+import me.ddivad.judgebot.embeds.createUnmuteEmbed
 import me.ddivad.judgebot.services.DatabaseService
 import me.ddivad.judgebot.services.LoggingService
 import me.jakejmattson.discordkt.api.annotations.Service
@@ -27,8 +29,12 @@ class InfractionService(private val configuration: Configuration,
             rule = databaseService.guilds.getRule(guild, infraction.ruleNumber)
         }
         return databaseService.users.addInfraction(guild, userRecord, infraction).also {
-            target.asUser().sendPrivateMessage {
-                createInfractionEmbed(guild, configuration[guild.id.longValue]!!, target, userRecord, it, rule)
+            try {
+                target.asUser().sendPrivateMessage {
+                    createInfractionEmbed(guild, configuration[guild.id.longValue]!!, target, userRecord, it, rule)
+                }
+            } catch (ex: RequestException) {
+                loggingService.dmDisabled(guild, target.asUser())
             }
             loggingService.infractionApplied(guild, target.asUser(), it)
             applyPunishment(guild, target, it)

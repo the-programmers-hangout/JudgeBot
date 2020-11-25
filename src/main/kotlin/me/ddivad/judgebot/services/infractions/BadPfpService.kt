@@ -1,5 +1,6 @@
 package me.ddivad.judgebot.services.infractions
 
+import com.gitlab.kordlib.common.exception.RequestException
 import com.gitlab.kordlib.core.behavior.ban
 import com.gitlab.kordlib.core.entity.Guild
 import com.gitlab.kordlib.core.entity.Member
@@ -8,6 +9,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import me.ddivad.judgebot.embeds.createBadPfpEmbed
+import me.ddivad.judgebot.embeds.createUnmuteEmbed
 import me.ddivad.judgebot.services.LoggingService
 import me.jakejmattson.discordkt.api.Discord
 import me.jakejmattson.discordkt.api.annotations.Service
@@ -21,8 +23,12 @@ class BadPfpService(private val muteService: MuteService,
     private suspend fun toKey(member: Member): Pair<GuildID, UserId> = member.guild.id.value to member.asUser().id.value
 
     suspend fun applyBadPfp(target: Member, guild: Guild, timeLimit: Long) {
-        target.sendPrivateMessage {
-            createBadPfpEmbed(guild, target)
+        try {
+            target.sendPrivateMessage {
+                createBadPfpEmbed(guild, target)
+            }
+        } catch (ex: RequestException) {
+            loggingService.dmDisabled(guild, target.asUser())
         }
         muteService.applyMute(target, timeLimit, "Bad Pfp Mute")
         loggingService.badBfpApplied(guild, target)

@@ -1,6 +1,8 @@
 package me.ddivad.judgebot.commands
 
 import com.gitlab.kordlib.common.exception.RequestException
+import com.gitlab.kordlib.kordx.emoji.Emojis
+import com.gitlab.kordlib.kordx.emoji.addReaction
 import me.ddivad.judgebot.arguments.LowerMemberArg
 import me.ddivad.judgebot.conversations.InfractionConversation
 import me.ddivad.judgebot.dataclasses.Configuration
@@ -34,7 +36,9 @@ fun createInfractionCommands(databaseService: DatabaseService,
             }
             try {
                 targetMember.testDmStatus()
+                this.message.addReaction(Emojis.whiteCheckMark)
             } catch (ex: RequestException) {
+                this.message.addReaction(Emojis.x)
                 respond("Target user has DM's disabled. Infraction cancelled.")
                 return@execute
             }
@@ -51,7 +55,9 @@ fun createInfractionCommands(databaseService: DatabaseService,
             val (targetMember, reason) = args
             try {
                 targetMember.testDmStatus()
+                this.message.addReaction(Emojis.whiteCheckMark)
             } catch (ex: RequestException) {
+                this.message.addReaction(Emojis.x)
                 respond("Target user has DM's disabled. Infraction cancelled.")
                 return@execute
             }
@@ -68,7 +74,9 @@ fun createInfractionCommands(databaseService: DatabaseService,
             val (cancel, targetMember) = args
             try {
                 targetMember.testDmStatus()
+                this.message.addReaction(Emojis.whiteCheckMark)
             } catch (ex: RequestException) {
+                this.message.addReaction(Emojis.x)
                 respond("Target user has DM's disabled. Infraction cancelled.")
                 return@execute
             }
