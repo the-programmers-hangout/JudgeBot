@@ -18,7 +18,7 @@ fun noteCommands(databaseService: DatabaseService) = commands("Notes") {
             val (target, note) = args
             val user = databaseService.users.getOrCreateUser(target, guild)
             databaseService.users.addNote(guild, user, note, author.id.value)
-            respond("Note added.")
+            respond("Note added to ${target.mention}.")
         }
     }
 
@@ -33,7 +33,7 @@ fun noteCommands(databaseService: DatabaseService) = commands("Notes") {
                 return@execute
             }
             databaseService.users.deleteNote(guild, user, noteId)
-            respond("Note deleted.")
+            respond("Note deleted from ${target.mention}.")
         }
     }
 
@@ -41,13 +41,14 @@ fun noteCommands(databaseService: DatabaseService) = commands("Notes") {
         description = "Use this to delete (permanently) as user's notes."
         requiredPermissionLevel = PermissionLevel.Administrator
         execute(LowerMemberArg) {
-            val user = databaseService.users.getOrCreateUser(args.first, guild)
+            val target = args.first
+            val user = databaseService.users.getOrCreateUser(target, guild)
             if (user.getGuildInfo(guild.id.value).notes.isEmpty()) {
                 respond("User has no notes.")
                 return@execute
             }
             databaseService.users.cleanseNotes(guild, user)
-            respond("Notes cleansed.")
+            respond("Notes cleansed from ${target.mention}.")
         }
     }
 }
