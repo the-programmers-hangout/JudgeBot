@@ -53,6 +53,8 @@ fun EmbedBuilder.createInfractionRuleEmbed(guild: Guild, rules: List<Rule>) {
         icon = guild.getIconUrl(Image.Format.PNG) ?: ""
         text = guild.name
     }
+    addField("","")
+    addField("Rule Choice:", "Reply with **rule id**, or **0** for no rule.")
 }
 
 fun EmbedBuilder.createRulesEmbedDetailed(guild: Guild, rules: List<Rule>) {

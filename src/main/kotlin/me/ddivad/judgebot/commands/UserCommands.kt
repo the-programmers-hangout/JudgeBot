@@ -80,7 +80,7 @@ fun createUserCommands(databaseService: DatabaseService,
     guildCommand("setBanReason") {
         description = "Set a ban reason for a banned user"
         requiredPermissionLevel = PermissionLevel.Staff
-        execute(UserArg, EveryArg) {
+        execute(UserArg, EveryArg("Reason")) {
             val (user, reason) = args
             val ban = Ban(user.id.value, author.id.value, reason)
             if (guild.getBanOrNull(user.id) != null) {

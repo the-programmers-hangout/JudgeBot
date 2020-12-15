@@ -2,6 +2,7 @@ package me.ddivad.judgebot.conversations
 
 import com.gitlab.kordlib.core.entity.Guild
 import com.gitlab.kordlib.core.entity.Member
+import com.gitlab.kordlib.rest.builder.message.EmbedBuilder
 import me.ddivad.judgebot.dataclasses.*
 import me.ddivad.judgebot.embeds.createHistoryEmbed
 import me.ddivad.judgebot.embeds.createInfractionRuleEmbed
@@ -21,8 +22,7 @@ class InfractionConversation(private val databaseService: DatabaseService,
                 else guildConfiguration.infractionConfiguration.warnPoints
         val rules = databaseService.guilds.getRules(guild)
         val ruleId = if (rules.isNotEmpty()) {
-            respond { createInfractionRuleEmbed(guild, rules) }
-            val rule = promptMessage(IntegerArg, "Enter `0` for no rule, or rule id to add a rule:")
+            val rule = promptEmbed(IntegerArg) { createInfractionRuleEmbed(guild, rules) }
             if (rule > 0) rule else null
         } else null
         val infraction = Infraction(this.user.id.value, infractionReason, type, points, ruleId)

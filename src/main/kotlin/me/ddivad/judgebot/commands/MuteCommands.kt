@@ -19,14 +19,14 @@ fun createMuteCommands(muteService: MuteService) = commands("Mute") {
     guildCommand("mute") {
         description = "Mute a user for a specified time."
         requiredPermissionLevel = PermissionLevel.Moderator
-        execute(LowerMemberArg, TimeArg, EveryArg) {
+        execute(LowerMemberArg, TimeArg("Time"), EveryArg("Reason")) {
             val (targetMember, length, reason) = args
             try {
                 targetMember.testDmStatus()
                 this.message.addReaction(Emojis.whiteCheckMark)
             } catch (ex: RequestException) {
                 this.message.addReaction(Emojis.x)
-                respond("User has DM's disabled and won't receive message.")
+                respond("${targetMember.mention} has DMs disabled and won't receive message.")
             }
             muteService.applyMute(targetMember, length.roundToLong() * 1000, reason)
             respond("User ${targetMember.mention} has been muted")

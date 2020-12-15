@@ -43,7 +43,7 @@ fun createInformationCommands(databaseService: DatabaseService) = commands("Info
     guildCommand("removeInfo") {
         description = "Remove an information message from a member record."
         requiredPermissionLevel = PermissionLevel.Staff
-        execute(LowerMemberArg, IntegerArg) {
+        execute(LowerMemberArg, IntegerArg("Info ID")) {
             val (target, id) = args
             val user = databaseService.users.getOrCreateUser(target, guild)
             if (user.getGuildInfo(guild.id.value).info.isEmpty()) {
