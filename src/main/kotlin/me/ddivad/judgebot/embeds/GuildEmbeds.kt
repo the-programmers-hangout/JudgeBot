@@ -19,9 +19,9 @@ suspend fun EmbedBuilder.createConfigEmbed(config: GuildConfiguration, guild: Gu
     field {
         name = "**General:**"
         value = "Bot Prefix: ${config.prefix} \n" +
-                "Admin Role: ${guild.getRoleOrNull(config.adminRole.toSnowflake())?.mention} \n" +
-                "Staff Role: ${guild.getRoleOrNull(config.staffRole.toSnowflake())?.mention} \n" +
-                "Moderator Role: ${guild.getRoleOrNull(config.moderatorRole.toSnowflake())?.mention} \n" +
+                "Admin Roles: ${config.adminRoles.map{ guild.getRoleOrNull(it.toSnowflake())?.mention }} \n" +
+                "Staff Roles: ${config.staffRoles.map{ guild.getRoleOrNull(it.toSnowflake())?.mention }} \n" +
+                "Moderator Roles: ${config.moderatorRoles.map{ guild.getRoleOrNull(it.toSnowflake())?.mention }} \n" +
                 "Mute Role: ${guild.getRoleOrNull(config.mutedRole.toSnowflake())?.mention} \n"
     }
 

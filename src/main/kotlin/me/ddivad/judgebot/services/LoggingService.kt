@@ -69,7 +69,7 @@ class LoggingService(private val configuration: Configuration) {
             log(guild, "**Info ::** Existing ban timers initialized.")
 
     suspend fun dmDisabled(guild: Guild, target: User) =
-        log(guild, "**Error ::** Attempted to send direct message to ${target.mention} :: ${target.id} but they have DMs disabled")
+        log(guild, "**Info ::** Attempted to send direct message to ${target.mention} :: ${target.id.value} but they have DMs disabled")
 
     private suspend fun log(guild: Guild, message: String) = getLoggingChannel(guild)?.createMessage(message)
 

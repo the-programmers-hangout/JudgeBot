@@ -8,7 +8,6 @@ import me.ddivad.judgebot.conversations.InfractionConversation
 import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.dataclasses.Infraction
 import me.ddivad.judgebot.dataclasses.InfractionType
-import me.ddivad.judgebot.embeds.createHistoryEmbed
 import me.ddivad.judgebot.extensions.testDmStatus
 import me.ddivad.judgebot.services.*
 import me.ddivad.judgebot.services.infractions.BadPfpService
@@ -26,7 +25,7 @@ fun createInfractionCommands(databaseService: DatabaseService,
     guildCommand("strike", "s") {
         description = "Strike a user."
         requiredPermissionLevel = PermissionLevel.Staff
-        execute(LowerMemberArg, IntegerArg.makeOptional(1), EveryArg) {
+        execute(LowerMemberArg, IntegerArg("Weight").makeOptional(1), EveryArg("Reason")) {
             val (targetMember, weight, reason) = args
             val guildConfiguration = config[guild.id.longValue] ?: return@execute
             val maxStrikes = guildConfiguration.infractionConfiguration.pointCeiling / 10
@@ -39,8 +38,7 @@ fun createInfractionCommands(databaseService: DatabaseService,
                 this.message.addReaction(Emojis.whiteCheckMark)
             } catch (ex: RequestException) {
                 this.message.addReaction(Emojis.x)
-                respond("Target user has DM's disabled. Infraction cancelled.")
-                return@execute
+                respond("${targetMember.mention} has DMs disabled. No messages will be sent.")
             }
             InfractionConversation(databaseService, config, infractionService)
                     .createInfractionConversation(guild, targetMember, weight, reason, InfractionType.Strike)
@@ -51,15 +49,14 @@ fun createInfractionCommands(databaseService: DatabaseService,
     guildCommand("warn", "w") {
         description = "Warn a user."
         requiredPermissionLevel = PermissionLevel.Moderator
-        execute(LowerMemberArg, EveryArg) {
+        execute(LowerMemberArg, EveryArg("Reason")) {
             val (targetMember, reason) = args
             try {
                 targetMember.testDmStatus()
                 this.message.addReaction(Emojis.whiteCheckMark)
             } catch (ex: RequestException) {
                 this.message.addReaction(Emojis.x)
-                respond("Target user has DM's disabled. Infraction cancelled.")
-                return@execute
+                respond("${targetMember.mention} has DMs disabled. No messages will be sent.")
             }
             InfractionConversation(databaseService, config, infractionService)
                     .createInfractionConversation(guild, targetMember, 1, reason, InfractionType.Warn)
@@ -77,8 +74,7 @@ fun createInfractionCommands(databaseService: DatabaseService,
                 this.message.addReaction(Emojis.whiteCheckMark)
             } catch (ex: RequestException) {
                 this.message.addReaction(Emojis.x)
-                respond("Target user has DM's disabled. Infraction cancelled.")
-                return@execute
+                respond("${targetMember.mention} has DMs disabled. No messages will be sent.")
             }
             val minutesUntilBan = 30L
             val timeLimit = 1000 * 60 * minutesUntilBan

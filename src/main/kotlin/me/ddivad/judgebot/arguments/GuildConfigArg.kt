@@ -8,9 +8,12 @@ import me.jakejmattson.discordkt.api.dsl.CommandEvent
 
 val validConfigParameters = mutableListOf(
         "setPrefix",
-        "setAdminRole",
-        "setStaffRole",
-        "setModeratorRole",
+        "addAdminRole",
+        "addStaffRole",
+        "addModeratorRole",
+        "removeAdminRole",
+        "removeStaffRole",
+        "removeModeratorRole",
         "setMuteRole",
         "setLogChannel",
         "setAlertChannel",

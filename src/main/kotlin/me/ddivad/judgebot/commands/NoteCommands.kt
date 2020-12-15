@@ -25,7 +25,7 @@ fun noteCommands(databaseService: DatabaseService) = commands("Notes") {
     guildCommand("deleteNote") {
         description = "Use this to add a delete a note from a user."
         requiredPermissionLevel = PermissionLevel.Staff
-        execute(LowerMemberArg, IntegerArg) {
+        execute(LowerMemberArg, IntegerArg("Note ID")) {
             val (target, noteId) = args
             val user = databaseService.users.getOrCreateUser(target, guild)
             if (user.getGuildInfo(guild.id.value).notes.isEmpty()) {

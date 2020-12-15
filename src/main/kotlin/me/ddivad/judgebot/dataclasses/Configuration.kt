@@ -19,9 +19,9 @@ data class Configuration(
         val newConfiguration = GuildConfiguration(
                 guild.id.value,
                 prefix,
-                moderatorRole.id.value,
-                staffRole.id.value,
-                adminRole.id.value,
+                mutableListOf(moderatorRole.id.value),
+                mutableListOf(staffRole.id.value),
+                mutableListOf(adminRole.id.value),
                 mutedRole.id.value,
                 logging
         )
@@ -48,9 +48,9 @@ data class DatabaseConfiguration(
 data class GuildConfiguration(
         val id: String = "",
         var prefix: String = "j!",
-        var moderatorRole: String = "",
-        var staffRole: String = "",
-        var adminRole: String = "",
+        var moderatorRoles: MutableList<String> = mutableListOf(),
+        var staffRoles: MutableList<String> = mutableListOf(),
+        var adminRoles: MutableList<String> = mutableListOf(),
         var mutedRole: String = "",
         var loggingConfiguration: LoggingConfiguration = LoggingConfiguration(),
         var infractionConfiguration: InfractionConfiguration = InfractionConfiguration(),
