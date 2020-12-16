@@ -52,8 +52,14 @@ private suspend fun MenuBuilder.buildOverviewPage(
             url = target.asUser().avatar.url
         }
         val memberInGuild = target.asMemberOrNull(guild.id)
-        addInlineField("Notes", "${userRecord.notes.size}")
-        addInlineField("Infractions", "${userRecord.infractions.size}")
+
+        addInlineField("Record",
+            """
+                ${userRecord.infractions.size} Infaction(s)
+                ${userRecord.notes.size} Note(s)
+                ${userRecord.info.size} Information(s)
+            """.trimIndent())
+
         addInlineField("Points", "**${userRecord.points} / ${config.infractionConfiguration.pointCeiling}**")
         addInlineField("History Invokes", "${userRecord.historyCount}")
         addInlineField("Creation date", formatOffsetTime(target.id.timeStamp))
