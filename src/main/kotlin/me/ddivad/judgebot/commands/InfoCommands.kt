@@ -27,7 +27,7 @@ fun createInformationCommands(databaseService: DatabaseService) = commands("Info
                 this.message.addReaction(Emojis.whiteCheckMark)
             } catch (ex: RequestException) {
                 this.message.addReaction(Emojis.x)
-                respond("Target user has DM's disabled. Info will not be sent.")
+                respond("${target.mention} has DM's disabled. Info will not be sent.")
                 return@execute
             }
             val user = databaseService.users.getOrCreateUser(target, guild)
@@ -36,7 +36,7 @@ fun createInformationCommands(databaseService: DatabaseService) = commands("Info
             target.sendPrivateMessage {
                 createInformationEmbed(guild, target, information)
             }
-            respond("Info added and sent to user.")
+            respond("Info added and sent to ${target.mention}.")
         }
     }
 
@@ -47,11 +47,11 @@ fun createInformationCommands(databaseService: DatabaseService) = commands("Info
             val (target, id) = args
             val user = databaseService.users.getOrCreateUser(target, guild)
             if (user.getGuildInfo(guild.id.value).info.isEmpty()) {
-                respond("User has no information records.")
+                respond("${target.mention} has no information records.")
                 return@execute
             }
             databaseService.users.removeInfo(guild, user, id)
-            respond("Information record removed.")
+            respond("Information record removed from ${target.mention}.")
         }
     }
 }
