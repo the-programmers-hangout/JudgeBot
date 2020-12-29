@@ -13,7 +13,10 @@ import me.ddivad.judgebot.dataclasses.Punishment
 import me.ddivad.judgebot.services.infractions.RoleState
 import me.ddivad.judgebot.util.timeBetween
 import me.jakejmattson.discordkt.api.annotations.Service
+import me.jakejmattson.discordkt.api.extensions.toTimeString
 import org.joda.time.DateTime
+import java.text.SimpleDateFormat
+import java.util.*
 
 @Service
 class LoggingService(private val configuration: Configuration) {
@@ -71,7 +74,10 @@ class LoggingService(private val configuration: Configuration) {
     suspend fun dmDisabled(guild: Guild, target: User) =
         log(guild, "**Info ::** Attempted to send direct message to ${target.mention} :: ${target.id.value} but they have DMs disabled")
 
-    private suspend fun log(guild: Guild, message: String) = getLoggingChannel(guild)?.createMessage(message)
+    private suspend fun log(guild: Guild, message: String) {
+        getLoggingChannel(guild)?.createMessage(message)
+        println("${SimpleDateFormat("dd/M/yyyy HH:mm:ss").format(Date())} > ${guild.name} > $message")
+    }
 
     private suspend fun getLoggingChannel(guild: Guild): TextChannel? {
         val channelId = configuration[guild.id.longValue]?.loggingConfiguration?.loggingChannel.takeIf { it!!.isNotEmpty() }
