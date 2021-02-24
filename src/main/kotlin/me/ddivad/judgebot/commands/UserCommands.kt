@@ -53,7 +53,7 @@ fun createUserCommands(databaseService: DatabaseService,
     guildCommand("ban") {
         description = "Ban a member from this guild."
         requiredPermissionLevel = PermissionLevel.Staff
-        execute(LowerUserArg, IntegerArg("Delete message days").makeOptional(1), EveryArg) {
+        execute(LowerUserArg, IntegerArg("Delete message days").makeOptional(0), EveryArg) {
             val (target, deleteDays, reason) = args
             val ban = Punishment(target.id.value, InfractionType.Ban , reason, author.id.value)
             banService.banUser(target, guild, ban, deleteDays).also {
