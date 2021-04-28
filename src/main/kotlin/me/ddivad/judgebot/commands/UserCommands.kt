@@ -23,7 +23,7 @@ fun createUserCommands(databaseService: DatabaseService,
                        config: Configuration,
                        loggingService: LoggingService,
                        banService: BanService) = commands("User") {
-    guildCommand("history", "h") {
+    guildCommand("history", "h", "H") {
         description = "Use this to view a user's record."
         requiredPermissionLevel = PermissionLevel.Moderator
         execute(UserArg) {
