@@ -22,7 +22,7 @@ fun createInfractionCommands(databaseService: DatabaseService,
                              config: Configuration,
                              infractionService: InfractionService,
                              badPfpService: BadPfpService) = commands("Infraction") {
-    guildCommand("strike", "s") {
+    guildCommand("strike", "s", "S") {
         description = "Strike a user."
         requiredPermissionLevel = PermissionLevel.Staff
         execute(LowerMemberArg, IntegerArg("Weight").makeOptional(1), EveryArg("Reason")) {
@@ -46,7 +46,7 @@ fun createInfractionCommands(databaseService: DatabaseService,
         }
     }
 
-    guildCommand("warn", "w") {
+    guildCommand("warn", "w", "W") {
         description = "Warn a user."
         requiredPermissionLevel = PermissionLevel.Moderator
         execute(LowerMemberArg, EveryArg("Reason")) {
