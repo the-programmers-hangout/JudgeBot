@@ -38,6 +38,11 @@ class UserOperations(connection: ConnectionService, private val configuration: C
         return this.updateUser(user)
     }
 
+    suspend fun editNote(guild: Guild, user: GuildMember, noteId: Int, newContent: String, moderator: String): GuildMember {
+        user.editNote(guild, noteId, newContent, moderator)
+        return this.updateUser(user)
+    }
+
     suspend fun deleteNote(guild: Guild, user: GuildMember, noteId: Int): GuildMember {
         user.deleteNote(noteId, guild)
         return this.updateUser(user)

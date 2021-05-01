@@ -79,8 +79,9 @@ class MuteService(val configuration: Configuration,
         }
     }
 
-    suspend fun gag(target: Member) {
-        this.applyMute(target, 1000L * 60 * 5, "You've been muted temporarily so that a mod can handle something.")
+    suspend fun gag(guild: Guild, target: Member, moderator: User) {
+        loggingService.gagApplied(guild, target, moderator)
+        this.applyMute(target, 1000L * 60 * 5, "You've been muted temporarily by staff.")
     }
 
     fun removeMute(guild: Guild, user: User) {

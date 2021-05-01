@@ -54,7 +54,7 @@ fun EmbedBuilder.createInfractionRuleEmbed(guild: Guild, rules: List<Rule>) {
         text = guild.name
     }
     addField("","")
-    addField("Rule Choice:", "Reply with **rule id**, or **0** for no rule.")
+    addField("Rule Choice:", "Reply with **rule id**, or **0** for no rule.\nYou can also type **cancel** to stop this process.")
 }
 
 fun EmbedBuilder.createRulesEmbedDetailed(guild: Guild, rules: List<Rule>) {

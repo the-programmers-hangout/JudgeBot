@@ -58,7 +58,7 @@ fun createMuteCommands(muteService: MuteService) = commands("Mute") {
                 return@execute
             }
             val time = 1000L * 60 * 5
-            muteService.gag(targetMember)
+            muteService.gag(guild, targetMember, author)
 
             respond("${targetMember.mention} has been muted for ${timeToString(time)}")
         }

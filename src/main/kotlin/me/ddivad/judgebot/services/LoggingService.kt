@@ -74,6 +74,9 @@ class LoggingService(private val configuration: Configuration) {
     suspend fun dmDisabled(guild: Guild, target: User) =
         log(guild, "**Info ::** Attempted to send direct message to ${target.mention} :: ${target.id.value} but they have DMs disabled")
 
+    suspend fun gagApplied(guild: Guild, target: Member, moderator: User) =
+        log(guild, "**Info ::** User ${target.mention} has been gagged by **${moderator.username} :: ${moderator.tag}**")
+
     private suspend fun log(guild: Guild, message: String) {
         getLoggingChannel(guild)?.createMessage(message)
         println("${SimpleDateFormat("dd/M/yyyy HH:mm:ss").format(Date())} > ${guild.name} > $message")

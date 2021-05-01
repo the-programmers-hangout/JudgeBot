@@ -30,6 +30,13 @@ data class GuildMember(
         this.notes.add(Note(note, moderator, DateTime().millis, nextId))
     }
 
+    fun editNote(guild: Guild, noteId: Int, newNote: String, moderator: String) = with(this.getGuildInfo(guild.id.value)) {
+        this.notes.find { it.id == noteId }?.let{
+            it.note = newNote
+            it.moderator = moderator
+        }
+    }
+
     fun deleteNote(noteId: Int, guild: Guild) = with(this.getGuildInfo(guild.id.value)) {
         this.notes.removeIf { it.id == noteId }
     }

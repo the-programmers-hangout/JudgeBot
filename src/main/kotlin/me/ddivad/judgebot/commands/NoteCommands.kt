@@ -22,6 +22,21 @@ fun noteCommands(databaseService: DatabaseService) = commands("Notes") {
         }
     }
 
+    guildCommand("editNote") {
+        description = "Use this to edit a note."
+        requiredPermissionLevel = PermissionLevel.Moderator
+        execute(UserArg, IntegerArg("Note to edit"), EveryArg("Note Content")) {
+            val (target, noteId, note) = args
+            val user = databaseService.users.getOrCreateUser(target, guild)
+            if (user.getGuildInfo(guild.id.value).notes.none{ it.id == noteId }) {
+                respond("User has no note with ID $noteId.")
+                return@execute
+            }
+            databaseService.users.editNote(guild, user, noteId, note, author.id.value)
+            respond("Note edited.")
+        }
+    }
+
     guildCommand("deleteNote") {
         description = "Use this to add a delete a note from a user."
         requiredPermissionLevel = PermissionLevel.Staff

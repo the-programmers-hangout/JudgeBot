@@ -34,11 +34,12 @@
 | unmute   | LowerMemberArg               | Unmute a user.                                          |
 
 ## Notes
-| Commands     | Arguments               | Description                                       |
-| ------------ | ----------------------- | ------------------------------------------------- |
-| cleansenotes | LowerMemberArg          | Use this to delete (permanently) as user's notes. |
-| deleteNote   | LowerMemberArg, Note ID | Use this to add a delete a note from a user.      |
-| note         | User, Note Content      | Use this to add a note to a user.                 |
+| Commands     | Arguments                        | Description                                       |
+| ------------ | -------------------------------- | ------------------------------------------------- |
+| cleansenotes | LowerMemberArg                   | Use this to delete (permanently) as user's notes. |
+| deleteNote   | LowerMemberArg, Note ID          | Use this to add a delete a note from a user.      |
+| editNote     | User, Note to edit, Note Content | Use this to edit a note.                          |
+| note         | User, Note Content               | Use this to add a note to a user.                 |
 
 ## Rules
 | Commands    | Arguments | Description                                                                                       |
