@@ -23,8 +23,8 @@
 | badpfp           | (cancel), LowerMemberArg         | Notifies the user that they should change their profile pic and applies a 30 minute mute. Bans the user if they don't change picture. |
 | cleanse          | LowerMemberArg                   | Use this to delete (permanently) as user's infractions.                                                                               |
 | removeInfraction | LowerMemberArg, Infraction ID    | Use this to delete (permanently) an infraction from a user.                                                                           |
-| strike, s        | LowerMemberArg, (Weight), Reason | Strike a user.                                                                                                                        |
-| warn, w          | LowerMemberArg, Reason           | Warn a user.                                                                                                                          |
+| strike, s, S     | LowerMemberArg, (Weight), Reason | Strike a user.                                                                                                                        |
+| warn, w, W       | LowerMemberArg, Reason           | Warn a user.                                                                                                                          |
 
 ## Mute
 | Commands | Arguments                    | Description                                             |
@@ -51,15 +51,15 @@
 | rules       | (Message) | List the rules of this guild. Pass a message ID to edit existing rules embed.                     |
 
 ## User
-| Commands     | Arguments                                 | Description                                                |
-| ------------ | ----------------------------------------- | ---------------------------------------------------------- |
-| ban          | LowerUserArg, (Delete message days), Text | Ban a member from this guild.                              |
-| getBanReason | User                                      | Get a ban reason for a banned user                         |
-| history, h   | User                                      | Use this to view a user's record.                          |
-| selfHistory  |                                           | View your infraction history (contents will be DM'd)       |
-| setBanReason | User, Reason                              | Set a ban reason for a banned user                         |
-| unban        | User                                      | Unban a banned member from this guild.                     |
-| whatpfp      | User                                      | Perform a reverse image search of a User's profile picture |
+| Commands      | Arguments                                 | Description                                                |
+| ------------- | ----------------------------------------- | ---------------------------------------------------------- |
+| ban           | LowerUserArg, (Delete message days), Text | Ban a member from this guild.                              |
+| getBanReason  | User                                      | Get a ban reason for a banned user                         |
+| history, h, H | User                                      | Use this to view a user's record.                          |
+| selfHistory   |                                           | View your infraction history (contents will be DM'd)       |
+| setBanReason  | User, Reason                              | Set a ban reason for a banned user                         |
+| unban         | User                                      | Unban a banned member from this guild.                     |
+| whatpfp       | User                                      | Perform a reverse image search of a User's profile picture |
 
 ## Utility
 | Commands | Arguments | Description          |

@@ -44,8 +44,10 @@ class MuteService(val configuration: Configuration,
     suspend fun initGuilds() {
         configuration.guildConfigurations.forEach { config ->
             val guild = config.value.id.toSnowflake().let { discord.api.getGuild(it) } ?: return@forEach
-            initialiseMuteTimers(guild)
-            setupMutedRole(guild)
+            runBlocking {
+                initialiseMuteTimers(guild)
+                setupMutedRole(guild)
+            }
         }
     }
 
@@ -115,8 +117,8 @@ class MuteService(val configuration: Configuration,
                     removeMute(guild, user)
                 }
             }
-            loggingService.initialiseMutes(guild, getMutedRole(guild))
         }
+        loggingService.initialiseMutes(guild, getMutedRole(guild))
     }
 
     suspend fun handleRejoinMute(guild: Guild, member: Member) {

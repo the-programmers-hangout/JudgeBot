@@ -12,6 +12,7 @@ import me.ddivad.judgebot.services.DatabaseService
 import me.ddivad.judgebot.services.PermissionLevel
 import me.ddivad.judgebot.services.PermissionsService
 import me.ddivad.judgebot.services.infractions.MuteService
+import me.ddivad.judgebot.services.infractions.RoleState
 import me.jakejmattson.discordkt.api.dsl.listeners
 import me.jakejmattson.discordkt.api.extensions.isSelf
 import me.jakejmattson.discordkt.api.extensions.sendPrivateMessage
@@ -32,8 +33,13 @@ fun onStaffReactionAdd(muteService: MuteService,
         if (permissionsService.hasPermission(member, PermissionLevel.Moderator) && !member.isHigherRankedThan(permissionsService, messageAuthor)) {
             when (this.emoji.name) {
                 guildConfiguration.reactions.gagReaction -> {
+                    val target = messageAuthor.asMember(guild.id)
                     msg.deleteReaction(this.emoji)
-                    muteService.gag(messageAuthor.asMember(guild.id))
+                    if (muteService.checkRoleState(guild, target) == RoleState.Tracked) {
+                        member.sendPrivateMessage("${messageAuthor.mention} is already muted.")
+                        return@on
+                    }
+                    muteService.gag(target)
                     member.sendPrivateMessage("${messageAuthor.mention} gagged.")
                 }
                 guildConfiguration.reactions.historyReaction -> {
