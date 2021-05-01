@@ -106,15 +106,19 @@ class MuteService(val configuration: Configuration,
     }
 
     private suspend fun initialiseMuteTimers(guild: Guild) {
-        databaseService.guilds.getPunishmentsForGuild(guild, InfractionType.Mute).forEach {
-            if (it.clearTime != null) {
-                println("Adding Existing Timer :: UserId: ${it.userId}, GuildId: ${guild.id.value}, PunishmentId: ${it.id}")
-                val difference = it.clearTime - DateTime.now().millis
-                val member = guild.getMemberOrNull(it.userId.toSnowflake()) ?: return
-                val user = member.asUser()
-                val key = toKey(user, guild)
-                muteTimerMap[key] = applyRoleWithTimer(member, getMutedRole(guild), difference) {
-                    removeMute(guild, user)
+        runBlocking {
+            val punishments = databaseService.guilds.getPunishmentsForGuild(guild, InfractionType.Mute)
+            println("Existing Punishments :: ${punishments.size} existing punishments found for ${guild.name}")
+            punishments.forEach {
+                if (it.clearTime != null) {
+                    println("Adding Existing Timer :: UserId: ${it.userId}, GuildId: ${guild.id.value}, PunishmentId: ${it.id}")
+                    val difference = it.clearTime - DateTime.now().millis
+                    val member = guild.getMemberOrNull(it.userId.toSnowflake()) ?: return@forEach
+                    val user = member.asUser()
+                    val key = toKey(user, guild)
+                    muteTimerMap[key] = applyRoleWithTimer(member, getMutedRole(guild), difference) {
+                        removeMute(guild, user)
+                    }
                 }
             }
         }
