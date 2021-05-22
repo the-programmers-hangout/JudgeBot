@@ -14,6 +14,12 @@ data class GuildMemberDetails(
         var points: Int = 0,
         var pointDecayTimer: Long = DateTime().millis,
         var lastInfraction: Long = 0,
+        val deletedMessageCount: DeletedMessages = DeletedMessages()
+)
+
+data class DeletedMessages(
+    var deleteReaction: Int = 0,
+    var total: Int = 0
 )
 
 data class GuildLeave(
@@ -87,6 +93,11 @@ data class GuildMember(
 
     fun addGuildJoinDate(guild: Guild, joinDate: Long) = with(this.getGuildInfo(guild.id.value)){
         this.leaveHistory.add(GuildLeave(joinDate, null))
+    }
+
+    fun addMessageDeleted(guild: Guild, deleteReaction: Boolean) = with(this.getGuildInfo(guild.id.value)) {
+        this.deletedMessageCount.total++
+        if (deleteReaction) this.deletedMessageCount.deleteReaction++
     }
 
     fun checkPointDecay(guild: Guild, configuration: GuildConfiguration) = with(this.getGuildInfo(guild.id.value)) {
