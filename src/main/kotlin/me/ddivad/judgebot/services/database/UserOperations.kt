@@ -70,6 +70,11 @@ class UserOperations(connection: ConnectionService, private val configuration: C
         return infraction
     }
 
+    suspend fun addMessageDelete(guild: Guild, user: GuildMember, deleteReaction: Boolean): GuildMember {
+        user.addMessageDeleted(guild, deleteReaction)
+        return this.updateUser(user)
+    }
+
     suspend fun cleanseInfractions(guild: Guild, user: GuildMember): GuildMember {
         user.cleanseInfractions(guild)
         return this.updateUser(user)
