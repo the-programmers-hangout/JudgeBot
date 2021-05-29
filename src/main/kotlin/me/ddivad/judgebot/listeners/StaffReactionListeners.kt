@@ -7,7 +7,7 @@ import com.gitlab.kordlib.kordx.emoji.addReaction
 import me.ddivad.judgebot.arguments.isHigherRankedThan
 import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.embeds.createMessageDeleteEmbed
-import me.ddivad.judgebot.embeds.createSelfHistoryEmbed
+import me.ddivad.judgebot.embeds.createCondensedHistoryEmbed
 import me.ddivad.judgebot.services.DatabaseService
 import me.ddivad.judgebot.services.PermissionLevel
 import me.ddivad.judgebot.services.PermissionsService
@@ -29,6 +29,7 @@ fun onStaffReactionAdd(muteService: MuteService,
         val staffMember = user.asMemberOrNull(guild.id) ?: return@on
         val messageAuthor = message.asMessage().author?.asMemberOrNull(guild.id) ?: return@on
         val msg = message.asMessage()
+        val target = databaseService.users.getOrCreateUser(messageAuthor, guild.asGuild())
 
         if (permissionsService.hasPermission(staffMember, PermissionLevel.Moderator) && !staffMember.isHigherRankedThan(permissionsService, messageAuthor)) {
             when (this.emoji.name) {
@@ -43,12 +44,12 @@ fun onStaffReactionAdd(muteService: MuteService,
                 }
                 guildConfiguration.reactions.historyReaction -> {
                     msg.deleteReaction(this.emoji)
-                    val target = databaseService.users.getOrCreateUser(messageAuthor, guild.asGuild())
-                    staffMember.sendPrivateMessage { createSelfHistoryEmbed(messageAuthor, target, guild.asGuild(), configuration) }
+                    staffMember.sendPrivateMessage { createCondensedHistoryEmbed(messageAuthor, target, guild.asGuild(), configuration) }
                 }
                 guildConfiguration.reactions.deleteMessageReaction -> {
                     msg.deleteReaction(this.emoji)
                     msg.delete()
+                    databaseService.users.addMessageDelete(guild, target, true)
                     try {
                         messageAuthor.sendPrivateMessage {
                             createMessageDeleteEmbed(guild, msg)

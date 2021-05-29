@@ -172,7 +172,7 @@ fun EmbedBuilder.createMessageDeleteEmbed(guild: Guild, message: Message) {
     color = Color.RED
     description = """
         Your ${if (message.attachments.isNotEmpty()) "image" else "message"} was deleted from ${message.channel.mention} 
-        as it is against our server rules.
+        as it was deemed either off topic or against our server rules.
     """.trimIndent()
     addField("Message", "```${messageContent}```")
     if (message.attachments.isNotEmpty()) {

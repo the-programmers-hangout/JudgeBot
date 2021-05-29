@@ -11,6 +11,7 @@ import me.ddivad.judgebot.util.*
 import me.jakejmattson.discordkt.api.dsl.MenuBuilder
 import me.jakejmattson.discordkt.api.extensions.addField
 import me.jakejmattson.discordkt.api.extensions.addInlineField
+import me.jakejmattson.discordkt.api.extensions.toSnowflake
 import org.joda.time.DateTime
 import java.awt.Color
 import java.text.SimpleDateFormat
@@ -55,17 +56,22 @@ private suspend fun MenuBuilder.buildOverviewPage(
 
         addInlineField("Record",
             """
-                ${userRecord.infractions.size} Infaction(s)
-                ${userRecord.notes.size} Note(s)
-                ${userRecord.info.size} Information(s)
+                **${userRecord.infractions.size}** Infraction(s)
+                **${userRecord.notes.size}** Note(s)
+                **${userRecord.info.size}** Information(s)
+                **${userRecord.deletedMessageCount.deleteReaction}** Deletes (${config.reactions.deleteMessageReaction})
             """.trimIndent())
-
         addInlineField("Points", "**${userRecord.points} / ${config.infractionConfiguration.pointCeiling}**")
         addInlineField("History Invokes", "${userRecord.historyCount}")
-        addInlineField("Creation date", formatOffsetTime(target.id.timeStamp))
+
+        addInlineField("Created", formatOffsetTime(target.id.timeStamp))
         if (memberInGuild != null) {
-            addInlineField("Join date", formatOffsetTime(memberInGuild.joinedAt))
+            addInlineField("Joined", formatOffsetTime(memberInGuild.joinedAt))
         } else addInlineField("", "")
+
+        if(userRecord.linkedAccounts.isNotEmpty()) {
+            addInlineField("Alts", userRecord.linkedAccounts.map { guild.kord.getUser(Snowflake(it))?.mention }.joinToString("\n"))
+        }
 
         getStatus(guild, target, databaseService)?.let { addField("Status", it) }
 
@@ -73,7 +79,7 @@ private suspend fun MenuBuilder.buildOverviewPage(
             val lastInfraction = userRecord.infractions[userRecord.infractions.size - 1]
             addField(
                     "**__Most Recent Infraction__**",
-                    "Type: **${lastInfraction.type}** :: Weight: **${lastInfraction.points}**\n " +
+                    "Type: **${lastInfraction.type} (${lastInfraction.points})**\n " +
                             "Issued by **${guild.kord.getUser(Snowflake(lastInfraction.moderator))?.username}** " +
                             "on **${SimpleDateFormat("dd/MM/yyyy").format(Date(lastInfraction.dateTime))}**\n" +
                             "Punishment: **${lastInfraction.punishment?.punishment}** ${getDurationText(lastInfraction.punishment)}\n" +
@@ -301,6 +307,97 @@ private suspend fun getStatus(guild: Guild, target: User, databaseService: Datab
     return null
 }
 
+suspend fun MenuBuilder.createLinkedAccountMenu(linkedAccountIds: List<String>,
+                                                guild: Guild,
+                                                config: Configuration,
+                                                databaseService: DatabaseService) {
+    linkedAccountIds.forEach {
+        val linkedUser = guild.kord.getUser(it.toSnowflake()) ?: return@forEach
+        val linkedUserRecord = databaseService.users.getOrCreateUser(linkedUser, guild)
+        page {
+            createCondensedHistoryEmbed(linkedUser, linkedUserRecord, guild, config)
+        }
+    }
+}
+
+suspend fun EmbedBuilder.createCondensedHistoryEmbed(target: User,
+                                                     member: GuildMember,
+                                                     guild: Guild,
+                                                     config: Configuration) {
+
+    val userGuildDetails = member.getGuildInfo(guild.id.value)
+    val infractions = userGuildDetails.infractions
+    val warnings = userGuildDetails.infractions.filter { it.type == InfractionType.Warn }
+    val strikes = userGuildDetails.infractions.filter { it.type == InfractionType.Strike }
+    val notes = userGuildDetails.notes
+    val maxPoints = config[guild.id.longValue]?.infractionConfiguration?.pointCeiling
+
+    color = Color.MAGENTA
+    title = "${target.asUser().tag}'s Record"
+    thumbnail {
+        url = target.asUser().avatar.url
+    }
+    addInlineField("Infractions", "${infractions.size}")
+    addInlineField("Notes", "${notes.size}")
+    addInlineField("Points", "**${member.getPoints(guild)} / $maxPoints**")
+
+    if(notes.isEmpty()) {
+        addField("", "**__Notes__**")
+        addField("No notes recorded.", "")
+    } else {
+        addField("", "**__Notes__**")
+        notes.forEach { note ->
+            val moderator = guild.kord.getUser(Snowflake(note.moderator))?.username
+
+            addField(
+                "ID :: ${note.id} :: Staff :: __${moderator}__",
+                "Noted by **${moderator}** on **${SimpleDateFormat("dd/MM/yyyy").format(Date(note.dateTime))}**\n" +
+                        note.note
+            )
+        }
+    }
+
+    if (infractions.isEmpty()) {
+        addField("", "**__Infractions__**")
+        addField("No infractions issued.", "")
+    } else {
+        if (warnings.isNotEmpty()) addField("", "**__Warnings__**")
+        warnings.forEachIndexed { index, infraction ->
+            val moderator = guild.kord.getUser(Snowflake(infraction.moderator))?.username
+                addField(
+                    "ID :: $index :: Staff :: $moderator",
+                    "Type: **${infraction.type} (${infraction.points})** :: " +
+                            "Date: **${SimpleDateFormat("dd/MM/yyyy").format(Date(infraction.dateTime))}**\n " +
+                            "Punishment: **${infraction.punishment?.punishment}** ${
+                                if (infraction.punishment?.duration != null && infraction.punishment?.punishment !== PunishmentType.NONE)
+                                    "for **" + timeToString(infraction.punishment?.duration!!) + "**" else "indefinitely"
+                            }\n" +
+                            infraction.reason
+                )
+        }
+
+        if (strikes.isNotEmpty()) addField("", "**__Strikes__**")
+        strikes.forEachIndexed { index, infraction ->
+                val moderator = guild.kord.getUser(Snowflake(infraction.moderator))?.username
+                addField(
+                    "ID :: $index :: Staff :: $moderator",
+                    "Type: **${infraction.type} (${infraction.points})** :: " +
+                            "Date: **${SimpleDateFormat("dd/MM/yyyy").format(Date(infraction.dateTime))}**\n " +
+                            "Punishment: **${infraction.punishment?.punishment}** ${
+                                if (infraction.punishment?.duration != null && infraction.punishment?.punishment !== PunishmentType.NONE)
+                                    "for **" + timeToString(infraction.punishment?.duration!!) + "**" else "indefinitely"
+                            }\n" +
+                            infraction.reason
+                )
+        }
+    }
+
+    footer {
+        icon = guild.getIconUrl(Image.Format.PNG) ?: ""
+        text = guild.name
+    }
+}
+
 suspend fun EmbedBuilder.createSelfHistoryEmbed(target: User,
                                                 member: GuildMember,
                                                 guild: Guild,
@@ -327,28 +424,28 @@ suspend fun EmbedBuilder.createSelfHistoryEmbed(target: User,
         if (warnings.isNotEmpty()) addField("", "**__Warnings__**")
         warnings.forEachIndexed { index, infraction ->
             addField(
-                    "ID :: $index :: Weight :: ${infraction.points}",
-                    "Type: **${infraction.type} (${infraction.points})** :: " +
-                            "Date: **${SimpleDateFormat("dd/MM/yyyy").format(Date(infraction.dateTime))}**\n " +
-                            "Punishment: **${infraction.punishment?.punishment}** ${
-                                if (infraction.punishment?.duration != null && infraction.punishment?.punishment !== PunishmentType.NONE)
-                                    "for **" + timeToString(infraction.punishment?.duration!!) + "**" else "indefinitely"
-                            }\n" +
-                            infraction.reason
+                "ID :: $index :: Weight :: ${infraction.points}",
+                "Type: **${infraction.type} (${infraction.points})** :: " +
+                        "Date: **${SimpleDateFormat("dd/MM/yyyy").format(Date(infraction.dateTime))}**\n " +
+                        "Punishment: **${infraction.punishment?.punishment}** ${
+                            if (infraction.punishment?.duration != null && infraction.punishment?.punishment !== PunishmentType.NONE)
+                                "for **" + timeToString(infraction.punishment?.duration!!) + "**" else "indefinitely"
+                        }\n" +
+                        infraction.reason
             )
         }
 
         if (strikes.isNotEmpty()) addField("", "**__Strikes__**")
         strikes.forEachIndexed { index, infraction ->
             addField(
-                    "ID :: $index :: Weight :: ${infraction.points}",
-                    "Type: **${infraction.type} (${infraction.points})** :: " +
-                            "Date: **${SimpleDateFormat("dd/MM/yyyy").format(Date(infraction.dateTime))}**\n " +
-                            "Punishment: **${infraction.punishment?.punishment}** ${
-                                if (infraction.punishment?.duration != null && infraction.punishment?.punishment !== PunishmentType.NONE)
-                                    "for **" + timeToString(infraction.punishment?.duration!!) + "**" else "indefinitely"
-                            }\n" +
-                            infraction.reason
+                "ID :: $index :: Weight :: ${infraction.points}",
+                "Type: **${infraction.type} (${infraction.points})** :: " +
+                        "Date: **${SimpleDateFormat("dd/MM/yyyy").format(Date(infraction.dateTime))}**\n " +
+                        "Punishment: **${infraction.punishment?.punishment}** ${
+                            if (infraction.punishment?.duration != null && infraction.punishment?.punishment !== PunishmentType.NONE)
+                                "for **" + timeToString(infraction.punishment?.duration!!) + "**" else "indefinitely"
+                        }\n" +
+                        infraction.reason
             )
         }
     }
