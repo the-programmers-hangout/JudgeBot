@@ -7,7 +7,7 @@ import com.gitlab.kordlib.kordx.emoji.addReaction
 import me.ddivad.judgebot.arguments.isHigherRankedThan
 import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.embeds.createMessageDeleteEmbed
-import me.ddivad.judgebot.embeds.createSelfHistoryEmbed
+import me.ddivad.judgebot.embeds.createCondensedHistoryEmbed
 import me.ddivad.judgebot.services.DatabaseService
 import me.ddivad.judgebot.services.PermissionLevel
 import me.ddivad.judgebot.services.PermissionsService
@@ -44,7 +44,7 @@ fun onStaffReactionAdd(muteService: MuteService,
                 }
                 guildConfiguration.reactions.historyReaction -> {
                     msg.deleteReaction(this.emoji)
-                    staffMember.sendPrivateMessage { createSelfHistoryEmbed(messageAuthor, target, guild.asGuild(), configuration) }
+                    staffMember.sendPrivateMessage { createCondensedHistoryEmbed(messageAuthor, target, guild.asGuild(), configuration) }
                 }
                 guildConfiguration.reactions.deleteMessageReaction -> {
                     msg.deleteReaction(this.emoji)

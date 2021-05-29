@@ -10,6 +10,7 @@ data class GuildMemberDetails(
         val infractions: MutableList<Infraction> = mutableListOf(),
         val info: MutableList<Info> = mutableListOf(),
         val leaveHistory: MutableList<GuildLeave> = mutableListOf(),
+        val linkedAccounts: MutableList<String> = mutableListOf(),
         var historyCount: Int = 0,
         var points: Int = 0,
         var pointDecayTimer: Long = DateTime().millis,
@@ -55,6 +56,23 @@ data class GuildMember(
 
     fun removeInfo(id: Int, guild: Guild) = with(this.getGuildInfo(guild.id.value)) {
         this.info.removeIf { it.id == id }
+    }
+
+    fun addLinkedAccount(guild: Guild, userId: String) = with(this.getGuildInfo(guild.id.value)) {
+        this.linkedAccounts.find { it == userId }.let {
+            if (it == null) {
+                this.linkedAccounts.add(userId)
+            }
+            return@let
+        }
+    }
+
+    fun getLinkedAccounts(guild: Guild) = with(this.getGuildInfo(guild.id.value)) {
+        this.linkedAccounts
+    }
+
+    fun removeLinkedAccount(guild: Guild, userId: String) = with(this.getGuildInfo(guild.id.value)) {
+        this.linkedAccounts.removeIf { it == userId }
     }
 
     fun cleanseNotes(guild: Guild) = with(this.getGuildInfo(guild.id.value)) {

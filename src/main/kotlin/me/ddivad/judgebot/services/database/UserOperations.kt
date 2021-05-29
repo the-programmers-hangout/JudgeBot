@@ -58,6 +58,20 @@ class UserOperations(connection: ConnectionService, private val configuration: C
         return this.updateUser(user)
     }
 
+    suspend fun addLinkedAccount(guild: Guild, user: GuildMember, userId: String): GuildMember {
+        user.addLinkedAccount(guild, userId)
+        return this.updateUser(user)
+    }
+
+    fun getLinkedAccounts(guild: Guild, user: GuildMember) {
+        user.getLinkedAccounts(guild)
+    }
+
+    suspend fun removeLinkedAccount(guild: Guild, user: GuildMember, userId: String): GuildMember {
+        user.removeLinkedAccount(guild, userId)
+        return this.updateUser(user)
+    }
+
     suspend fun cleanseNotes(guild: Guild, user: GuildMember): GuildMember {
         user.cleanseNotes(guild)
         return this.updateUser(user)

@@ -1,19 +1,17 @@
 package me.ddivad.judgebot.commands
 
-import me.ddivad.judgebot.arguments.LowerMemberArg
 import me.ddivad.judgebot.arguments.LowerUserArg
 import me.ddivad.judgebot.dataclasses.*
 import me.ddivad.judgebot.embeds.createHistoryEmbed
+import me.ddivad.judgebot.embeds.createCondensedHistoryEmbed
+import me.ddivad.judgebot.embeds.createLinkedAccountMenu
 import me.ddivad.judgebot.embeds.createSelfHistoryEmbed
 import me.ddivad.judgebot.services.DatabaseService
 import me.ddivad.judgebot.services.LoggingService
 import me.ddivad.judgebot.services.PermissionLevel
 import me.ddivad.judgebot.services.infractions.BanService
 import me.ddivad.judgebot.services.requiredPermissionLevel
-import me.jakejmattson.discordkt.api.arguments.EitherArg
-import me.jakejmattson.discordkt.api.arguments.EveryArg
-import me.jakejmattson.discordkt.api.arguments.IntegerArg
-import me.jakejmattson.discordkt.api.arguments.UserArg
+import me.jakejmattson.discordkt.api.arguments.*
 import me.jakejmattson.discordkt.api.dsl.commands
 import me.jakejmattson.discordkt.api.extensions.sendPrivateMessage
 import java.awt.Color
@@ -29,8 +27,29 @@ fun createUserCommands(databaseService: DatabaseService,
         execute(UserArg) {
             val user = databaseService.users.getOrCreateUser(args.first, guild)
             databaseService.users.incrementUserHistory(user, guild)
+            val linkedAccounts = user.getLinkedAccounts(guild)
             respondMenu {
                 createHistoryEmbed(args.first, user, guild, config, databaseService)
+            }
+        }
+    }
+
+    guildCommand("listAlts", "alts") {
+        description = "Use this to view a user's alt accounts."
+        requiredPermissionLevel = PermissionLevel.Moderator
+        execute(UserArg) {
+            val target = args.first
+            val user = databaseService.users.getOrCreateUser(args.first, guild)
+            databaseService.users.incrementUserHistory(user, guild)
+            val linkedAccounts = user.getLinkedAccounts(guild)
+
+            if(linkedAccounts.isEmpty()) {
+                respond("User ${target.mention} has no alt accounts recorded.")
+                return@execute
+            }
+
+            respondMenu {
+                createLinkedAccountMenu(linkedAccounts, guild, config, databaseService)
             }
         }
     }
@@ -55,7 +74,7 @@ fun createUserCommands(databaseService: DatabaseService,
         requiredPermissionLevel = PermissionLevel.Staff
         execute(LowerUserArg, IntegerArg("Delete message days").makeOptional(0), EveryArg) {
             val (target, deleteDays, reason) = args
-            val ban = Punishment(target.id.value, InfractionType.Ban , reason, author.id.value)
+            val ban = Punishment(target.id.value, InfractionType.Ban, reason, author.id.value)
             banService.banUser(target, guild, ban, deleteDays).also {
                 loggingService.userBanned(guild, target, ban)
                 respond("User ${target.mention} banned")
@@ -119,6 +138,32 @@ fun createUserCommands(databaseService: DatabaseService,
             user.sendPrivateMessage {
                 createSelfHistoryEmbed(user, guildMember, guild, config)
             }
+        }
+    }
+
+    guildCommand("link") {
+        description = "Link a user's alt account with their main"
+        requiredPermissionLevel = PermissionLevel.Staff
+        execute(UserArg("Main Account"), UserArg("Alt Account")) {
+            val (main, alt) = args
+            val mainRecord = databaseService.users.getOrCreateUser(main, guild)
+            val altRecord = databaseService.users.getOrCreateUser(alt, guild)
+            databaseService.users.addLinkedAccount(guild, mainRecord, alt.id.value)
+            databaseService.users.addLinkedAccount(guild, altRecord, main.id.value)
+            respond("Linked accounts ${main.mention} and ${alt.mention}")
+        }
+    }
+
+    guildCommand("unlink") {
+        description = "Link a user's alt account with their main"
+        requiredPermissionLevel = PermissionLevel.Staff
+        execute(UserArg("Main Account"), UserArg("Alt Account")) {
+            val (main, alt) = args
+            val mainRecord = databaseService.users.getOrCreateUser(main, guild)
+            val altRecord = databaseService.users.getOrCreateUser(alt, guild)
+            databaseService.users.removeLinkedAccount(guild, mainRecord, alt.id.value)
+            databaseService.users.removeLinkedAccount(guild, altRecord, main.id.value)
+            respond("Unlinked accounts ${main.mention} and ${alt.mention}")
         }
     }
 }
