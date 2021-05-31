@@ -30,7 +30,7 @@ class BadPfpService(private val muteService: MuteService,
         } catch (ex: RequestException) {
             loggingService.dmDisabled(guild, target.asUser())
         }
-        muteService.applyMute(target, timeLimit, "Bad Pfp Mute")
+        muteService.applyMuteAndSendReason(target, timeLimit, "Mute for BadPfp.")
         loggingService.badBfpApplied(guild, target)
         badPfpTracker[toKey((target))] = GlobalScope.launch {
             delay(timeLimit)

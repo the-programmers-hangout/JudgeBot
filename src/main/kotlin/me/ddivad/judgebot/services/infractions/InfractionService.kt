@@ -44,7 +44,7 @@ class InfractionService(private val configuration: Configuration,
     private suspend fun applyPunishment(guild: Guild, target: Member, infraction: Infraction) {
         when (infraction.punishment?.punishment) {
             PunishmentType.NONE -> return
-            PunishmentType.MUTE -> muteService.applyMute(target, infraction.punishment?.duration!!, infraction.reason)
+            PunishmentType.MUTE -> muteService.applyInfractionMute(target, infraction.punishment?.duration!!, "Infraction mute. Please check corresponding infraction embed above.")
             PunishmentType.BAN -> {
                 val clearTime = infraction.punishment!!.duration?.let { DateTime().millis.plus(it) }
                 val punishment = Punishment(target.id.value, InfractionType.Ban, infraction.reason, infraction.moderator, clearTime)

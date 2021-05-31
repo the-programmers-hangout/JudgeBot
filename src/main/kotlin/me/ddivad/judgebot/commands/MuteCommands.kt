@@ -28,7 +28,7 @@ fun createMuteCommands(muteService: MuteService) = commands("Mute") {
                 this.message.addReaction(Emojis.x)
                 respond("${targetMember.mention} has DMs disabled and won't receive message.")
             }
-            muteService.applyMute(targetMember, length.roundToLong() * 1000, reason)
+            muteService.applyMuteAndSendReason(targetMember, length.roundToLong() * 1000, reason)
             respond("User ${targetMember.mention} has been muted")
         }
     }

@@ -76,7 +76,8 @@ private suspend fun MenuBuilder.buildOverviewPage(
         getStatus(guild, target, databaseService)?.let { addField("Status", it) }
 
         if (userRecord.infractions.size > 0) {
-            val lastInfraction = userRecord.infractions[userRecord.infractions.size - 1]
+            val lastInfraction = userRecord.infractions.maxByOrNull { it.dateTime }!!
+
             addField(
                     "**__Most Recent Infraction__**",
                     "Type: **${lastInfraction.type} (${lastInfraction.points})**\n " +
@@ -106,8 +107,8 @@ private suspend fun MenuBuilder.buildInfractionPage(
         thumbnail {
             url = target.asUser().avatar.url
         }
-        val warnings = userRecord.infractions.filter { it.type == InfractionType.Warn }
-        val strikes = userRecord.infractions.filter { it.type == InfractionType.Strike }
+        val warnings = userRecord.infractions.filter { it.type == InfractionType.Warn }.sortedBy { it.dateTime }
+        val strikes = userRecord.infractions.filter { it.type == InfractionType.Strike }.sortedBy { it.dateTime }
         val bans = userRecord.infractions.filter { it.punishment?.punishment == PunishmentType.BAN }
 
         addInlineField("Warns", "${warnings.size}")
@@ -154,7 +155,7 @@ private suspend fun MenuBuilder.buildNotesPages(
         embedColor: Color,
         totalPages: Int
 ) {
-    val paginatedNotes = userRecord.notes.chunked(4)
+    val paginatedNotes = userRecord.notes.sortedBy { it.dateTime }.chunked(4)
     if (userRecord.notes.isEmpty()) {
         page {
             color = embedColor

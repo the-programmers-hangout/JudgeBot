@@ -51,7 +51,24 @@ class MuteService(val configuration: Configuration,
         }
     }
 
-    suspend fun applyMute(member: Member, time: Long, reason: String) {
+    suspend fun applyInfractionMute(member: Member, time: Long, reason: String) {
+        applyMute(member, time, reason)
+    }
+
+    suspend fun applyMuteAndSendReason(member: Member, time: Long, reason: String) {
+        val guild = member.guild.asGuild()
+        val user = member.asUser()
+        applyMute(member, time, reason)
+        try {
+            member.sendPrivateMessage {
+                createMuteEmbed(guild, member, reason, time)
+            }
+        } catch (ex: RequestException) {
+            loggingService.dmDisabled(guild, user)
+        }
+    }
+
+    private suspend fun applyMute(member: Member, time: Long, reason: String) {
         val guild = member.guild.asGuild()
         val user = member.asUser()
         val clearTime = DateTime.now().plus(time).millis
@@ -69,19 +86,12 @@ class MuteService(val configuration: Configuration,
             removeMute(guild, user)
         }.also {
             loggingService.roleApplied(guild, member.asUser(), muteRole)
-            try {
-                member.sendPrivateMessage {
-                    createMuteEmbed(guild, member, reason, time)
-                }
-            } catch (ex: RequestException) {
-                loggingService.dmDisabled(guild, user)
-            }
         }
     }
 
     suspend fun gag(guild: Guild, target: Member, moderator: User) {
         loggingService.gagApplied(guild, target, moderator)
-        this.applyMute(target, 1000L * 60 * 5, "You've been muted temporarily by staff.")
+        this.applyMuteAndSendReason(target, 1000L * 60 * 5, "You've been muted temporarily by staff.")
     }
 
     fun removeMute(guild: Guild, user: User) {
@@ -158,7 +168,6 @@ class MuteService(val configuration: Configuration,
                 } catch (ex: RequestException) {
                     println("No permssions to add overwrite to ${it.id.value} - ${it.name}")
                 }
-
             }
         }
     }
