@@ -18,22 +18,19 @@ fun EmbedBuilder.createInfractionEmbed(guild: Guild, configuration: GuildConfigu
 
 fun EmbedBuilder.createWarnEmbed(guild: Guild, configuration: GuildConfiguration, user: User, guildMember: GuildMember, infraction: Infraction, rule: Rule?) {
     title = "Warn"
-    description = """
-                    | ${user.mention}, you have received a **warning** from **${guild.name}**. A warning is a way for staff to inform you that your behaviour needs to change or further infractions will follow.
-                    | If you think this to be unjustified, please **do not** post about it in a public channel but take it up with **Modmail**.
-                """.trimMargin()
+    description = "${user.mention}, you have received a **warning** from **${guild.name}**."
+
+    field {
+        name = "__Reason__"
+        value = infraction.reason
+        inline = false
+    }
 
     if (infraction.ruleNumber != null) {
         field {
             name = "__Rule Broken__"
             value = "**[${rule?.title}](${rule?.link})** \n${rule?.description}"
         }
-    }
-
-    field {
-        name = "__Reason__"
-        value = infraction.reason
-        inline = true
     }
 
     if (configuration.infractionConfiguration.warnPoints > 0) {
@@ -48,6 +45,14 @@ fun EmbedBuilder.createWarnEmbed(guild: Guild, configuration: GuildConfiguration
             value = "${guildMember.getPoints(guild)} / ${configuration.infractionConfiguration.pointCeiling}"
             inline = true
         }
+    }
+
+    field {
+        name = ""
+        value = """
+            A warning is a way for staff to inform you that your behaviour needs to change or further infractions will follow.
+            If you think this to be unjustified, please **do not** post about it in a public channel but DM **Modmail**.
+        """.trimIndent()
     }
 
     color = Color.RED
