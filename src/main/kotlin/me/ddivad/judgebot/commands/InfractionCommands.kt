@@ -1,5 +1,6 @@
 package me.ddivad.judgebot.commands
 
+import me.ddivad.judgebot.arguments.LowerUserArg
 import com.gitlab.kordlib.common.exception.RequestException
 import com.gitlab.kordlib.kordx.emoji.Emojis
 import com.gitlab.kordlib.kordx.emoji.addReaction
@@ -98,7 +99,7 @@ fun createInfractionCommands(databaseService: DatabaseService,
     guildCommand("cleanse") {
         description = "Use this to delete (permanently) as user's infractions."
         requiredPermissionLevel = PermissionLevel.Administrator
-        execute(LowerMemberArg) {
+        execute(LowerUserArg) {
             val user = databaseService.users.getOrCreateUser(args.first, guild)
             if (user.getGuildInfo(guild.id.value).infractions.isEmpty()) {
                 respond("User has no infractions.")
@@ -112,7 +113,7 @@ fun createInfractionCommands(databaseService: DatabaseService,
     guildCommand("removeInfraction") {
         description = "Use this to delete (permanently) an infraction from a user."
         requiredPermissionLevel = PermissionLevel.Administrator
-        execute(LowerMemberArg, IntegerArg("Infraction ID")) {
+        execute(LowerUserArg, IntegerArg("Infraction ID")) {
             val user = databaseService.users.getOrCreateUser(args.first, guild)
             if (user.getGuildInfo(guild.id.value).infractions.isEmpty()) {
                 respond("User has no infractions.")
