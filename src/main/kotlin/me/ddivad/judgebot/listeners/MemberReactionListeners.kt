@@ -20,13 +20,17 @@ fun onMemberReactionAdd(configuration: Configuration) = listeners {
         when (this.emoji.name) {
             guildConfiguration.reactions.flagMessageReaction -> {
                 message.deleteReaction(this.emoji)
-                guild.asGuild().getChannelOf<TextChannel>(guildConfiguration.loggingConfiguration.alertChannel.toSnowflake()).asChannel()
-                        .createMessage("**Message Flagged**" +
+                guild.asGuild()
+                    .getChannelOf<TextChannel>(guildConfiguration.loggingConfiguration.alertChannel.toSnowflake())
+                    .asChannel()
+                    .createMessage(
+                        "**Message Flagged**" +
                                 "\n**User**: ${user.mention}" +
                                 "\n**Channel**: ${message.channel.mention}" +
                                 "\n**Author:** ${message.asMessage().author?.mention}" +
-                                "\n**Message:** ${message.asMessage().jumpLink(guild.id.value)}")
-                        .addReaction(Emojis.question)
+                                "\n**Message:** ${message.asMessage().jumpLink(guild.id.value)}"
+                    )
+                    .addReaction(Emojis.question)
             }
         }
     }

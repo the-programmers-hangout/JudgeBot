@@ -34,7 +34,7 @@ fun createUserCommands(databaseService: DatabaseService,
         }
     }
 
-    guildCommand("listAlts", "alts") {
+    guildCommand("alts") {
         description = "Use this to view a user's alt accounts."
         requiredPermissionLevel = PermissionLevel.Moderator
         execute(UserArg) {

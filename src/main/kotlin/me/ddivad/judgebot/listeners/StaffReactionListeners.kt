@@ -18,10 +18,12 @@ import me.jakejmattson.discordkt.api.extensions.isSelf
 import me.jakejmattson.discordkt.api.extensions.sendPrivateMessage
 
 @Suppress("unused")
-fun onStaffReactionAdd(muteService: MuteService,
-                       databaseService: DatabaseService,
-                       permissionsService: PermissionsService,
-                       configuration: Configuration) = listeners {
+fun onStaffReactionAdd(
+    muteService: MuteService,
+    databaseService: DatabaseService,
+    permissionsService: PermissionsService,
+    configuration: Configuration
+) = listeners {
     on<ReactionAddEvent> {
         val guild = guild?.asGuildOrNull() ?: return@on
         val guildConfiguration = configuration[guild.asGuild().id.longValue]
@@ -31,7 +33,11 @@ fun onStaffReactionAdd(muteService: MuteService,
         val msg = message.asMessage()
         val target = databaseService.users.getOrCreateUser(messageAuthor, guild.asGuild())
 
-        if (permissionsService.hasPermission(staffMember, PermissionLevel.Moderator) && !staffMember.isHigherRankedThan(permissionsService, messageAuthor)) {
+        if (permissionsService.hasPermission(staffMember, PermissionLevel.Moderator) && !staffMember.isHigherRankedThan(
+                permissionsService,
+                messageAuthor
+            )
+        ) {
             when (this.emoji.name) {
                 guildConfiguration.reactions.gagReaction -> {
                     msg.deleteReaction(this.emoji)
@@ -44,7 +50,14 @@ fun onStaffReactionAdd(muteService: MuteService,
                 }
                 guildConfiguration.reactions.historyReaction -> {
                     msg.deleteReaction(this.emoji)
-                    staffMember.sendPrivateMessage { createCondensedHistoryEmbed(messageAuthor, target, guild.asGuild(), configuration) }
+                    staffMember.sendPrivateMessage {
+                        createCondensedHistoryEmbed(
+                            messageAuthor,
+                            target,
+                            guild.asGuild(),
+                            configuration
+                        )
+                    }
                 }
                 guildConfiguration.reactions.deleteMessageReaction -> {
                     msg.deleteReaction(this.emoji)
@@ -55,8 +68,10 @@ fun onStaffReactionAdd(muteService: MuteService,
                             createMessageDeleteEmbed(guild, msg)
                         }
                     } catch (ex: RequestException) {
-                        staffMember.sendPrivateMessage("User ${messageAuthor.mention} has DM's disabled." +
-                                " Message deleted without notification.")
+                        staffMember.sendPrivateMessage(
+                            "User ${messageAuthor.mention} has DM's disabled." +
+                                    " Message deleted without notification."
+                        )
                     }
 
                 }

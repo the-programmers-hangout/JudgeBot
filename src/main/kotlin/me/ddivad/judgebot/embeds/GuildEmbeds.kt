@@ -1,12 +1,17 @@
 package me.ddivad.judgebot.embeds
 
+import com.gitlab.kordlib.common.entity.Snowflake
 import com.gitlab.kordlib.core.entity.Guild
 import com.gitlab.kordlib.rest.Image
 import com.gitlab.kordlib.rest.builder.message.EmbedBuilder
 import me.ddivad.judgebot.arguments.validConfigParameters
 import me.ddivad.judgebot.dataclasses.GuildConfiguration
+import me.ddivad.judgebot.dataclasses.Punishment
+import me.ddivad.judgebot.util.timeBetween
 import me.ddivad.judgebot.util.timeToString
+import me.jakejmattson.discordkt.api.extensions.addField
 import me.jakejmattson.discordkt.api.extensions.toSnowflake
+import org.joda.time.DateTime
 import java.awt.Color
 
 suspend fun EmbedBuilder.createConfigEmbed(config: GuildConfiguration, guild: Guild) {
@@ -68,6 +73,22 @@ fun EmbedBuilder.createConfigOptionsEmbed(config: GuildConfiguration, guild: Gui
     field {
         name = "Usage: `${config.prefix}configuration <option>`"
         value = "```css\n${validConfigParameters.joinToString("\n")}\n```"
+    }
+    footer {
+        icon = guild.getIconUrl(Image.Format.PNG) ?: ""
+        text = guild.name
+    }
+}
+
+suspend fun EmbedBuilder.createActivePunishmentsEmbed(guild: Guild, punishments: List<Punishment>) {
+    title = "__Active Punishments__"
+    color = Color.MAGENTA
+    punishments.forEach {
+        val user = guild.kord.getUser(Snowflake(it.userId))?.mention
+        addField(
+            "${it.id} - ${it.type} - ${timeBetween(DateTime(it.clearTime))} left.",
+            "User: $user"
+        )
     }
     footer {
         icon = guild.getIconUrl(Image.Format.PNG) ?: ""

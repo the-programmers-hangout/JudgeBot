@@ -9,7 +9,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import me.ddivad.judgebot.services.DatabaseService
 import me.jakejmattson.discordkt.api.dsl.listeners
-import org.joda.time.DateTime
 
 @Suppress("unused")
 fun onGuildMemberLeave(databaseService: DatabaseService) = listeners {
@@ -18,23 +17,15 @@ fun onGuildMemberLeave(databaseService: DatabaseService) = listeners {
     }
 
     on<MemberLeaveEvent> {
-        databaseService.users.getUserOrNull(this.user.asUser())?.let {
-            databaseService.users.addGuildLeave(it, guild.asGuild(), DateTime.now().millis)
-        }
+        databaseService.joinLeaves.addLeaveData(guildId.value, user.id.value)
     }
 
     on<MemberJoinEvent> {
-        val user = this.member.asUser()
-        val guild = this.getGuild()
-        databaseService.users.getUserOrNull(user)?.let {
-            databaseService.users.addGuildJoin(guild, it, this.member.joinedAt.toEpochMilli())
-            return@on
-        }
-        // Add delay before creating user in case they are banned (raid, etc...)
+        // Add delay before creating user in case they are banned immediately (raid, etc...)
         GlobalScope.launch {
             delay(1000 * 60 * 5)
             guild.getMemberOrNull(member.id)?.let {
-                databaseService.users.getOrCreateUser(member.asUser(), guild)
+                databaseService.joinLeaves.createJoinLeaveRecord(guildId.value, member)
             }
         }
     }

@@ -5,11 +5,12 @@
 | ----------- | ------------------------------ |
 | (Argument)  | Argument is not required.      |
 
-## Configuration
-| Commands      | Arguments     | Description                                                    |
-| ------------- | ------------- | -------------------------------------------------------------- |
-| configuration | (GuildConfig) | Update configuration parameters for this guild (conversation). |
-| setup         |               | Configure a guild to use Judgebot.                             |
+## Guild
+| Commands          | Arguments     | Description                                                    |
+| ----------------- | ------------- | -------------------------------------------------------------- |
+| activePunishments |               | View active punishments for a guild.                           |
+| configuration     | (GuildConfig) | Update configuration parameters for this guild (conversation). |
+| setup             |               | Configure a guild to use Judgebot.                             |
 
 ## Information
 | Commands   | Arguments                    | Description                                         |
@@ -21,8 +22,8 @@
 | Commands         | Arguments                        | Description                                                                                                                           |
 | ---------------- | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
 | badpfp           | (cancel), LowerMemberArg         | Notifies the user that they should change their profile pic and applies a 30 minute mute. Bans the user if they don't change picture. |
-| cleanse          | LowerMemberArg                   | Use this to delete (permanently) as user's infractions.                                                                               |
-| removeInfraction | LowerMemberArg, Infraction ID    | Use this to delete (permanently) an infraction from a user.                                                                           |
+| cleanse          | LowerUserArg                     | Use this to delete (permanently) as user's infractions.                                                                               |
+| removeInfraction | LowerUserArg, Infraction ID      | Use this to delete (permanently) an infraction from a user.                                                                           |
 | strike, s, S     | LowerMemberArg, (Weight), Reason | Strike a user.                                                                                                                        |
 | warn, w, W       | LowerMemberArg, Reason           | Warn a user.                                                                                                                          |
 

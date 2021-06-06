@@ -30,9 +30,9 @@ fun timeBetween(endTime: DateTime): String {
     val minutes = Minutes.minutesBetween(now, endTime).minutes
 
     return when {
-        days > 0 -> "$days days"
-        hours > 0 -> "$hours hours"
-        else -> "$minutes minutes"
+        days > 0 -> "$days day(s)"
+        hours > 0 -> "$hours hour(s)"
+        else -> "$minutes minute(s)"
     }
 }
 

@@ -31,4 +31,3 @@ open class LowerMemberArg(override val name: String = "LowerMemberArg") : Argume
 
 suspend fun Member.isHigherRankedThan(permissions: PermissionsService, targetMember: Member) =
         permissions.getPermissionRank(this) < permissions.getPermissionRank(targetMember)
-
