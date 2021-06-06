@@ -15,7 +15,6 @@ data class GuildMemberDetails(
     val infractions: MutableList<Infraction> = mutableListOf(),
     val info: MutableList<Info> = mutableListOf(),
     val linkedAccounts: MutableList<String> = mutableListOf(),
-    var leaveHistory: MutableList<GuildLeave> = mutableListOf(),
     var historyCount: Int = 0,
     var points: Int = 0,
     var pointDecayTimer: Long = DateTime().millis,
