@@ -2,10 +2,7 @@ package me.ddivad.judgebot.services
 
 import com.gitlab.kordlib.common.entity.Snowflake
 import com.gitlab.kordlib.core.behavior.getChannelOf
-import com.gitlab.kordlib.core.entity.Guild
-import com.gitlab.kordlib.core.entity.Member
-import com.gitlab.kordlib.core.entity.Role
-import com.gitlab.kordlib.core.entity.User
+import com.gitlab.kordlib.core.entity.*
 import com.gitlab.kordlib.core.entity.channel.TextChannel
 import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.dataclasses.Infraction
@@ -75,6 +72,9 @@ class LoggingService(private val configuration: Configuration) {
 
     suspend fun gagApplied(guild: Guild, target: Member, moderator: User) =
         log(guild, "**Info ::** User ${target.mention} has been gagged by **${moderator.username} :: ${moderator.tag}**")
+
+    suspend fun staffReactionUsed(guild: Guild, moderator: User, target: Member, reaction: ReactionEmoji) =
+        log(guild, "**Info ::** ${reaction.name} used by ${moderator.username} on ${target.mention}")
 
     private suspend fun log(guild: Guild, message: String) {
         getLoggingChannel(guild)?.createMessage(message)
