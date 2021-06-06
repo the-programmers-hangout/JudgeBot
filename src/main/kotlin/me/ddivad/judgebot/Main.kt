@@ -7,7 +7,6 @@ import me.ddivad.judgebot.services.BotStatsService
 import me.ddivad.judgebot.services.infractions.MuteService
 import me.ddivad.judgebot.services.PermissionsService
 import me.ddivad.judgebot.services.infractions.BanService
-import me.ddivad.judgebot.services.migrations.JoinLeaveMigration
 import me.ddivad.judgebot.services.requiredPermissionLevel
 import me.jakejmattson.discordkt.api.dsl.bot
 import me.jakejmattson.discordkt.api.extensions.addInlineField
@@ -58,7 +57,7 @@ suspend fun main(args: Array<String>) {
             field {
                 name = "Build Info"
                 value = "```" +
-                        "Version:   2.0.0\n" +
+                        "Version:   2.0.1\n" +
                         "DiscordKt: ${versions.library}\n" +
                         "Kotlin:    $kotlinVersion" +
                         "```"
@@ -83,14 +82,12 @@ suspend fun main(args: Array<String>) {
         }
 
         onStart {
-            val (muteService, banService, joinLeaveMigration) = this.getInjectionObjects(
+            val (muteService, banService) = this.getInjectionObjects(
                 MuteService::class,
                 BanService::class,
-                JoinLeaveMigration::class
             )
             muteService.initGuilds()
             banService.initialiseBanTimers()
-            joinLeaveMigration.run()
         }
 
         intents {
