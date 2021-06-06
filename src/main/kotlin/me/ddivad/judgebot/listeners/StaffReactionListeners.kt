@@ -9,6 +9,7 @@ import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.embeds.createMessageDeleteEmbed
 import me.ddivad.judgebot.embeds.createCondensedHistoryEmbed
 import me.ddivad.judgebot.services.DatabaseService
+import me.ddivad.judgebot.services.LoggingService
 import me.ddivad.judgebot.services.PermissionLevel
 import me.ddivad.judgebot.services.PermissionsService
 import me.ddivad.judgebot.services.infractions.MuteService
@@ -22,6 +23,7 @@ fun onStaffReactionAdd(
     muteService: MuteService,
     databaseService: DatabaseService,
     permissionsService: PermissionsService,
+    loggingService: LoggingService,
     configuration: Configuration
 ) = listeners {
     on<ReactionAddEvent> {
@@ -33,6 +35,7 @@ fun onStaffReactionAdd(
         val msg = message.asMessage()
         val target = databaseService.users.getOrCreateUser(messageAuthor, guild.asGuild())
 
+
         if (permissionsService.hasPermission(staffMember, PermissionLevel.Moderator) && !staffMember.isHigherRankedThan(
                 permissionsService,
                 messageAuthor
@@ -40,6 +43,7 @@ fun onStaffReactionAdd(
         ) {
             when (this.emoji.name) {
                 guildConfiguration.reactions.gagReaction -> {
+                    loggingService.staffReactionUsed(guild, staffMember, messageAuthor, this.emoji)
                     msg.deleteReaction(this.emoji)
                     if (muteService.checkRoleState(guild, messageAuthor) == RoleState.Tracked) {
                         staffMember.sendPrivateMessage("${messageAuthor.mention} is already muted.")
@@ -49,6 +53,7 @@ fun onStaffReactionAdd(
                     staffMember.sendPrivateMessage("${messageAuthor.mention} gagged.")
                 }
                 guildConfiguration.reactions.historyReaction -> {
+                    loggingService.staffReactionUsed(guild, staffMember, messageAuthor, this.emoji)
                     msg.deleteReaction(this.emoji)
                     staffMember.sendPrivateMessage {
                         createCondensedHistoryEmbed(
@@ -60,6 +65,7 @@ fun onStaffReactionAdd(
                     }
                 }
                 guildConfiguration.reactions.deleteMessageReaction -> {
+                    loggingService.staffReactionUsed(guild, staffMember, messageAuthor, this.emoji)
                     msg.deleteReaction(this.emoji)
                     msg.delete()
                     databaseService.users.addMessageDelete(guild, target, true)
@@ -73,7 +79,6 @@ fun onStaffReactionAdd(
                                     " Message deleted without notification."
                         )
                     }
-
                 }
                 Emojis.question.unicode -> {
                     if (this.user.isSelf() || msg.author != this.message.kord.getSelf()) return@on
