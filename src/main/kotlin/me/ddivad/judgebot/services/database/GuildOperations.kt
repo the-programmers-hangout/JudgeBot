@@ -102,6 +102,10 @@ class GuildOperations(connection: ConnectionService) {
         return this.getGuild(guild).punishments.filter { it.type == type }
     }
 
+    suspend fun getActivePunishments(guild: Guild): List<Punishment> {
+        return this.getGuild(guild).punishments
+    }
+
     private suspend fun getGuild(guild: Guild): GuildInformation {
         return guildCollection.findOne(GuildInformation::guildId eq guild.id.value)
                 ?: GuildInformation(guild.id.value, guild.name)

@@ -1,11 +1,11 @@
 package me.ddivad.judgebot.dataclasses
 
 data class GuildInformation(
-        val guildId: String,
-        val guildName: String,
-        val rules: MutableList<Rule> = mutableListOf(),
-        val bans: MutableList<Ban> = mutableListOf(),
-        val punishments: MutableList<Punishment> = mutableListOf()
+    val guildId: String,
+    val guildName: String,
+    val rules: MutableList<Rule> = mutableListOf(),
+    val bans: MutableList<Ban> = mutableListOf(),
+    val punishments: MutableList<Punishment> = mutableListOf()
 ) {
     fun addRule(rule: Rule): GuildInformation = this.apply {
         this.rules.add(rule)
@@ -55,9 +55,9 @@ data class GuildInformation(
 }
 
 data class Rule(
-        val number: Int,
-        val title: String,
-        val description: String,
-        val link: String,
-        var archived: Boolean = false
+    val number: Int,
+    val title: String,
+    val description: String,
+    val link: String,
+    var archived: Boolean = false
 )

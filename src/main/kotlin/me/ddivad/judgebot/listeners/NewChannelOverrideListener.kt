@@ -19,9 +19,10 @@ fun onChannelCreated(configuration: Configuration, loggingService: LoggingServic
         val deniedPermissions = channel.getPermissionOverwritesForRole(mutedRole.id)?.denied ?: Permissions()
         if (!deniedPermissions.contains(Permission.SendMessages) || !deniedPermissions.contains(Permission.AddReactions)) {
             channel.addOverwrite(
-                    PermissionOverwrite.forRole(
-                            mutedRole.id,
-                            denied = deniedPermissions.plus(Permission.SendMessages).plus(Permission.AddReactions))
+                PermissionOverwrite.forRole(
+                    mutedRole.id,
+                    denied = deniedPermissions.plus(Permission.SendMessages).plus(Permission.AddReactions)
+                )
             )
             loggingService.channelOverrideAdded(guild, channel)
         }
