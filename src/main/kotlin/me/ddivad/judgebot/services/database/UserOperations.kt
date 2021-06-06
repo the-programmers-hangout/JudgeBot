@@ -23,7 +23,6 @@ class UserOperations(connection: ConnectionService, private val configuration: C
         } else {
             val guildMember = GuildMember(target.id.value)
             guildMember.guilds.add(GuildMemberDetails(guild.id.value))
-            target.asMemberOrNull(guild.id)?.let { guildMember.addGuildJoinDate(guild, it.joinedAt.toEpochMilli()) }
             userCollection.insertOne(guildMember)
             guildMember
         }
@@ -63,10 +62,6 @@ class UserOperations(connection: ConnectionService, private val configuration: C
         return this.updateUser(user)
     }
 
-    fun getLinkedAccounts(guild: Guild, user: GuildMember) {
-        user.getLinkedAccounts(guild)
-    }
-
     suspend fun removeLinkedAccount(guild: Guild, user: GuildMember, userId: String): GuildMember {
         user.removeLinkedAccount(guild, userId)
         return this.updateUser(user)
@@ -101,16 +96,6 @@ class UserOperations(connection: ConnectionService, private val configuration: C
 
     suspend fun incrementUserHistory(user: GuildMember, guild: Guild): GuildMember {
         user.incrementHistoryCount(guild.id.value)
-        return this.updateUser(user)
-    }
-
-    suspend fun addGuildLeave(user: GuildMember, guild: Guild, leaveDateTime: Long): GuildMember {
-        user.addGuildLeave(guild, leaveDateTime)
-        return this.updateUser(user)
-    }
-
-    suspend fun addGuildJoin(guild: Guild, user: GuildMember, joinDateTime: Long): GuildMember {
-        user.addGuildJoinDate(guild, joinDateTime)
         return this.updateUser(user)
     }
 

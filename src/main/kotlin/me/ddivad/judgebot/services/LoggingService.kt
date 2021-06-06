@@ -13,7 +13,6 @@ import me.ddivad.judgebot.dataclasses.Punishment
 import me.ddivad.judgebot.services.infractions.RoleState
 import me.ddivad.judgebot.util.timeBetween
 import me.jakejmattson.discordkt.api.annotations.Service
-import me.jakejmattson.discordkt.api.extensions.toTimeString
 import org.joda.time.DateTime
 import java.text.SimpleDateFormat
 import java.util.*

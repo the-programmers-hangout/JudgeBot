@@ -4,28 +4,28 @@ import com.gitlab.kordlib.core.entity.Guild
 import org.joda.time.DateTime
 import org.joda.time.Weeks
 
+data class GuildLeave(
+    val joinDate: Long,
+    var leaveDate: Long?
+)
+
 data class GuildMemberDetails(
-        val guildId: String,
-        val notes: MutableList<Note> = mutableListOf(),
-        val infractions: MutableList<Infraction> = mutableListOf(),
-        val info: MutableList<Info> = mutableListOf(),
-        val leaveHistory: MutableList<GuildLeave> = mutableListOf(),
-        val linkedAccounts: MutableList<String> = mutableListOf(),
-        var historyCount: Int = 0,
-        var points: Int = 0,
-        var pointDecayTimer: Long = DateTime().millis,
-        var lastInfraction: Long = 0,
-        val deletedMessageCount: DeletedMessages = DeletedMessages()
+    val guildId: String,
+    val notes: MutableList<Note> = mutableListOf(),
+    val infractions: MutableList<Infraction> = mutableListOf(),
+    val info: MutableList<Info> = mutableListOf(),
+    val linkedAccounts: MutableList<String> = mutableListOf(),
+    var leaveHistory: MutableList<GuildLeave> = mutableListOf(),
+    var historyCount: Int = 0,
+    var points: Int = 0,
+    var pointDecayTimer: Long = DateTime().millis,
+    var lastInfraction: Long = 0,
+    val deletedMessageCount: DeletedMessages = DeletedMessages()
 )
 
 data class DeletedMessages(
     var deleteReaction: Int = 0,
     var total: Int = 0
-)
-
-data class GuildLeave(
-        val joinDate: Long?,
-        var leaveDate: Long?
 )
 
 data class GuildMember(
@@ -101,16 +101,6 @@ data class GuildMember(
 
     fun incrementHistoryCount(guildId: String) {
         this.getGuildInfo(guildId).historyCount += 1
-    }
-
-    fun addGuildLeave( guild: Guild, leaveDate: Long) = with(this.getGuildInfo(guild.id.value)) {
-        this.leaveHistory.find { it.joinDate != null && it.leaveDate == null }?.let {
-            it.leaveDate = leaveDate
-        }
-    }
-
-    fun addGuildJoinDate(guild: Guild, joinDate: Long) = with(this.getGuildInfo(guild.id.value)){
-        this.leaveHistory.add(GuildLeave(joinDate, null))
     }
 
     fun addMessageDeleted(guild: Guild, deleteReaction: Boolean) = with(this.getGuildInfo(guild.id.value)) {
