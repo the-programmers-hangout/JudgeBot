@@ -33,8 +33,6 @@ fun onStaffReactionAdd(
         val staffMember = user.asMemberOrNull(guild.id) ?: return@on
         val messageAuthor = message.asMessage().author?.asMemberOrNull(guild.id) ?: return@on
         val msg = message.asMessage()
-        val target = databaseService.users.getOrCreateUser(messageAuthor, guild.asGuild())
-
 
         if (permissionsService.hasPermission(staffMember, PermissionLevel.Moderator) && !staffMember.isHigherRankedThan(
                 permissionsService,
@@ -58,7 +56,7 @@ fun onStaffReactionAdd(
                     staffMember.sendPrivateMessage {
                         createCondensedHistoryEmbed(
                             messageAuthor,
-                            target,
+                            databaseService.users.getOrCreateUser(messageAuthor, guild.asGuild()),
                             guild.asGuild(),
                             configuration
                         )
@@ -68,7 +66,11 @@ fun onStaffReactionAdd(
                     loggingService.staffReactionUsed(guild, staffMember, messageAuthor, this.emoji)
                     msg.deleteReaction(this.emoji)
                     msg.delete()
-                    databaseService.users.addMessageDelete(guild, target, true)
+                    databaseService.users.addMessageDelete(
+                        guild,
+                        databaseService.users.getOrCreateUser(messageAuthor, guild.asGuild()),
+                        true
+                    )
                     try {
                         messageAuthor.sendPrivateMessage {
                             createMessageDeleteEmbed(guild, msg)
