@@ -96,7 +96,7 @@ fun createInfractionCommands(databaseService: DatabaseService,
         }
     }
 
-    guildCommand("cleanse") {
+    guildCommand("cleanseInfractions") {
         description = "Use this to delete (permanently) as user's infractions."
         requiredPermissionLevel = PermissionLevel.Administrator
         execute(LowerUserArg) {

@@ -11,7 +11,11 @@ import me.jakejmattson.discordkt.api.annotations.Service
 import org.litote.kmongo.eq
 
 @Service
-class UserOperations(connection: ConnectionService, private val configuration: Configuration) {
+class UserOperations(
+    connection: ConnectionService,
+    private val configuration: Configuration,
+    private val joinLeaveService: JoinLeaveOperations
+) {
     private val userCollection = connection.db.getCollection<GuildMember>("Users")
 
     suspend fun getOrCreateUser(target: User, guild: Guild): GuildMember {
@@ -19,6 +23,9 @@ class UserOperations(connection: ConnectionService, private val configuration: C
         return if (userRecord != null) {
             userRecord.ensureGuildDetailsPresent(guild.id.value)
             userRecord.checkPointDecay(guild, configuration[guild.id.longValue]!!)
+            target.asMemberOrNull(guild.id)?.let {
+                joinLeaveService.createJoinLeaveRecordIfNotRecorded(guild.id.value, it)
+            }
             userRecord
         } else {
             val guildMember = GuildMember(target.id.value)
@@ -37,7 +44,13 @@ class UserOperations(connection: ConnectionService, private val configuration: C
         return this.updateUser(user)
     }
 
-    suspend fun editNote(guild: Guild, user: GuildMember, noteId: Int, newContent: String, moderator: String): GuildMember {
+    suspend fun editNote(
+        guild: Guild,
+        user: GuildMember,
+        noteId: Int,
+        newContent: String,
+        moderator: String
+    ): GuildMember {
         user.editNote(guild, noteId, newContent, moderator)
         return this.updateUser(user)
     }
@@ -96,6 +109,11 @@ class UserOperations(connection: ConnectionService, private val configuration: C
 
     suspend fun incrementUserHistory(user: GuildMember, guild: Guild): GuildMember {
         user.incrementHistoryCount(guild.id.value)
+        return this.updateUser(user)
+    }
+
+    suspend fun resetUserRecord(guild: Guild, user: GuildMember): GuildMember {
+        user.reset(guild)
         return this.updateUser(user)
     }
 

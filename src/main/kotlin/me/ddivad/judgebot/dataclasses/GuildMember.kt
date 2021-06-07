@@ -78,6 +78,10 @@ data class GuildMember(
         this.notes.clear()
     }
 
+    private fun cleanseInfo(guild: Guild) = with(this.getGuildInfo(guild.id.value)) {
+        this.info.clear()
+    }
+
     fun cleanseInfractions(guild: Guild) = with(this.getGuildInfo(guild.id.value)) {
         this.infractions.clear()
         this.points = 0
@@ -119,6 +123,15 @@ data class GuildMember(
 
     fun getPoints(guild: Guild) = with(this.getGuildInfo(guild.id.value)) {
         return@with this.points
+    }
+
+    fun reset(guild: Guild) = with(this.getGuildInfo(guild.id.value)) {
+        this.points = 0
+        this.historyCount = 0
+        this.deletedMessageCount.deleteReaction = 0
+        cleanseInfo(guild)
+        cleanseInfractions(guild)
+        cleanseNotes(guild)
     }
 
     fun ensureGuildDetailsPresent(guildId: String) {
