@@ -19,13 +19,13 @@
 | removeInfo | LowerMemberArg, Info ID      | Remove an information message from a member record. |
 
 ## Infraction
-| Commands         | Arguments                        | Description                                                                                                                           |
-| ---------------- | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| badpfp           | (cancel), LowerMemberArg         | Notifies the user that they should change their profile pic and applies a 30 minute mute. Bans the user if they don't change picture. |
-| cleanse          | LowerUserArg                     | Use this to delete (permanently) as user's infractions.                                                                               |
-| removeInfraction | LowerUserArg, Infraction ID      | Use this to delete (permanently) an infraction from a user.                                                                           |
-| strike, s, S     | LowerMemberArg, (Weight), Reason | Strike a user.                                                                                                                        |
-| warn, w, W       | LowerMemberArg, Reason           | Warn a user.                                                                                                                          |
+| Commands           | Arguments                        | Description                                                                                                                           |
+| ------------------ | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| badpfp             | (cancel), LowerMemberArg         | Notifies the user that they should change their profile pic and applies a 30 minute mute. Bans the user if they don't change picture. |
+| cleanseInfractions | LowerUserArg                     | Use this to delete (permanently) as user's infractions.                                                                               |
+| removeInfraction   | LowerUserArg, Infraction ID      | Use this to delete (permanently) an infraction from a user.                                                                           |
+| strike, s, S       | LowerMemberArg, (Weight), Reason | Strike a user.                                                                                                                        |
+| warn, w, W         | LowerMemberArg, Reason           | Warn a user.                                                                                                                          |
 
 ## Mute
 | Commands | Arguments                    | Description                                             |
@@ -37,7 +37,7 @@
 ## Notes
 | Commands     | Arguments                        | Description                                       |
 | ------------ | -------------------------------- | ------------------------------------------------- |
-| cleansenotes | LowerMemberArg                   | Use this to delete (permanently) as user's notes. |
+| cleanseNotes | LowerMemberArg                   | Use this to delete (permanently) as user's notes. |
 | deleteNote   | LowerMemberArg, Note ID          | Use this to add a delete a note from a user.      |
 | editNote     | User, Note to edit, Note Content | Use this to edit a note.                          |
 | note         | User, Note Content               | Use this to add a note to a user.                 |
@@ -60,6 +60,7 @@
 | getBanReason  | User                                      | Get a ban reason for a banned user                         |
 | history, h, H | User                                      | Use this to view a user's record.                          |
 | link          | Main Account, Alt Account                 | Link a user's alt account with their main                  |
+| reset         | LowerUserArg                              | Reset a user's record, and any linked accounts             |
 | selfHistory   |                                           | View your infraction history (contents will be DM'd)       |
 | setBanReason  | User, Reason                              | Set a ban reason for a banned user                         |
 | unban         | User                                      | Unban a banned member from this guild.                     |
