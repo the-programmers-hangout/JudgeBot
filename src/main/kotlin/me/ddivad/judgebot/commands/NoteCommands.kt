@@ -52,7 +52,7 @@ fun noteCommands(databaseService: DatabaseService) = commands("Notes") {
         }
     }
 
-    guildCommand("cleansenotes") {
+    guildCommand("cleanseNotes") {
         description = "Use this to delete (permanently) as user's notes."
         requiredPermissionLevel = PermissionLevel.Administrator
         execute(LowerMemberArg) {

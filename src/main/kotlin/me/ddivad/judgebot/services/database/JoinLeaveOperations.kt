@@ -1,6 +1,7 @@
 package me.ddivad.judgebot.services.database
 
 import com.gitlab.kordlib.core.entity.Member
+import com.gitlab.kordlib.core.entity.User
 import me.ddivad.judgebot.dataclasses.JoinLeave
 import me.jakejmattson.discordkt.api.annotations.Service
 import org.joda.time.DateTime
@@ -35,5 +36,12 @@ class JoinLeaveOperations(connection: ConnectionService) {
                 JoinLeave::userId eq userId,
             )
         ).toList()
+    }
+
+    suspend fun createJoinLeaveRecordIfNotRecorded(guildId: String, target: Member) {
+        if (this.getMemberJoinLeaveDataForGuild(guildId, target.id.value).isNotEmpty()) {
+            return
+        }
+        this.createJoinLeaveRecord(guildId, target)
     }
 }

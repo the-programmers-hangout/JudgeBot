@@ -1,6 +1,8 @@
 package me.ddivad.judgebot.commands
 
 import me.ddivad.judgebot.arguments.LowerUserArg
+import me.ddivad.judgebot.conversations.InfractionConversation
+import me.ddivad.judgebot.conversations.ResetUserConversation
 import me.ddivad.judgebot.dataclasses.*
 import me.ddivad.judgebot.embeds.createHistoryEmbed
 import me.ddivad.judgebot.embeds.createCondensedHistoryEmbed
@@ -14,13 +16,16 @@ import me.ddivad.judgebot.services.requiredPermissionLevel
 import me.jakejmattson.discordkt.api.arguments.*
 import me.jakejmattson.discordkt.api.dsl.commands
 import me.jakejmattson.discordkt.api.extensions.sendPrivateMessage
+import me.jakejmattson.discordkt.api.extensions.toSnowflake
 import java.awt.Color
 
 @Suppress("unused")
-fun createUserCommands(databaseService: DatabaseService,
-                       config: Configuration,
-                       loggingService: LoggingService,
-                       banService: BanService) = commands("User") {
+fun createUserCommands(
+    databaseService: DatabaseService,
+    config: Configuration,
+    loggingService: LoggingService,
+    banService: BanService
+) = commands("User") {
     guildCommand("history", "h", "H") {
         description = "Use this to view a user's record."
         requiredPermissionLevel = PermissionLevel.Moderator
@@ -43,7 +48,7 @@ fun createUserCommands(databaseService: DatabaseService,
             databaseService.users.incrementUserHistory(user, guild)
             val linkedAccounts = user.getLinkedAccounts(guild)
 
-            if(linkedAccounts.isEmpty()) {
+            if (linkedAccounts.isEmpty()) {
                 respond("User ${target.mention} has no alt accounts recorded.")
                 return@execute
             }
@@ -164,6 +169,17 @@ fun createUserCommands(databaseService: DatabaseService,
             databaseService.users.removeLinkedAccount(guild, mainRecord, alt.id.value)
             databaseService.users.removeLinkedAccount(guild, altRecord, main.id.value)
             respond("Unlinked accounts ${main.mention} and ${alt.mention}")
+        }
+    }
+
+    guildCommand("reset") {
+        description = "Reset a user's record, and any linked accounts"
+        requiredPermissionLevel = PermissionLevel.Administrator
+        execute(LowerUserArg) {
+            val target = args.first
+            ResetUserConversation(databaseService, config)
+                .createResetConversation(guild, target)
+                .startPublicly(discord, author, channel)
         }
     }
 }
