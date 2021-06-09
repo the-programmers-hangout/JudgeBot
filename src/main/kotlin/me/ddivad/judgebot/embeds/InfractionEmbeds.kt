@@ -23,7 +23,7 @@ fun EmbedBuilder.createWarnEmbed(guild: Guild, configuration: GuildConfiguration
     field {
         name = "__Reason__"
         value = infraction.reason
-        inline = true
+        inline = false
     }
 
     if (infraction.ruleNumber != null) {
@@ -33,16 +33,22 @@ fun EmbedBuilder.createWarnEmbed(guild: Guild, configuration: GuildConfiguration
         }
     }
 
-    if (configuration.infractionConfiguration.warnPoints > 0) {
-        field {
-            name = "__Points__"
-            value = "${infraction.points}"
-            inline = true
-        }
+    field {
+        name = "__Warn Points__"
+        value = "${infraction.points}"
+        inline = true
+    }
 
+    field {
+        name = "__Points Count__"
+        value = "${guildMember.getPoints(guild)} / ${configuration.infractionConfiguration.pointCeiling}"
+        inline = true
+    }
+
+    if (infraction.punishment?.punishment != PunishmentType.NONE) {
         field {
-            name = "__Points Count__"
-            value = "${guildMember.getPoints(guild)} / ${configuration.infractionConfiguration.pointCeiling}"
+            name = "__Punishment__"
+            value = "${infraction.punishment?.punishment.toString()} ${if (infraction.punishment?.duration != null) "for " + timeToString(infraction.punishment?.duration!!) else "indefinitely"}"
             inline = true
         }
     }
@@ -88,10 +94,12 @@ fun EmbedBuilder.createStrikeEmbed(guild: Guild, configuration: GuildConfigurati
         inline = true
     }
 
-    field {
-        name = "__Punishment__"
-        value = "${infraction.punishment?.punishment.toString()} ${if (infraction.punishment?.duration != null) "for " + timeToString(infraction.punishment?.duration!!) else "indefinitely"}"
-        inline = true
+    if (infraction.punishment?.punishment != PunishmentType.NONE) {
+        field {
+            name = "__Punishment__"
+            value = "${infraction.punishment?.punishment.toString()} ${if (infraction.punishment?.duration != null) "for " + timeToString(infraction.punishment?.duration!!) else "indefinitely"}"
+            inline = true
+        }
     }
 
     addField("", " A strike is a formal warning for breaking the rules.\nIf you think this to be unjustified, please **do not** post about it in a public channel but take it up with **Modmail**.")
