@@ -23,7 +23,6 @@ class InfractionConversation(private val databaseService: DatabaseService,
         val rules = databaseService.guilds.getRules(guild)
         val ruleId = if (rules.isNotEmpty()) {
             respond { createInfractionRuleEmbed(guild, rules) }
-//            val rule = promptEmbed(IntegerArg) { createInfractionRuleEmbed(guild, rules) }
             val rule = promptUntil(
                     IntegerArg,
                     prompt = "Enter choice:",
