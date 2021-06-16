@@ -22,7 +22,13 @@ class InfractionConversation(private val databaseService: DatabaseService,
                 else guildConfiguration.infractionConfiguration.warnPoints
         val rules = databaseService.guilds.getRules(guild)
         val ruleId = if (rules.isNotEmpty()) {
-            val rule = promptEmbed(IntegerArg) { createInfractionRuleEmbed(guild, rules) }
+            respond { createInfractionRuleEmbed(guild, rules) }
+            val rule = promptUntil(
+                    IntegerArg,
+                    prompt = "Enter choice:",
+                    isValid = { number -> rules.any { it.number == number } || number == 0 },
+                    error = "Rule not found. Please enter a valid rule ID or 0:"
+            )
             if (rule > 0) rule else null
         } else null
         val infraction = Infraction(this.user.id.value, infractionReason, type, points, ruleId)
