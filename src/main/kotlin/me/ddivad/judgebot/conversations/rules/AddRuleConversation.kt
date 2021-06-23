@@ -1,6 +1,6 @@
 package me.ddivad.judgebot.conversations.rules
 
-import com.gitlab.kordlib.core.entity.Guild
+import dev.kord.core.entity.Guild
 import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.dataclasses.Rule
 import me.ddivad.judgebot.embeds.createRuleEmbed

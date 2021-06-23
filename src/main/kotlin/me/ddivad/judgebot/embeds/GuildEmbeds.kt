@@ -1,9 +1,10 @@
 package me.ddivad.judgebot.embeds
 
-import com.gitlab.kordlib.common.entity.Snowflake
-import com.gitlab.kordlib.core.entity.Guild
-import com.gitlab.kordlib.rest.Image
-import com.gitlab.kordlib.rest.builder.message.EmbedBuilder
+import dev.kord.common.entity.Snowflake
+import dev.kord.common.kColor
+import dev.kord.core.entity.Guild
+import dev.kord.rest.Image
+import dev.kord.rest.builder.message.EmbedBuilder
 import me.ddivad.judgebot.arguments.validConfigParameters
 import me.ddivad.judgebot.dataclasses.GuildConfiguration
 import me.ddivad.judgebot.dataclasses.Punishment
@@ -16,7 +17,7 @@ import java.awt.Color
 
 suspend fun EmbedBuilder.createConfigEmbed(config: GuildConfiguration, guild: Guild) {
     title = "Configuration"
-    color = Color.MAGENTA
+    color = Color.MAGENTA.kColor
     thumbnail {
         url = guild.getIconUrl(Image.Format.PNG) ?: ""
     }
@@ -69,7 +70,7 @@ suspend fun EmbedBuilder.createConfigEmbed(config: GuildConfiguration, guild: Gu
 
 fun EmbedBuilder.createConfigOptionsEmbed(config: GuildConfiguration, guild: Guild) {
     title = "Available Configuration Options"
-    color = Color.MAGENTA
+    color = Color.MAGENTA.kColor
     field {
         name = "Usage: `${config.prefix}configuration <option>`"
         value = "```css\n${validConfigParameters.joinToString("\n")}\n```"
@@ -82,7 +83,7 @@ fun EmbedBuilder.createConfigOptionsEmbed(config: GuildConfiguration, guild: Gui
 
 suspend fun EmbedBuilder.createActivePunishmentsEmbed(guild: Guild, punishments: List<Punishment>) {
     title = "__Active Punishments__"
-    color = Color.MAGENTA
+    color = Color.MAGENTA.kColor
     punishments.forEach {
         val user = guild.kord.getUser(Snowflake(it.userId))?.mention
         addField(

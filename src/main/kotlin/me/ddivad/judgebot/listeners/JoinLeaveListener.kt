@@ -1,23 +1,25 @@
 package me.ddivad.judgebot.listeners
 
-import com.gitlab.kordlib.core.event.guild.GuildCreateEvent
-import com.gitlab.kordlib.core.event.guild.MemberJoinEvent
-import com.gitlab.kordlib.core.event.guild.MemberLeaveEvent
-import com.gitlab.kordlib.gateway.RequestGuildMembers
+import dev.kord.core.event.guild.GuildCreateEvent
+import dev.kord.core.event.guild.MemberJoinEvent
+import dev.kord.core.event.guild.MemberLeaveEvent
+import dev.kord.gateway.PrivilegedIntent
+import dev.kord.gateway.RequestGuildMembers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import me.ddivad.judgebot.services.DatabaseService
 import me.jakejmattson.discordkt.api.dsl.listeners
 
+@OptIn(PrivilegedIntent::class)
 @Suppress("unused")
 fun onGuildMemberLeave(databaseService: DatabaseService) = listeners {
     on<GuildCreateEvent> {
-        gateway.send(RequestGuildMembers(guildId = listOf(guild.id.value)))
+        gateway.send(RequestGuildMembers(guildId = guild.id))
     }
 
     on<MemberLeaveEvent> {
-        databaseService.joinLeaves.addLeaveData(guildId.value, user.id.value)
+        databaseService.joinLeaves.addLeaveData(guildId.asString, user.id.asString)
     }
 
     on<MemberJoinEvent> {
@@ -25,7 +27,7 @@ fun onGuildMemberLeave(databaseService: DatabaseService) = listeners {
         GlobalScope.launch {
             delay(1000 * 60 * 5)
             guild.getMemberOrNull(member.id)?.let {
-                databaseService.joinLeaves.createJoinLeaveRecord(guildId.value, member)
+                databaseService.joinLeaves.createJoinLeaveRecord(guildId.asString, member)
             }
         }
     }

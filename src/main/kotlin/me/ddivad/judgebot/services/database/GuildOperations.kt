@@ -1,8 +1,8 @@
 package me.ddivad.judgebot.services.database
 
-import com.gitlab.kordlib.core.entity.Guild
-import com.gitlab.kordlib.core.entity.Member
-import com.gitlab.kordlib.core.entity.User
+import dev.kord.core.entity.Guild
+import dev.kord.core.entity.Member
+import dev.kord.core.entity.User
 import kotlinx.coroutines.runBlocking
 import me.ddivad.judgebot.dataclasses.*
 import me.jakejmattson.discordkt.api.annotations.Service
@@ -15,7 +15,7 @@ class GuildOperations(connection: ConnectionService) {
     private val guildCollection = connection.db.getCollection<GuildInformation>("Guilds")
 
     suspend fun setupGuild(guild: Guild): GuildInformation {
-        val guildConfig = GuildInformation(guild.id.value, guild.name)
+        val guildConfig = GuildInformation(guild.id.asString, guild.name)
         this.guildCollection.insertOne(guildConfig)
         return guildConfig
     }
@@ -83,7 +83,7 @@ class GuildOperations(connection: ConnectionService) {
     }
 
     suspend fun checkPunishmentExists(guild: Guild, member: Member, type: InfractionType): List<Punishment> {
-        return this.getGuild(guild).getPunishmentByType(type, member.asUser().id.value)
+        return this.getGuild(guild).getPunishmentByType(type, member.asUser().id.asString)
     }
 
     suspend fun getPunishmentByType(guild: Guild, userId: String, type: InfractionType): List<Punishment> {
@@ -91,7 +91,7 @@ class GuildOperations(connection: ConnectionService) {
     }
 
     suspend fun getPunishmentsForUser(guild: Guild, user: User): List<Punishment> {
-        return this.getGuild(guild).getPunishmentsByUser(user.id.value)
+        return this.getGuild(guild).getPunishmentsByUser(user.id.asString)
     }
 
     suspend fun getBanOrNull(guild: Guild, userId: String): Ban? {
@@ -107,8 +107,8 @@ class GuildOperations(connection: ConnectionService) {
     }
 
     private suspend fun getGuild(guild: Guild): GuildInformation {
-        return guildCollection.findOne(GuildInformation::guildId eq guild.id.value)
-                ?: GuildInformation(guild.id.value, guild.name)
+        return guildCollection.findOne(GuildInformation::guildId eq guild.id.asString)
+                ?: GuildInformation(guild.id.asString, guild.name)
     }
 
     private suspend fun updateGuild(guildInformation: GuildInformation): GuildInformation {

@@ -1,11 +1,11 @@
 package me.ddivad.judgebot.services.database
 
-import com.gitlab.kordlib.core.entity.Guild
+import dev.kord.core.entity.Guild
 
 import me.ddivad.judgebot.dataclasses.GuildMemberDetails
 import me.ddivad.judgebot.dataclasses.GuildMember
 import me.ddivad.judgebot.dataclasses.Infraction
-import com.gitlab.kordlib.core.entity.User
+import dev.kord.core.entity.User
 import me.ddivad.judgebot.dataclasses.*
 import me.jakejmattson.discordkt.api.annotations.Service
 import org.litote.kmongo.eq
@@ -19,24 +19,24 @@ class UserOperations(
     private val userCollection = connection.db.getCollection<GuildMember>("Users")
 
     suspend fun getOrCreateUser(target: User, guild: Guild): GuildMember {
-        val userRecord = userCollection.findOne(GuildMember::userId eq target.id.value)
+        val userRecord = userCollection.findOne(GuildMember::userId eq target.id.asString)
         return if (userRecord != null) {
-            userRecord.ensureGuildDetailsPresent(guild.id.value)
-            userRecord.checkPointDecay(guild, configuration[guild.id.longValue]!!)
+            userRecord.ensureGuildDetailsPresent(guild.id.asString)
+            userRecord.checkPointDecay(guild, configuration[guild.id.value]!!)
             target.asMemberOrNull(guild.id)?.let {
-                joinLeaveService.createJoinLeaveRecordIfNotRecorded(guild.id.value, it)
+                joinLeaveService.createJoinLeaveRecordIfNotRecorded(guild.id.asString, it)
             }
             userRecord
         } else {
-            val guildMember = GuildMember(target.id.value)
-            guildMember.guilds.add(GuildMemberDetails(guild.id.value))
+            val guildMember = GuildMember(target.id.asString)
+            guildMember.guilds.add(GuildMemberDetails(guild.id.asString))
             userCollection.insertOne(guildMember)
             guildMember
         }
     }
 
     suspend fun getUserOrNull(target: User): GuildMember? {
-        return userCollection.findOne(GuildMember::userId eq target.id.value)
+        return userCollection.findOne(GuildMember::userId eq target.id.asString)
     }
 
     suspend fun addNote(guild: Guild, user: GuildMember, note: String, moderator: String): GuildMember {
@@ -108,7 +108,7 @@ class UserOperations(
     }
 
     suspend fun incrementUserHistory(user: GuildMember, guild: Guild): GuildMember {
-        user.incrementHistoryCount(guild.id.value)
+        user.incrementHistoryCount(guild.id.asString)
         return this.updateUser(user)
     }
 
@@ -123,9 +123,9 @@ class UserOperations(
     }
 
     private fun getPunishmentForPoints(guild: Guild, guildMember: GuildMember): PunishmentLevel {
-        val punishmentLevels = configuration[guild.id.longValue]?.punishments
+        val punishmentLevels = configuration[guild.id.value]?.punishments
         return punishmentLevels!!.filter {
-            it.points <= guildMember.getGuildInfo(guild.id.value).points
+            it.points <= guildMember.getGuildInfo(guild.id.asString).points
         }.maxByOrNull { it.points }!!
     }
 }

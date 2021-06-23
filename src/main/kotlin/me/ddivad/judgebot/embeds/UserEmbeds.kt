@@ -1,10 +1,12 @@
 package me.ddivad.judgebot.embeds
 
-import com.gitlab.kordlib.common.entity.Snowflake
-import com.gitlab.kordlib.core.entity.Guild
-import com.gitlab.kordlib.core.entity.User
-import com.gitlab.kordlib.rest.Image
-import com.gitlab.kordlib.rest.builder.message.EmbedBuilder
+import dev.kord.common.entity.Snowflake
+import dev.kord.common.kColor
+import dev.kord.core.entity.Guild
+import dev.kord.core.entity.User
+import dev.kord.rest.Image
+import dev.kord.rest.builder.message.EmbedBuilder
+import kotlinx.datetime.toJavaInstant
 import me.ddivad.judgebot.dataclasses.*
 import me.ddivad.judgebot.services.DatabaseService
 import me.ddivad.judgebot.util.*
@@ -24,12 +26,12 @@ suspend fun MenuBuilder.createHistoryEmbed(
     config: Configuration,
     databaseService: DatabaseService
 ) {
-    val userRecord = member.getGuildInfo(guild.id.value)
+    val userRecord = member.getGuildInfo(guild.id.asString)
     val paginatedNotes = userRecord.notes.chunked(4)
     val totalMenuPages = 1 + 1 + 1 + 1 + if (paginatedNotes.isNotEmpty()) paginatedNotes.size else 1
-    val guildConfiguration = config[guild.id.longValue]!!
+    val guildConfiguration = config[guild.id.value]!!
     val embedColor = getEmbedColour(guild, target, databaseService)
-    val leaveData = databaseService.joinLeaves.getMemberJoinLeaveDataForGuild(guild.id.value, member.userId)
+    val leaveData = databaseService.joinLeaves.getMemberJoinLeaveDataForGuild(guild.id.asString, member.userId)
     this.apply {
         buildOverviewPage(guild, guildConfiguration, target, userRecord, embedColor, totalMenuPages, databaseService)
         buildInfractionPage(guild, target, userRecord, embedColor, totalMenuPages)
@@ -49,7 +51,7 @@ private suspend fun MenuBuilder.buildOverviewPage(
     databaseService: DatabaseService
 ) {
     page {
-        color = embedColor
+        color = embedColor.kColor
         title = "${target.asUser().tag}: Overview"
         thumbnail {
             url = target.asUser().avatar.url
@@ -68,9 +70,9 @@ private suspend fun MenuBuilder.buildOverviewPage(
         addInlineField("Points", "**${userRecord.points} / ${config.infractionConfiguration.pointCeiling}**")
         addInlineField("History Invokes", "${userRecord.historyCount}")
 
-        addInlineField("Created", formatOffsetTime(target.id.timeStamp))
+        addInlineField("Created", formatOffsetTime(target.id.timeStamp.toJavaInstant()))
         if (memberInGuild != null) {
-            addInlineField("Joined", formatOffsetTime(memberInGuild.joinedAt))
+            addInlineField("Joined", formatOffsetTime(memberInGuild.joinedAt.toJavaInstant()))
         } else addInlineField("", "")
 
         if (userRecord.linkedAccounts.isNotEmpty()) {
@@ -109,7 +111,7 @@ private suspend fun MenuBuilder.buildInfractionPage(
     totalPages: Int
 ) {
     page {
-        color = embedColor
+        color = embedColor.kColor
         title = "${target.asUser().tag}: Infractions"
         thumbnail {
             url = target.asUser().avatar.url
@@ -165,7 +167,7 @@ private suspend fun MenuBuilder.buildNotesPages(
     val paginatedNotes = userRecord.notes.sortedBy { it.dateTime }.chunked(4)
     if (userRecord.notes.isEmpty()) {
         page {
-            color = embedColor
+            color = embedColor.kColor
             title = "${target.asUser().tag}: Notes"
             thumbnail {
                 url = target.asUser().avatar.url
@@ -185,7 +187,7 @@ private suspend fun MenuBuilder.buildNotesPages(
 
     paginatedNotes.forEachIndexed { index, list ->
         page {
-            color = embedColor
+            color = embedColor.kColor
             title = "${target.asUser().tag}: Notes" + if (paginatedNotes.size > 1) "(${index + 1})" else ""
             thumbnail {
                 url = target.asUser().avatar.url
@@ -221,7 +223,7 @@ private suspend fun MenuBuilder.buildInformationPage(
 ) {
     val paginatedNotes = userRecord.notes.chunked(4)
     page {
-        color = embedColor
+        color = embedColor.kColor
         title = "${target.asUser().tag}: Information"
         thumbnail {
             url = target.asUser().avatar.url
@@ -258,7 +260,7 @@ private suspend fun MenuBuilder.buildJoinLeavePage(
         val leaves = joinLeaves.filter { it.leaveDate != null }
         val paginatedNotes = userRecord.notes.chunked(4)
 
-        color = embedColor
+        color = embedColor.kColor
         title = "${target.asUser().tag}: Join / Leave"
         thumbnail {
             url = target.asUser().avatar.url
@@ -311,7 +313,7 @@ private suspend fun getEmbedColour(guild: Guild, target: User, databaseService: 
 
 private suspend fun getStatus(guild: Guild, target: User, databaseService: DatabaseService): String? {
     guild.getBanOrNull(target.id)?.let {
-        val reason = databaseService.guilds.getBanOrNull(guild, target.id.value)?.reason ?: it.reason
+        val reason = databaseService.guilds.getBanOrNull(guild, target.id.asString)?.reason ?: it.reason
         return "```css\nUser is banned with reason:\n${reason}```"
     }
     if (target.asMemberOrNull(guild.id) == null) return "```css\nUser not currently in this guild```"
@@ -343,14 +345,14 @@ suspend fun EmbedBuilder.createCondensedHistoryEmbed(
     config: Configuration
 ) {
 
-    val userGuildDetails = member.getGuildInfo(guild.id.value)
+    val userGuildDetails = member.getGuildInfo(guild.id.asString)
     val infractions = userGuildDetails.infractions
     val warnings = userGuildDetails.infractions.filter { it.type == InfractionType.Warn }
     val strikes = userGuildDetails.infractions.filter { it.type == InfractionType.Strike }
     val notes = userGuildDetails.notes
-    val maxPoints = config[guild.id.longValue]?.infractionConfiguration?.pointCeiling
+    val maxPoints = config[guild.id.value]?.infractionConfiguration?.pointCeiling
 
-    color = Color.MAGENTA
+    color = Color.MAGENTA.kColor
     title = "${target.asUser().tag}'s Record"
     thumbnail {
         url = target.asUser().avatar.url
@@ -423,13 +425,13 @@ suspend fun EmbedBuilder.createSelfHistoryEmbed(
     config: Configuration
 ) {
 
-    val userGuildDetails = member.getGuildInfo(guild.id.value)
+    val userGuildDetails = member.getGuildInfo(guild.id.asString)
     val infractions = userGuildDetails.infractions
     val warnings = userGuildDetails.infractions.filter { it.type == InfractionType.Warn }
     val strikes = userGuildDetails.infractions.filter { it.type == InfractionType.Strike }
-    val maxPoints = config[guild.id.longValue]?.infractionConfiguration?.pointCeiling
+    val maxPoints = config[guild.id.value]?.infractionConfiguration?.pointCeiling
 
-    color = Color.MAGENTA
+    color = Color.MAGENTA.kColor
     title = "${target.asUser().tag}'s Record"
     thumbnail {
         url = target.asUser().avatar.url

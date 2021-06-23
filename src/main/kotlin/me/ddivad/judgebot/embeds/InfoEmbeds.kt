@@ -1,16 +1,17 @@
 package me.ddivad.judgebot.embeds
 
-import com.gitlab.kordlib.core.entity.Guild
-import com.gitlab.kordlib.core.entity.Member
-import com.gitlab.kordlib.rest.Image
-import com.gitlab.kordlib.rest.builder.message.EmbedBuilder
+import dev.kord.common.kColor
+import dev.kord.core.entity.Guild
+import dev.kord.core.entity.Member
+import dev.kord.rest.Image
+import dev.kord.rest.builder.message.EmbedBuilder
 import me.ddivad.judgebot.dataclasses.*
 import me.jakejmattson.discordkt.api.extensions.addField
 import java.awt.Color
 
 fun EmbedBuilder.createInformationEmbed(guild: Guild, user: Member, information: Info) {
     title = "Information"
-    color = Color.CYAN
+    color = Color.CYAN.kColor
     thumbnail {
         url = guild.getIconUrl(Image.Format.PNG) ?: ""
     }

@@ -1,9 +1,9 @@
 package me.ddivad.judgebot.services
 
-import com.gitlab.kordlib.common.entity.Snowflake
-import com.gitlab.kordlib.core.behavior.getChannelOf
-import com.gitlab.kordlib.core.entity.*
-import com.gitlab.kordlib.core.entity.channel.TextChannel
+import dev.kord.common.entity.Snowflake
+import dev.kord.core.behavior.getChannelOf
+import dev.kord.core.entity.*
+import dev.kord.core.entity.channel.TextChannel
 import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.dataclasses.Infraction
 import me.ddivad.judgebot.dataclasses.Punishment
@@ -82,7 +82,7 @@ class LoggingService(private val configuration: Configuration) {
     }
 
     private suspend fun getLoggingChannel(guild: Guild): TextChannel? {
-        val channelId = configuration[guild.id.longValue]?.loggingConfiguration?.loggingChannel.takeIf { it!!.isNotEmpty() }
+        val channelId = configuration[guild.id.value]?.loggingConfiguration?.loggingChannel.takeIf { it!!.isNotEmpty() }
                 ?: return null
         return guild.getChannelOf(Snowflake(channelId))
     }

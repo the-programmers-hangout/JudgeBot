@@ -1,5 +1,6 @@
 package me.ddivad.judgebot.commands
 
+import dev.kord.common.kColor
 import me.ddivad.judgebot.arguments.LowerUserArg
 import me.ddivad.judgebot.conversations.InfractionConversation
 import me.ddivad.judgebot.conversations.ResetUserConversation
@@ -67,7 +68,7 @@ fun createUserCommands(
             val reverseSearchUrl = "<https://www.google.com/searchbyimage?&image_url=${user.avatar.url}>"
             respond {
                 title = "${user.tag}'s pfp"
-                color = Color.MAGENTA
+                color = Color.MAGENTA.kColor
                 description = "[Reverse Search]($reverseSearchUrl)"
                 image = "${user.avatar.url}?size=512"
             }
@@ -77,9 +78,9 @@ fun createUserCommands(
     guildCommand("ban") {
         description = "Ban a member from this guild."
         requiredPermissionLevel = PermissionLevel.Staff
-        execute(LowerUserArg, IntegerArg("Delete message days").makeOptional(0), EveryArg) {
+        execute(LowerUserArg, IntegerArg("Delete message days").optional(0), EveryArg) {
             val (target, deleteDays, reason) = args
-            val ban = Punishment(target.id.value, InfractionType.Ban, reason, author.id.value)
+            val ban = Punishment(target.id.asString, InfractionType.Ban, reason, author.id.asString)
             banService.banUser(target, guild, ban, deleteDays).also {
                 loggingService.userBanned(guild, target, ban)
                 respond("User ${target.mention} banned")
@@ -106,12 +107,12 @@ fun createUserCommands(
         requiredPermissionLevel = PermissionLevel.Staff
         execute(UserArg, EveryArg("Reason")) {
             val (user, reason) = args
-            val ban = Ban(user.id.value, author.id.value, reason)
+            val ban = Ban(user.id.asString, author.id.asString, reason)
             if (guild.getBanOrNull(user.id) != null) {
-                if (!databaseService.guilds.checkBanExists(guild, user.id.value)) {
+                if (!databaseService.guilds.checkBanExists(guild, user.id.asString)) {
                     databaseService.guilds.addBan(guild, ban)
                 } else {
-                    databaseService.guilds.editBanReason(guild, user.id.value, reason)
+                    databaseService.guilds.editBanReason(guild, user.id.asString, reason)
                 }
                 respond("Ban reason for ${user.username} set to: $reason")
             } else respond("User ${user.username} isn't banned")
@@ -125,7 +126,7 @@ fun createUserCommands(
         execute(UserArg) {
             val user = args.first
             guild.getBanOrNull(user.id)?.let {
-                val reason = databaseService.guilds.getBanOrNull(guild, user.id.value)?.reason ?: it.reason
+                val reason = databaseService.guilds.getBanOrNull(guild, user.id.asString)?.reason ?: it.reason
                 respond(reason ?: "No reason logged")
                 return@execute
             }
@@ -153,8 +154,8 @@ fun createUserCommands(
             val (main, alt) = args
             val mainRecord = databaseService.users.getOrCreateUser(main, guild)
             val altRecord = databaseService.users.getOrCreateUser(alt, guild)
-            databaseService.users.addLinkedAccount(guild, mainRecord, alt.id.value)
-            databaseService.users.addLinkedAccount(guild, altRecord, main.id.value)
+            databaseService.users.addLinkedAccount(guild, mainRecord, alt.id.asString)
+            databaseService.users.addLinkedAccount(guild, altRecord, main.id.asString)
             respond("Linked accounts ${main.mention} and ${alt.mention}")
         }
     }
@@ -166,8 +167,8 @@ fun createUserCommands(
             val (main, alt) = args
             val mainRecord = databaseService.users.getOrCreateUser(main, guild)
             val altRecord = databaseService.users.getOrCreateUser(alt, guild)
-            databaseService.users.removeLinkedAccount(guild, mainRecord, alt.id.value)
-            databaseService.users.removeLinkedAccount(guild, altRecord, main.id.value)
+            databaseService.users.removeLinkedAccount(guild, mainRecord, alt.id.asString)
+            databaseService.users.removeLinkedAccount(guild, altRecord, main.id.asString)
             respond("Unlinked accounts ${main.mention} and ${alt.mention}")
         }
     }

@@ -1,9 +1,9 @@
 package me.ddivad.judgebot.commands
 
 import me.ddivad.judgebot.arguments.LowerUserArg
-import com.gitlab.kordlib.common.exception.RequestException
-import com.gitlab.kordlib.kordx.emoji.Emojis
-import com.gitlab.kordlib.kordx.emoji.addReaction
+import dev.kord.common.exception.RequestException
+import dev.kord.x.emoji.Emojis
+import dev.kord.x.emoji.addReaction
 import me.ddivad.judgebot.arguments.LowerMemberArg
 import me.ddivad.judgebot.conversations.InfractionConversation
 import me.ddivad.judgebot.dataclasses.Configuration
@@ -26,9 +26,9 @@ fun createInfractionCommands(databaseService: DatabaseService,
     guildCommand("strike", "s", "S") {
         description = "Strike a user."
         requiredPermissionLevel = PermissionLevel.Staff
-        execute(LowerMemberArg, IntegerArg("Weight").makeOptional(1), EveryArg("Reason")) {
+        execute(LowerMemberArg, IntegerArg("Weight").optional(1), EveryArg("Reason")) {
             val (targetMember, weight, reason) = args
-            val guildConfiguration = config[guild.id.longValue] ?: return@execute
+            val guildConfiguration = config[guild.id.value] ?: return@execute
             val maxStrikes = guildConfiguration.infractionConfiguration.pointCeiling / 10
             if (weight > maxStrikes) {
                 respond("Maximum strike weight is **$maxStrikes (${guildConfiguration.infractionConfiguration.pointCeiling} points)**")
@@ -68,7 +68,7 @@ fun createInfractionCommands(databaseService: DatabaseService,
     guildCommand("badpfp") {
         description = "Notifies the user that they should change their profile pic and applies a 30 minute mute. Bans the user if they don't change picture."
         requiredPermissionLevel = PermissionLevel.Staff
-        execute(BooleanArg("cancel", "apply", "cancel").makeOptional(true), LowerMemberArg) {
+        execute(BooleanArg("cancel", "apply", "cancel").optional(true), LowerMemberArg) {
             val (cancel, targetMember) = args
             try {
                 targetMember.testDmStatus()
@@ -90,7 +90,7 @@ fun createInfractionCommands(databaseService: DatabaseService,
                 return@execute
             }
 
-            val badPfp = Infraction(author.id.value, "BadPfp", InfractionType.BadPfp)
+            val badPfp = Infraction(author.id.asString, "BadPfp", InfractionType.BadPfp)
             badPfpService.applyBadPfp(targetMember, guild, timeLimit)
             respond("${targetMember.mention} has been muted and a badpfp has been triggered with a time limit of $minutesUntilBan minutes.")
         }
@@ -101,7 +101,7 @@ fun createInfractionCommands(databaseService: DatabaseService,
         requiredPermissionLevel = PermissionLevel.Administrator
         execute(LowerUserArg) {
             val user = databaseService.users.getOrCreateUser(args.first, guild)
-            if (user.getGuildInfo(guild.id.value).infractions.isEmpty()) {
+            if (user.getGuildInfo(guild.id.asString).infractions.isEmpty()) {
                 respond("User has no infractions.")
                 return@execute
             }
@@ -115,7 +115,7 @@ fun createInfractionCommands(databaseService: DatabaseService,
         requiredPermissionLevel = PermissionLevel.Administrator
         execute(LowerUserArg, IntegerArg("Infraction ID")) {
             val user = databaseService.users.getOrCreateUser(args.first, guild)
-            if (user.getGuildInfo(guild.id.value).infractions.isEmpty()) {
+            if (user.getGuildInfo(guild.id.asString).infractions.isEmpty()) {
                 respond("User has no infractions.")
                 return@execute
             }

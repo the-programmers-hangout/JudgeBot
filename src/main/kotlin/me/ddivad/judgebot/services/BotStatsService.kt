@@ -14,5 +14,5 @@ class BotStatsService(private val configuration: Configuration, private val disc
         get() = timeToString(Date().time - startTime.time)
 
     val ping: String
-        get() = "${discord.api.gateway.averagePing}"
+        get() = "${discord.kord.gateway.averagePing}"
 }

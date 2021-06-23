@@ -1,8 +1,8 @@
 package me.ddivad.judgebot.conversations
 
-import com.gitlab.kordlib.core.entity.Guild
-import com.gitlab.kordlib.core.entity.Member
-import com.gitlab.kordlib.rest.builder.message.EmbedBuilder
+import dev.kord.core.entity.Guild
+import dev.kord.core.entity.Member
+import dev.kord.rest.builder.message.EmbedBuilder
 import me.ddivad.judgebot.dataclasses.*
 import me.ddivad.judgebot.embeds.createHistoryEmbed
 import me.ddivad.judgebot.embeds.createInfractionRuleEmbed
@@ -15,7 +15,7 @@ class InfractionConversation(private val databaseService: DatabaseService,
                              private val configuration: Configuration,
                              private val infractionService: InfractionService) {
     fun createInfractionConversation(guild: Guild, targetUser: Member, weight: Int, infractionReason: String, type: InfractionType) = conversation("cancel") {
-        val guildConfiguration = configuration[guild.id.longValue] ?: return@conversation
+        val guildConfiguration = configuration[guild.id.value] ?: return@conversation
         val user = databaseService.users.getOrCreateUser(targetUser, guild)
         val points = weight *
                 if (type == InfractionType.Strike) guildConfiguration.infractionConfiguration.strikePoints
@@ -31,7 +31,7 @@ class InfractionConversation(private val databaseService: DatabaseService,
             )
             if (rule > 0) rule else null
         } else null
-        val infraction = Infraction(this.user.id.value, infractionReason, type, points, ruleId)
+        val infraction = Infraction(this.user.id.asString, infractionReason, type, points, ruleId)
         infractionService.infract(targetUser, guild, user, infraction)
         respondMenu { createHistoryEmbed(targetUser, user, guild, configuration, databaseService) }
     }

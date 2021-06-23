@@ -1,8 +1,8 @@
 package me.ddivad.judgebot.services.infractions
 
-import com.gitlab.kordlib.common.exception.RequestException
-import com.gitlab.kordlib.core.entity.Guild
-import com.gitlab.kordlib.core.entity.Member
+import dev.kord.common.exception.RequestException
+import dev.kord.core.entity.Guild
+import dev.kord.core.entity.Member
 import kotlinx.coroutines.Job
 import me.ddivad.judgebot.dataclasses.*
 import me.ddivad.judgebot.embeds.createInfractionEmbed
@@ -31,7 +31,7 @@ class InfractionService(private val configuration: Configuration,
         return databaseService.users.addInfraction(guild, userRecord, infraction).also {
             try {
                 target.asUser().sendPrivateMessage {
-                    createInfractionEmbed(guild, configuration[guild.id.longValue]!!, target, userRecord, it, rule)
+                    createInfractionEmbed(guild, configuration[guild.id.value]!!, target, userRecord, it, rule)
                 }
             } catch (ex: RequestException) {
                 loggingService.dmDisabled(guild, target.asUser())
@@ -47,7 +47,7 @@ class InfractionService(private val configuration: Configuration,
             PunishmentType.MUTE -> muteService.applyInfractionMute(target, infraction.punishment?.duration!!, "Infraction mute. Please check corresponding infraction embed above.")
             PunishmentType.BAN -> {
                 val clearTime = infraction.punishment!!.duration?.let { DateTime().millis.plus(it) }
-                val punishment = Punishment(target.id.value, InfractionType.Ban, infraction.reason, infraction.moderator, clearTime)
+                val punishment = Punishment(target.id.asString, InfractionType.Ban, infraction.reason, infraction.moderator, clearTime)
                 banService.banUser(target, guild, punishment)
             }
         }

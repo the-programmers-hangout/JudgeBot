@@ -18,7 +18,7 @@ fun guildConfigCommands(configuration: Configuration,
         description = "Configure a guild to use Judgebot."
         requiredPermissionLevel = PermissionLevel.Administrator
         execute {
-            if (configuration.hasGuildConfig(guild.id.longValue)) {
+            if (configuration.hasGuildConfig(guild.id.value)) {
                 respond("Guild configuration exists. To modify it use the commands to set values.")
                 return@execute
             }
@@ -33,8 +33,8 @@ fun guildConfigCommands(configuration: Configuration,
     guildCommand("configuration") {
         description = "Update configuration parameters for this guild (conversation)."
         requiredPermissionLevel = PermissionLevel.Staff
-        execute(GuildConfigArg.makeOptional("options")) {
-            if (!configuration.hasGuildConfig(guild.id.longValue)) {
+        execute(GuildConfigArg.optional("options")) {
+            if (!configuration.hasGuildConfig(guild.id.value)) {
                 respond("Please run the **setup** command to set this initially.")
                 return@execute
             }

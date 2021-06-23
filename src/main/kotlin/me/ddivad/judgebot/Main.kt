@@ -1,12 +1,13 @@
 package me.ddivad.judgebot
 
-import com.gitlab.kordlib.gateway.Intent
-import com.gitlab.kordlib.gateway.PrivilegedIntent
+import dev.kord.common.kColor
+import dev.kord.gateway.Intent
+import dev.kord.gateway.PrivilegedIntent
 import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.services.BotStatsService
-import me.ddivad.judgebot.services.infractions.MuteService
 import me.ddivad.judgebot.services.PermissionsService
 import me.ddivad.judgebot.services.infractions.BanService
+import me.ddivad.judgebot.services.infractions.MuteService
 import me.ddivad.judgebot.services.requiredPermissionLevel
 import me.jakejmattson.discordkt.api.dsl.bot
 import me.jakejmattson.discordkt.api.extensions.addInlineField
@@ -22,14 +23,14 @@ suspend fun main(args: Array<String>) {
     bot(token) {
         prefix {
             val configuration = discord.getInjectionObjects(Configuration::class)
-
-            guild?.let { configuration[guild!!.id.longValue]?.prefix } ?: defaultPrefix
+            guild?.let { configuration[guild!!.id.value]?.prefix } ?: defaultPrefix
         }
 
         configure {
             allowMentionPrefix = true
             commandReaction = null
             theme = Color.MAGENTA
+            intents = setOf(Intent.GuildMessages, Intent.DirectMessages, Intent.GuildBans, Intent.Guilds, Intent.GuildMembers, Intent.GuildMessageReactions)
         }
 
         mentionEmbed {
@@ -37,7 +38,7 @@ suspend fun main(args: Array<String>) {
             val channel = it.channel
             val self = channel.kord.getSelf()
 
-            color = it.discord.configuration.theme
+            color = it.discord.configuration.theme?.kColor
 
             thumbnail {
                 url = self.avatar.url
@@ -57,10 +58,10 @@ suspend fun main(args: Array<String>) {
             field {
                 name = "Build Info"
                 value = "```" +
-                        "Version:   2.1.2\n" +
-                        "DiscordKt: ${versions.library}\n" +
-                        "Kotlin:    $kotlinVersion" +
-                        "```"
+                    "Version:   2.1.2\n" +
+                    "DiscordKt: ${versions.library}\n" +
+                    "Kotlin:    $kotlinVersion" +
+                    "```"
             }
             field {
                 name = "Uptime"
@@ -88,15 +89,6 @@ suspend fun main(args: Array<String>) {
             )
             muteService.initGuilds()
             banService.initialiseBanTimers()
-        }
-
-        intents {
-            +Intent.GuildMessages
-            +Intent.DirectMessages
-            +Intent.GuildBans
-            +Intent.Guilds
-            +Intent.GuildMembers
-            +Intent.GuildMessageReactions
         }
     }
 }
