@@ -1,11 +1,13 @@
 package me.ddivad.judgebot.embeds
 
+import dev.kord.common.entity.ButtonStyle
 import dev.kord.common.entity.Snowflake
 import dev.kord.common.kColor
 import dev.kord.core.entity.Guild
 import dev.kord.core.entity.User
 import dev.kord.rest.Image
 import dev.kord.rest.builder.message.EmbedBuilder
+import dev.kord.x.emoji.Emojis
 import kotlinx.datetime.toJavaInstant
 import me.ddivad.judgebot.dataclasses.*
 import me.ddivad.judgebot.services.DatabaseService
@@ -28,6 +30,7 @@ suspend fun MenuBuilder.createHistoryEmbed(
 ) {
     val userRecord = member.getGuildInfo(guild.id.asString)
     val paginatedNotes = userRecord.notes.chunked(4)
+
     val totalMenuPages = 1 + 1 + 1 + 1 + if (paginatedNotes.isNotEmpty()) paginatedNotes.size else 1
     val guildConfiguration = config[guild.id.value]!!
     val embedColor = getEmbedColour(guild, target, databaseService)
@@ -38,6 +41,33 @@ suspend fun MenuBuilder.createHistoryEmbed(
         buildNotesPages(guild, guildConfiguration, target, userRecord, embedColor, totalMenuPages)
         buildInformationPage(guild, guildConfiguration, target, userRecord, embedColor, totalMenuPages)
         buildJoinLeavePage(guild, target, leaveData, userRecord, embedColor, totalMenuPages)
+    }
+
+    buttons {
+        button("Prev.", Emojis.arrowLeft) {
+            previousPage()
+        }
+        button("Next", Emojis.arrowRight) {
+            nextPage()
+        }
+        button("Overview", Emojis.clipboard) {
+            loadPage(0)
+        }
+    }
+
+    buttons {
+        button("Infractions", Emojis.warning) {
+            loadPage(1)
+        }
+        button("Notes", Emojis.pencil) {
+            loadPage(2)
+        }
+        button("Info", Emojis.informationSource) {
+            loadPage(3 + if (paginatedNotes.isNotEmpty()) paginatedNotes.size - 1 else 0)
+        }
+        button("Leaves", Emojis.x) {
+            loadPage(4 + if (paginatedNotes.isNotEmpty()) paginatedNotes.size - 1 else 0)
+        }
     }
 }
 

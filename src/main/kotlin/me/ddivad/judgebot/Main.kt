@@ -2,6 +2,7 @@ package me.ddivad.judgebot
 
 import dev.kord.common.kColor
 import dev.kord.gateway.Intent
+import dev.kord.gateway.Intents
 import dev.kord.gateway.PrivilegedIntent
 import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.services.BotStatsService
@@ -30,7 +31,6 @@ suspend fun main(args: Array<String>) {
             allowMentionPrefix = true
             commandReaction = null
             theme = Color.MAGENTA
-            intents = setOf(Intent.GuildMessages, Intent.DirectMessages, Intent.GuildBans, Intent.Guilds, Intent.GuildMembers, Intent.GuildMessageReactions)
         }
 
         mentionEmbed {
@@ -51,14 +51,14 @@ suspend fun main(args: Array<String>) {
 
             addInlineField("Prefix", it.prefix())
             addInlineField("Ping", botStats.ping)
-            addInlineField("Contributors", "ddivad#0001")
+            addInlineField("Contributors", "[Link](https://github.com/the-programmers-hangout/JudgeBot/graphs/contributors)")
 
             val kotlinVersion = KotlinVersion.CURRENT
             val versions = it.discord.versions
             field {
                 name = "Build Info"
                 value = "```" +
-                    "Version:   2.1.2\n" +
+                    "Version:   2.2.0\n" +
                     "DiscordKt: ${versions.library}\n" +
                     "Kotlin:    $kotlinVersion" +
                     "```"
