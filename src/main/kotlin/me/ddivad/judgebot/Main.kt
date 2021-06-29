@@ -6,6 +6,7 @@ import dev.kord.gateway.Intents
 import dev.kord.gateway.PrivilegedIntent
 import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.services.BotStatsService
+import me.ddivad.judgebot.services.PermissionLevel
 import me.ddivad.judgebot.services.PermissionsService
 import me.ddivad.judgebot.services.infractions.BanService
 import me.ddivad.judgebot.services.infractions.MuteService
@@ -17,7 +18,7 @@ import java.awt.Color
 @PrivilegedIntent
 suspend fun main(args: Array<String>) {
     val token = System.getenv("BOT_TOKEN") ?: null
-    val defaultPrefix = System.getenv("DEFAULT_PREFIX") ?: "<none>"
+    val defaultPrefix = System.getenv("DEFAULT_PREFIX") ?: "j!"
 
     require(token != null) { "Expected the bot token as an environment variable" }
 
@@ -79,7 +80,7 @@ suspend fun main(args: Array<String>) {
             if (guild != null)
                 permissionsService.hasClearance(guild!!, user, permission)
             else
-                false
+                return@permissions command.requiredPermissionLevel == PermissionLevel.Everyone
         }
 
         onStart {

@@ -12,17 +12,20 @@ import me.ddivad.judgebot.dataclasses.InfractionType
 import me.ddivad.judgebot.extensions.testDmStatus
 import me.ddivad.judgebot.services.*
 import me.ddivad.judgebot.services.infractions.BadPfpService
+import me.ddivad.judgebot.services.infractions.BadnameService
 import me.ddivad.judgebot.services.infractions.InfractionService
 import me.jakejmattson.discordkt.api.arguments.BooleanArg
 import me.jakejmattson.discordkt.api.arguments.EveryArg
 import me.jakejmattson.discordkt.api.arguments.IntegerArg
+import me.jakejmattson.discordkt.api.arguments.UserArg
 import me.jakejmattson.discordkt.api.dsl.commands
 
 @Suppress("unused")
 fun createInfractionCommands(databaseService: DatabaseService,
                              config: Configuration,
                              infractionService: InfractionService,
-                             badPfpService: BadPfpService) = commands("Infraction") {
+                             badPfpService: BadPfpService,
+                             badnameService: BadnameService) = commands("Infraction") {
     guildCommand("strike", "s", "S") {
         description = "Strike a user."
         requiredPermissionLevel = PermissionLevel.Staff
@@ -93,6 +96,15 @@ fun createInfractionCommands(databaseService: DatabaseService,
             val badPfp = Infraction(author.id.asString, "BadPfp", InfractionType.BadPfp)
             badPfpService.applyBadPfp(targetMember, guild, timeLimit)
             respond("${targetMember.mention} has been muted and a badpfp has been triggered with a time limit of $minutesUntilBan minutes.")
+        }
+    }
+
+    guildCommand("badname") {
+        description = "Rename a guild member that has a bad name."
+        requiredPermissionLevel = PermissionLevel.Moderator
+        execute(LowerMemberArg) {
+            badnameService.chooseRandomNickname(args.first)
+            respond("User renamed to ${args.first.mention}")
         }
     }
 

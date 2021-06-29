@@ -21,6 +21,7 @@
 ## Infraction
 | Commands           | Arguments                        | Description                                                                                                                           |
 | ------------------ | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| badname            | LowerMemberArg                   | Rename a guild member that has a bad name.                                                                                            |
 | badpfp             | [cancel], LowerMemberArg         | Notifies the user that they should change their profile pic and applies a 30 minute mute. Bans the user if they don't change picture. |
 | cleanseInfractions | LowerUserArg                     | Use this to delete (permanently) as user's infractions.                                                                               |
 | removeInfraction   | LowerUserArg, Infraction ID      | Use this to delete (permanently) an infraction from a user.                                                                           |

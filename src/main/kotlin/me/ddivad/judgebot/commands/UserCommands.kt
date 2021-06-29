@@ -1,9 +1,13 @@
 package me.ddivad.judgebot.commands
 
 import dev.kord.common.kColor
+import dev.kord.x.emoji.Emojis
+import dev.kord.x.emoji.addReaction
+import kotlinx.coroutines.flow.toList
 import me.ddivad.judgebot.arguments.LowerUserArg
 import me.ddivad.judgebot.conversations.InfractionConversation
 import me.ddivad.judgebot.conversations.ResetUserConversation
+import me.ddivad.judgebot.conversations.guildChoiceConversation
 import me.ddivad.judgebot.dataclasses.*
 import me.ddivad.judgebot.embeds.createHistoryEmbed
 import me.ddivad.judgebot.embeds.createCondensedHistoryEmbed
@@ -16,6 +20,7 @@ import me.ddivad.judgebot.services.infractions.BanService
 import me.ddivad.judgebot.services.requiredPermissionLevel
 import me.jakejmattson.discordkt.api.arguments.*
 import me.jakejmattson.discordkt.api.dsl.commands
+import me.jakejmattson.discordkt.api.extensions.mutualGuilds
 import me.jakejmattson.discordkt.api.extensions.sendPrivateMessage
 import me.jakejmattson.discordkt.api.extensions.toSnowflake
 import java.awt.Color
@@ -134,15 +139,23 @@ fun createUserCommands(
         }
     }
 
-    guildCommand("selfHistory") {
+    command("selfHistory") {
         description = "View your infraction history (contents will be DM'd)"
         requiredPermissionLevel = PermissionLevel.Everyone
         execute {
             val user = author
-            val guildMember = databaseService.users.getOrCreateUser(user, guild)
+            val mutualGuilds = author.mutualGuilds.toList().filter { config[it.id.value] != null }
 
-            user.sendPrivateMessage {
-                createSelfHistoryEmbed(user, guildMember, guild, config)
+            if (mutualGuilds.size == 1 || guild != null) {
+                val currentGuild = guild ?: mutualGuilds.first()
+                val guildMember = databaseService.users.getOrCreateUser(user, currentGuild)
+
+                user.sendPrivateMessage {
+                    createSelfHistoryEmbed(user, guildMember, currentGuild, config)
+                }
+                this.message.addReaction(Emojis.whiteCheckMark)
+            } else {
+                guildChoiceConversation(mutualGuilds, config).startPrivately(discord, author)
             }
         }
     }
