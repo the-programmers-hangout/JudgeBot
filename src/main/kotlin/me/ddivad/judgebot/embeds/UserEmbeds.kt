@@ -60,7 +60,7 @@ suspend fun MenuBuilder.createHistoryEmbed(
         }
     }
 
-    if (paginatedNotes.isNotEmpty()) {
+    if ((paginatedNotes.size > 1)) {
         buttons {
             button("Prev.", Emojis.arrowLeft) {
                 previousPage()
