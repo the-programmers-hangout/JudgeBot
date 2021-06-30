@@ -1,6 +1,5 @@
 package me.ddivad.judgebot.embeds
 
-import dev.kord.common.entity.ButtonStyle
 import dev.kord.common.entity.Snowflake
 import dev.kord.common.kColor
 import dev.kord.core.entity.Guild
@@ -37,25 +36,16 @@ suspend fun MenuBuilder.createHistoryEmbed(
     val leaveData = databaseService.joinLeaves.getMemberJoinLeaveDataForGuild(guild.id.asString, member.userId)
     this.apply {
         buildOverviewPage(guild, guildConfiguration, target, userRecord, embedColor, totalMenuPages, databaseService)
-        buildInfractionPage(guild, target, userRecord, embedColor, totalMenuPages)
+        buildInfractionPage(guild, guildConfiguration, target, userRecord, embedColor, totalMenuPages)
         buildNotesPages(guild, guildConfiguration, target, userRecord, embedColor, totalMenuPages)
         buildInformationPage(guild, guildConfiguration, target, userRecord, embedColor, totalMenuPages)
         buildJoinLeavePage(guild, target, leaveData, userRecord, embedColor, totalMenuPages)
     }
 
     buttons {
-        button("Prev.", Emojis.arrowLeft) {
-            previousPage()
-        }
-        button("Next", Emojis.arrowRight) {
-            nextPage()
-        }
         button("Overview", Emojis.clipboard) {
             loadPage(0)
         }
-    }
-
-    buttons {
         button("Infractions", Emojis.warning) {
             loadPage(1)
         }
@@ -67,6 +57,17 @@ suspend fun MenuBuilder.createHistoryEmbed(
         }
         button("Leaves", Emojis.x) {
             loadPage(4 + if (paginatedNotes.isNotEmpty()) paginatedNotes.size - 1 else 0)
+        }
+    }
+
+    if (paginatedNotes.isNotEmpty()) {
+        buttons {
+            button("Prev.", Emojis.arrowLeft) {
+                previousPage()
+            }
+            button("Next", Emojis.arrowRight) {
+                nextPage()
+            }
         }
     }
 }
@@ -135,6 +136,7 @@ private suspend fun MenuBuilder.buildOverviewPage(
 
 private suspend fun MenuBuilder.buildInfractionPage(
     guild: Guild,
+    config: GuildConfiguration,
     target: User,
     userRecord: GuildMemberDetails,
     embedColor: Color,
@@ -148,11 +150,10 @@ private suspend fun MenuBuilder.buildInfractionPage(
         }
         val warnings = userRecord.infractions.filter { it.type == InfractionType.Warn }.sortedBy { it.dateTime }
         val strikes = userRecord.infractions.filter { it.type == InfractionType.Strike }.sortedBy { it.dateTime }
-        val bans = userRecord.infractions.filter { it.punishment?.punishment == PunishmentType.BAN }
 
+        addInlineField("Points", "**${userRecord.points} / ${config.infractionConfiguration.pointCeiling}**")
         addInlineField("Warns", "${warnings.size}")
         addInlineField("Strikes", "${strikes.size}")
-        addInlineField("Bans", "${bans.size}")
 
         if (userRecord.infractions.isEmpty()) addField("", "**User has no infractions**")
         if (warnings.isNotEmpty()) addField("", "**__Warnings__**")
@@ -203,9 +204,9 @@ private suspend fun MenuBuilder.buildNotesPages(
                 url = target.asUser().avatar.url
             }
 
+            addInlineField("Points", "**${userRecord.points} / ${config.infractionConfiguration.pointCeiling}**")
             addInlineField("Notes", "${userRecord.notes.size}")
             addInlineField("Information", "${userRecord.info.size}")
-            addInlineField("Points", "**${userRecord.points} / ${config.infractionConfiguration.pointCeiling}**")
 
             addField("", "**User has no notes**")
             footer {
@@ -364,6 +365,15 @@ suspend fun MenuBuilder.createLinkedAccountMenu(
         val linkedUserRecord = databaseService.users.getOrCreateUser(linkedUser, guild)
         page {
             createCondensedHistoryEmbed(linkedUser, linkedUserRecord, guild, config)
+        }
+
+        buttons {
+            button("Prev.", Emojis.arrowLeft) {
+                previousPage()
+            }
+            button("Next", Emojis.arrowRight) {
+                nextPage()
+            }
         }
     }
 }
