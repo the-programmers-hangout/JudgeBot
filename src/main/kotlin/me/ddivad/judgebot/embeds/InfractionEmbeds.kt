@@ -1,11 +1,12 @@
 package me.ddivad.judgebot.embeds
 
-import com.gitlab.kordlib.core.entity.Guild
-import com.gitlab.kordlib.core.entity.Member
-import com.gitlab.kordlib.core.entity.Message
-import com.gitlab.kordlib.core.entity.User
-import com.gitlab.kordlib.rest.Image
-import com.gitlab.kordlib.rest.builder.message.EmbedBuilder
+import dev.kord.common.kColor
+import dev.kord.core.entity.Guild
+import dev.kord.core.entity.Member
+import dev.kord.core.entity.Message
+import dev.kord.core.entity.User
+import dev.kord.rest.Image
+import dev.kord.rest.builder.message.EmbedBuilder
 import me.ddivad.judgebot.dataclasses.*
 import me.ddivad.judgebot.util.timeToString
 import me.jakejmattson.discordkt.api.extensions.addField
@@ -55,7 +56,7 @@ fun EmbedBuilder.createWarnEmbed(guild: Guild, configuration: GuildConfiguration
 
     addField("", "A warning is a way for staff to inform you that your behaviour needs to change or further infractions will follow. \nIf you think this to be unjustified, please **do not** post about it in a public channel but take it up with **Modmail**.")
 
-    color = Color.RED
+    color = Color.RED.kColor
     thumbnail {
         url = guild.getIconUrl(Image.Format.PNG) ?: ""
     }
@@ -105,7 +106,7 @@ fun EmbedBuilder.createStrikeEmbed(guild: Guild, configuration: GuildConfigurati
     addField("", " A strike is a formal warning for breaking the rules.\nIf you think this to be unjustified, please **do not** post about it in a public channel but take it up with **Modmail**.")
 
 
-    color = Color.RED
+    color = Color.RED.kColor
     thumbnail {
         url = guild.getIconUrl(Image.Format.PNG) ?: ""
     }
@@ -133,7 +134,7 @@ fun EmbedBuilder.createMuteEmbed(guild: Guild, user: User, reason: String, lengt
         value = reason
         inline = false
     }
-    color = Color.RED
+    color = Color.RED.kColor
     thumbnail {
         url = guild.getIconUrl(Image.Format.PNG) ?: ""
     }
@@ -144,7 +145,7 @@ fun EmbedBuilder.createMuteEmbed(guild: Guild, user: User, reason: String, lengt
 }
 
 fun EmbedBuilder.createUnmuteEmbed(guild: Guild, user: User) {
-    color = Color.GREEN
+    color = Color.GREEN.kColor
     title = "Mute Removed"
     description = "${user.mention} you have been unmuted from **${guild.name}**."
     footer {
@@ -154,7 +155,7 @@ fun EmbedBuilder.createUnmuteEmbed(guild: Guild, user: User) {
 }
 
 fun EmbedBuilder.createBadPfpEmbed(guild: Guild, user: Member) {
-    color = Color.RED
+    color = Color.RED.kColor
     thumbnail {
         url = guild.getIconUrl(Image.Format.PNG) ?: ""
     }
@@ -177,12 +178,12 @@ fun EmbedBuilder.createMessageDeleteEmbed(guild: Guild, message: Message) {
     thumbnail {
         url = guild.getIconUrl(Image.Format.PNG) ?: ""
     }
-    color = Color.RED
+    color = Color.RED.kColor
     description = """
         Your ${if (message.attachments.isNotEmpty()) "image" else "message"} was deleted from ${message.channel.mention} 
         as it was deemed either off topic or against our server rules.
     """.trimIndent()
-    addField("Message", "```${messageContent}```")
+    addField("Message", "```${messageContent.replace("`", "")}```")
     if (message.attachments.isNotEmpty()) {
         addField("Filename", "```${message.attachments.first().filename}```")
     }

@@ -1,35 +1,34 @@
 package me.ddivad.judgebot.arguments
 
-import me.jakejmattson.discordkt.api.arguments.ArgumentResult
-import me.jakejmattson.discordkt.api.arguments.ArgumentType
-import me.jakejmattson.discordkt.api.arguments.Success
-import me.jakejmattson.discordkt.api.arguments.Error
+import me.jakejmattson.discordkt.api.arguments.*
 import me.jakejmattson.discordkt.api.dsl.CommandEvent
 
 val validConfigParameters = mutableListOf(
-        "setPrefix",
-        "addAdminRole",
-        "addStaffRole",
-        "addModeratorRole",
-        "removeAdminRole",
-        "removeStaffRole",
-        "removeModeratorRole",
-        "setMuteRole",
-        "setLogChannel",
-        "setAlertChannel",
-        "setGagReaction",
-        "setHistoryReaction",
-        "setDeleteMessageReaction",
-        "setFlagMessageReaction",
-        "enableReactions",
-        "view",
-        "options"
+    "setPrefix",
+    "addAdminRole",
+    "addStaffRole",
+    "addModeratorRole",
+    "removeAdminRole",
+    "removeStaffRole",
+    "removeModeratorRole",
+    "setMuteRole",
+    "setLogChannel",
+    "setAlertChannel",
+    "setGagReaction",
+    "setHistoryReaction",
+    "setDeleteMessageReaction",
+    "setFlagMessageReaction",
+    "enableReactions",
+    "view",
+    "options"
 )
 
-open class GuildConfigArg(override val name: String = "GuildConfig") : ArgumentType<String>() {
-    override fun generateExamples(event: CommandEvent<*>): MutableList<String> = validConfigParameters
+open class GuildConfigArg(override val name: String = "GuildConfig") : ArgumentType<String> {
+    override val description = "A Guild configuration"
 
     companion object : GuildConfigArg()
+
+    override suspend fun generateExamples(event: CommandEvent<*>): MutableList<String> = validConfigParameters
 
     override suspend fun convert(arg: String, args: List<String>, event: CommandEvent<*>): ArgumentResult<String> {
         val parameters = validConfigParameters.map { it.toLowerCase() }

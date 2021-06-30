@@ -1,9 +1,9 @@
 package me.ddivad.judgebot.services
 
-import com.gitlab.kordlib.core.any
-import com.gitlab.kordlib.core.entity.Guild
-import com.gitlab.kordlib.core.entity.Member
-import com.gitlab.kordlib.core.entity.User
+import dev.kord.core.any
+import dev.kord.core.entity.Guild
+import dev.kord.core.entity.Member
+import dev.kord.core.entity.User
 import me.ddivad.judgebot.dataclasses.Configuration
 import me.jakejmattson.discordkt.api.annotations.Service
 import me.jakejmattson.discordkt.api.dsl.Command
@@ -25,7 +25,7 @@ class PermissionsService(private val configuration: Configuration) {
     suspend fun hasClearance(guild: Guild?, user: User, requiredPermissionLevel: PermissionLevel): Boolean {
         val permissionLevel = guild?.getMember(user.id)?.let { getPermissionLevel(it) }
         return if (permissionLevel == null) {
-            requiredPermissionLevel == PermissionLevel.Everyone || user.id.value == configuration.ownerId
+            requiredPermissionLevel == PermissionLevel.Everyone || user.id.asString == configuration.ownerId
         } else {
             permissionLevel >= requiredPermissionLevel
         }
@@ -44,11 +44,11 @@ class PermissionsService(private val configuration: Configuration) {
                 else -> PermissionLevel.Everyone
             }
 
-    private fun Member.isBotOwner() = id.value == configuration.ownerId
+    private fun Member.isBotOwner() = id.asString == configuration.ownerId
     private suspend fun Member.isGuildOwner() = isOwner()
-    private suspend fun Member.isAdministrator() = roles.any { configuration[guild.id.longValue]!!.adminRoles.contains(it.id.value) }
-    private suspend fun Member.isStaff() = roles.any { configuration[guild.id.longValue]!!.staffRoles.contains(it.id.value) }
-    private suspend fun Member.isModerator() = roles.any { configuration[guild.id.longValue]!!.moderatorRoles.contains(it.id.value) }
+    private suspend fun Member.isAdministrator() = roles.any { configuration[guild.id.value]!!.adminRoles.contains(it.id.asString) }
+    private suspend fun Member.isStaff() = roles.any { configuration[guild.id.value]!!.staffRoles.contains(it.id.asString) }
+    private suspend fun Member.isModerator() = roles.any { configuration[guild.id.value]!!.moderatorRoles.contains(it.id.asString) }
 }
 
 var Command.requiredPermissionLevel: PermissionLevel

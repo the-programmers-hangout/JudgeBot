@@ -1,10 +1,10 @@
 package me.ddivad.judgebot.listeners
 
-import com.gitlab.kordlib.core.behavior.getChannelOf
-import com.gitlab.kordlib.core.entity.channel.TextChannel
-import com.gitlab.kordlib.core.event.message.ReactionAddEvent
-import com.gitlab.kordlib.kordx.emoji.Emojis
-import com.gitlab.kordlib.kordx.emoji.addReaction
+import dev.kord.core.behavior.getChannelOf
+import dev.kord.core.entity.channel.TextChannel
+import dev.kord.core.event.message.ReactionAddEvent
+import dev.kord.x.emoji.Emojis
+import dev.kord.x.emoji.addReaction
 import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.extensions.jumpLink
 import me.jakejmattson.discordkt.api.dsl.listeners
@@ -14,7 +14,7 @@ import me.jakejmattson.discordkt.api.extensions.toSnowflake
 fun onMemberReactionAdd(configuration: Configuration) = listeners {
     on<ReactionAddEvent> {
         val guild = guild?.asGuildOrNull() ?: return@on
-        val guildConfiguration = configuration[guild.asGuild().id.longValue]
+        val guildConfiguration = configuration[guild.asGuild().id.value]
         if (!guildConfiguration?.reactions!!.enabled) return@on
 
         when (this.emoji.name) {
@@ -28,7 +28,7 @@ fun onMemberReactionAdd(configuration: Configuration) = listeners {
                                 "\n**User**: ${user.mention}" +
                                 "\n**Channel**: ${message.channel.mention}" +
                                 "\n**Author:** ${message.asMessage().author?.mention}" +
-                                "\n**Message:** ${message.asMessage().jumpLink(guild.id.value)}"
+                                "\n**Message:** ${message.asMessage().jumpLink(guild.id.asString)}"
                     )
                     .addReaction(Emojis.question)
             }

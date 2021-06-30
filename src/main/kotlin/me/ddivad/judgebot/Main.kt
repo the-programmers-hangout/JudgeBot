@@ -1,12 +1,15 @@
 package me.ddivad.judgebot
 
-import com.gitlab.kordlib.gateway.Intent
-import com.gitlab.kordlib.gateway.PrivilegedIntent
+import dev.kord.common.kColor
+import dev.kord.gateway.Intent
+import dev.kord.gateway.Intents
+import dev.kord.gateway.PrivilegedIntent
 import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.services.BotStatsService
-import me.ddivad.judgebot.services.infractions.MuteService
+import me.ddivad.judgebot.services.PermissionLevel
 import me.ddivad.judgebot.services.PermissionsService
 import me.ddivad.judgebot.services.infractions.BanService
+import me.ddivad.judgebot.services.infractions.MuteService
 import me.ddivad.judgebot.services.requiredPermissionLevel
 import me.jakejmattson.discordkt.api.dsl.bot
 import me.jakejmattson.discordkt.api.extensions.addInlineField
@@ -15,15 +18,14 @@ import java.awt.Color
 @PrivilegedIntent
 suspend fun main(args: Array<String>) {
     val token = System.getenv("BOT_TOKEN") ?: null
-    val defaultPrefix = System.getenv("DEFAULT_PREFIX") ?: "<none>"
+    val defaultPrefix = System.getenv("DEFAULT_PREFIX") ?: "j!"
 
     require(token != null) { "Expected the bot token as an environment variable" }
 
     bot(token) {
         prefix {
             val configuration = discord.getInjectionObjects(Configuration::class)
-
-            guild?.let { configuration[guild!!.id.longValue]?.prefix } ?: defaultPrefix
+            guild?.let { configuration[guild!!.id.value]?.prefix } ?: defaultPrefix
         }
 
         configure {
@@ -37,7 +39,7 @@ suspend fun main(args: Array<String>) {
             val channel = it.channel
             val self = channel.kord.getSelf()
 
-            color = it.discord.configuration.theme
+            color = it.discord.configuration.theme?.kColor
 
             thumbnail {
                 url = self.avatar.url
@@ -50,17 +52,17 @@ suspend fun main(args: Array<String>) {
 
             addInlineField("Prefix", it.prefix())
             addInlineField("Ping", botStats.ping)
-            addInlineField("Contributors", "ddivad#0001")
+            addInlineField("Contributors", "[Link](https://github.com/the-programmers-hangout/JudgeBot/graphs/contributors)")
 
             val kotlinVersion = KotlinVersion.CURRENT
             val versions = it.discord.versions
             field {
                 name = "Build Info"
                 value = "```" +
-                        "Version:   2.1.2\n" +
-                        "DiscordKt: ${versions.library}\n" +
-                        "Kotlin:    $kotlinVersion" +
-                        "```"
+                    "Version:   2.2.0\n" +
+                    "DiscordKt: ${versions.library}\n" +
+                    "Kotlin:    $kotlinVersion" +
+                    "```"
             }
             field {
                 name = "Uptime"
@@ -78,7 +80,7 @@ suspend fun main(args: Array<String>) {
             if (guild != null)
                 permissionsService.hasClearance(guild!!, user, permission)
             else
-                false
+                return@permissions command.requiredPermissionLevel == PermissionLevel.Everyone
         }
 
         onStart {
@@ -88,15 +90,6 @@ suspend fun main(args: Array<String>) {
             )
             muteService.initGuilds()
             banService.initialiseBanTimers()
-        }
-
-        intents {
-            +Intent.GuildMessages
-            +Intent.DirectMessages
-            +Intent.GuildBans
-            +Intent.Guilds
-            +Intent.GuildMembers
-            +Intent.GuildMessageReactions
         }
     }
 }

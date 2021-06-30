@@ -1,6 +1,6 @@
 package me.ddivad.judgebot.listeners
 
-import com.gitlab.kordlib.core.event.guild.MemberJoinEvent
+import dev.kord.core.event.guild.MemberJoinEvent
 import me.ddivad.judgebot.services.LoggingService
 import me.ddivad.judgebot.services.infractions.MuteService
 import me.ddivad.judgebot.services.infractions.RoleState

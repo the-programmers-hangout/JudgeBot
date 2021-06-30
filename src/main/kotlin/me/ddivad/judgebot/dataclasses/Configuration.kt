@@ -1,7 +1,7 @@
 package me.ddivad.judgebot.dataclasses
 
-import com.gitlab.kordlib.core.entity.Guild
-import com.gitlab.kordlib.core.entity.Role
+import dev.kord.core.entity.Guild
+import dev.kord.core.entity.Role
 import me.jakejmattson.discordkt.api.dsl.Data
 
 data class Configuration(
@@ -22,15 +22,15 @@ data class Configuration(
         mutedRole: Role,
         logging: LoggingConfiguration
     ) {
-        if (guildConfigurations[guild.id.longValue] != null) return
+        if (guildConfigurations[guild.id.value] != null) return
 
         val newConfiguration = GuildConfiguration(
-            guild.id.value,
+            guild.id.asString,
             prefix,
-            mutableListOf(moderatorRole.id.value),
-            mutableListOf(staffRole.id.value),
-            mutableListOf(adminRole.id.value),
-            mutedRole.id.value,
+            mutableListOf(moderatorRole.id.asString),
+            mutableListOf(staffRole.id.asString),
+            mutableListOf(adminRole.id.asString),
+            mutedRole.id.asString,
             logging
         )
 
@@ -43,7 +43,7 @@ data class Configuration(
         newConfiguration.punishments.add(PunishmentLevel(40, PunishmentType.MUTE, 1000L * 60 * 60 * 24 * 30))
         newConfiguration.punishments.add(PunishmentLevel(50, PunishmentType.BAN))
 
-        guildConfigurations[guild.id.longValue] = newConfiguration
+        guildConfigurations[guild.id.value] = newConfiguration
         save()
     }
 }

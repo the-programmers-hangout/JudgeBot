@@ -1,8 +1,8 @@
 package me.ddivad.judgebot.commands
 
-import com.gitlab.kordlib.common.exception.RequestException
-import com.gitlab.kordlib.kordx.emoji.Emojis
-import com.gitlab.kordlib.kordx.emoji.addReaction
+import dev.kord.common.exception.RequestException
+import dev.kord.x.emoji.Emojis
+import dev.kord.x.emoji.addReaction
 import me.ddivad.judgebot.arguments.LowerMemberArg
 import me.ddivad.judgebot.extensions.testDmStatus
 import me.ddivad.judgebot.services.*

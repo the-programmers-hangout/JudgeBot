@@ -1,6 +1,6 @@
 package me.ddivad.judgebot.conversations.guild
 
-import com.gitlab.kordlib.core.entity.Guild
+import dev.kord.core.entity.Guild
 import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.dataclasses.LoggingConfiguration
 import me.ddivad.judgebot.services.infractions.MuteService
@@ -26,7 +26,7 @@ class GuildSetupConversation(private val configuration: Configuration, private v
                 staffRole,
                 moderatorRole,
                 mutedRole,
-                LoggingConfiguration(alertChannel.id.value, logChannel.id.value),
+                LoggingConfiguration(alertChannel.id.asString, logChannel.id.asString),
         )
         muteService.initGuilds()
     }
