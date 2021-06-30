@@ -17,7 +17,7 @@ fun noteCommands(databaseService: DatabaseService) = commands("Notes") {
         execute(UserArg, EveryArg("Note Content")) {
             val (target, note) = args
             val user = databaseService.users.getOrCreateUser(target, guild)
-            databaseService.users.addNote(guild, user, note, author.id.value)
+            databaseService.users.addNote(guild, user, note, author.id.asString)
             respond("Note added to ${target.mention}.")
         }
     }
@@ -28,11 +28,11 @@ fun noteCommands(databaseService: DatabaseService) = commands("Notes") {
         execute(UserArg, IntegerArg("Note to edit"), EveryArg("Note Content")) {
             val (target, noteId, note) = args
             val user = databaseService.users.getOrCreateUser(target, guild)
-            if (user.getGuildInfo(guild.id.value).notes.none{ it.id == noteId }) {
+            if (user.getGuildInfo(guild.id.asString).notes.none{ it.id == noteId }) {
                 respond("User has no note with ID $noteId.")
                 return@execute
             }
-            databaseService.users.editNote(guild, user, noteId, note, author.id.value)
+            databaseService.users.editNote(guild, user, noteId, note, author.id.asString)
             respond("Note edited.")
         }
     }
@@ -43,7 +43,7 @@ fun noteCommands(databaseService: DatabaseService) = commands("Notes") {
         execute(LowerMemberArg, IntegerArg("Note ID")) {
             val (target, noteId) = args
             val user = databaseService.users.getOrCreateUser(target, guild)
-            if (user.getGuildInfo(guild.id.value).notes.isEmpty()) {
+            if (user.getGuildInfo(guild.id.asString).notes.isEmpty()) {
                 respond("User has no notes.")
                 return@execute
             }
@@ -58,7 +58,7 @@ fun noteCommands(databaseService: DatabaseService) = commands("Notes") {
         execute(LowerMemberArg) {
             val target = args.first
             val user = databaseService.users.getOrCreateUser(target, guild)
-            if (user.getGuildInfo(guild.id.value).notes.isEmpty()) {
+            if (user.getGuildInfo(guild.id.asString).notes.isEmpty()) {
                 respond("User has no notes.")
                 return@execute
             }

@@ -1,6 +1,6 @@
 package me.ddivad.judgebot.commands
 
-import com.gitlab.kordlib.core.behavior.edit
+import dev.kord.core.behavior.edit
 import me.ddivad.judgebot.arguments.RuleArg
 import me.ddivad.judgebot.conversations.rules.AddRuleConversation
 import me.ddivad.judgebot.conversations.rules.ArchiveRuleConversation
@@ -53,11 +53,11 @@ fun ruleCommands(configuration: Configuration,
     guildCommand("rules") {
         description = "List the rules of this guild. Pass a message ID to edit existing rules embed."
         requiredPermissionLevel = PermissionLevel.Everyone
-        execute(MessageArg.makeNullableOptional(null)) {
+        execute(MessageArg.optionalNullable(null)) {
             val messageToEdit = args.first
             if (messageToEdit != null) {
                 messageToEdit.edit { this.embed { createRulesEmbed(guild, databaseService.guilds.getRules(guild)) } }
-                respond("Existing embed updated: ${messageToEdit.jumpLink(guild.id.value)}")
+                respond("Existing embed updated: ${messageToEdit.jumpLink(guild.id.asString)}")
             } else {
                 respond {
                     createRulesEmbed(guild, databaseService.guilds.getRules(guild))
@@ -69,11 +69,11 @@ fun ruleCommands(configuration: Configuration,
     guildCommand("longRules") {
         description = "List the rules (with descriptions) of this guild. Pass a message ID to edit existing rules embed."
         requiredPermissionLevel = PermissionLevel.Staff
-        execute(MessageArg.makeNullableOptional(null)) {
+        execute(MessageArg.optionalNullable(null)) {
             val messageToEdit = args.first
             if (messageToEdit != null) {
                 messageToEdit.edit { this.embed { createRulesEmbedDetailed(guild, databaseService.guilds.getRules(guild)) } }
-                respond("Existing embed updated: ${messageToEdit.jumpLink(guild.id.value)}")
+                respond("Existing embed updated: ${messageToEdit.jumpLink(guild.id.asString)}")
             } else {
                 respond {
                     createRulesEmbedDetailed(guild, databaseService.guilds.getRules(guild))

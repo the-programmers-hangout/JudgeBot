@@ -1,9 +1,9 @@
 package me.ddivad.judgebot.services.infractions
 
-import com.gitlab.kordlib.common.exception.RequestException
-import com.gitlab.kordlib.core.behavior.ban
-import com.gitlab.kordlib.core.entity.Guild
-import com.gitlab.kordlib.core.entity.Member
+import dev.kord.common.exception.RequestException
+import dev.kord.core.behavior.ban
+import dev.kord.core.entity.Guild
+import dev.kord.core.entity.Member
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -20,7 +20,7 @@ class BadPfpService(private val muteService: MuteService,
                     private val discord: Discord,
                     private val loggingService: LoggingService) {
     private val badPfpTracker = hashMapOf<Pair<GuildID, UserId>, Job>()
-    private suspend fun toKey(member: Member): Pair<GuildID, UserId> = member.guild.id.value to member.asUser().id.value
+    private suspend fun toKey(member: Member): Pair<GuildID, UserId> = member.guild.id.asString to member.asUser().id.asString
 
     suspend fun applyBadPfp(target: Member, guild: Guild, timeLimit: Long) {
         try {
@@ -34,7 +34,7 @@ class BadPfpService(private val muteService: MuteService,
         loggingService.badBfpApplied(guild, target)
         badPfpTracker[toKey((target))] = GlobalScope.launch {
             delay(timeLimit)
-            if (target.avatar == discord.api.getUser(target.id)?.avatar) {
+            if (target.avatar == discord.kord.getUser(target.id)?.avatar) {
                 GlobalScope.launch {
                     delay(1000)
                     guild.ban(target.id) {

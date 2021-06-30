@@ -1,9 +1,9 @@
 package me.ddivad.judgebot.services.infractions
 
-import com.gitlab.kordlib.core.behavior.ban
-import com.gitlab.kordlib.core.entity.Guild
-import com.gitlab.kordlib.core.entity.Member
-import com.gitlab.kordlib.core.entity.User
+import dev.kord.core.behavior.ban
+import dev.kord.core.entity.Guild
+import dev.kord.core.entity.Member
+import dev.kord.core.entity.User
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -22,14 +22,14 @@ class BanService(private val databaseService: DatabaseService,
                  private val configuration: Configuration,
                  private val discord: Discord) {
     private val banTracker = hashMapOf<Pair<UserId, GuildID>, Job>()
-    private fun toKey(user: User, guild: Guild): Pair<GuildID, UserId> = user.id.value to guild.id.value
+    private fun toKey(user: User, guild: Guild): Pair<GuildID, UserId> = user.id.asString to guild.id.asString
 
     suspend fun banUser(target: User, guild: Guild, punishment: Punishment, deleteDays: Int = 0) {
         guild.ban(target.id) {
             deleteMessagesDays = deleteDays
             reason = punishment.reason
         }
-        databaseService.guilds.addBan(guild, Ban(target.id.value, punishment.moderator, punishment.reason))
+        databaseService.guilds.addBan(guild, Ban(target.id.asString, punishment.moderator, punishment.reason))
         if (punishment.clearTime != null) {
             databaseService.guilds.addPunishment(guild.asGuild(), punishment)
             val key = toKey(target, guild)
@@ -44,17 +44,17 @@ class BanService(private val databaseService: DatabaseService,
     suspend fun unbanUser(guild: Guild, user: User) {
         val key = toKey(user, guild)
         if (databaseService.guilds.getPunishmentsForUser(guild, user).any { it.type == InfractionType.Ban }) {
-            databaseService.guilds.removePunishment(guild, user.id.value, InfractionType.Ban)
+            databaseService.guilds.removePunishment(guild, user.id.asString, InfractionType.Ban)
             banTracker[key]?.cancel()
         }
         guild.unban(user.id)
-        databaseService.guilds.removeBan(guild, user.id.value)
+        databaseService.guilds.removeBan(guild, user.id.asString)
         loggingService.userUnbanned(guild, user)
     }
 
     suspend fun initialiseBanTimers() {
         configuration.guildConfigurations.forEach { config ->
-            val guild = config.value.id.toSnowflake().let { discord.api.getGuild(it) } ?: return@forEach
+            val guild = config.value.id.toSnowflake().let { discord.kord.getGuild(it) } ?: return@forEach
             databaseService.guilds.getPunishmentsForGuild(guild, InfractionType.Ban).forEach() {
                 if (it.clearTime != null) {
                     val difference = it.clearTime - DateTime.now().millis

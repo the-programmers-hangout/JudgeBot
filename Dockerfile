@@ -1,5 +1,5 @@
 
-FROM gradle:6.5.1-jdk14 AS build
+FROM gradle:7.1-jdk16 AS build
 COPY --chown=gradle:gradle . /judgebot
 WORKDIR /judgebot
 RUN gradle shadowJar --no-daemon

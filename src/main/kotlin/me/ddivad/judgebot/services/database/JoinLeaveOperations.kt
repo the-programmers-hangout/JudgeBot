@@ -1,7 +1,7 @@
 package me.ddivad.judgebot.services.database
 
-import com.gitlab.kordlib.core.entity.Member
-import com.gitlab.kordlib.core.entity.User
+import dev.kord.core.entity.Member
+import dev.kord.core.entity.User
 import me.ddivad.judgebot.dataclasses.JoinLeave
 import me.jakejmattson.discordkt.api.annotations.Service
 import org.joda.time.DateTime
@@ -14,7 +14,7 @@ class JoinLeaveOperations(connection: ConnectionService) {
     private val joinLeaveCollection = connection.db.getCollection<JoinLeave>("JoinLeaves")
 
     suspend fun createJoinLeaveRecord(guildId: String, target: Member) {
-        val joinLeave = JoinLeave(guildId, target.id.value, target.joinedAt.toEpochMilli())
+        val joinLeave = JoinLeave(guildId, target.id.asString, target.joinedAt.toEpochMilliseconds())
         joinLeaveCollection.insertOne(joinLeave)
     }
 
@@ -39,7 +39,7 @@ class JoinLeaveOperations(connection: ConnectionService) {
     }
 
     suspend fun createJoinLeaveRecordIfNotRecorded(guildId: String, target: Member) {
-        if (this.getMemberJoinLeaveDataForGuild(guildId, target.id.value).isNotEmpty()) {
+        if (this.getMemberJoinLeaveDataForGuild(guildId, target.id.asString).isNotEmpty()) {
             return
         }
         this.createJoinLeaveRecord(guildId, target)

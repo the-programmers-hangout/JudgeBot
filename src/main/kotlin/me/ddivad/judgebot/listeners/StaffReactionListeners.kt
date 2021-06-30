@@ -1,9 +1,9 @@
 package me.ddivad.judgebot.listeners
 
-import com.gitlab.kordlib.common.exception.RequestException
-import com.gitlab.kordlib.core.event.message.ReactionAddEvent
-import com.gitlab.kordlib.kordx.emoji.Emojis
-import com.gitlab.kordlib.kordx.emoji.addReaction
+import dev.kord.common.exception.RequestException
+import dev.kord.core.event.message.ReactionAddEvent
+import dev.kord.x.emoji.Emojis
+import dev.kord.x.emoji.addReaction
 import me.ddivad.judgebot.arguments.isHigherRankedThan
 import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.embeds.createMessageDeleteEmbed
@@ -28,7 +28,7 @@ fun onStaffReactionAdd(
 ) = listeners {
     on<ReactionAddEvent> {
         val guild = guild?.asGuildOrNull() ?: return@on
-        val guildConfiguration = configuration[guild.asGuild().id.longValue]
+        val guildConfiguration = configuration[guild.asGuild().id.value]
         if (!guildConfiguration?.reactions!!.enabled) return@on
         val staffMember = user.asMemberOrNull(guild.id) ?: return@on
         val messageAuthor = message.asMessage().author?.asMemberOrNull(guild.id) ?: return@on

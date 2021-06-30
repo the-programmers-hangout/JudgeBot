@@ -1,6 +1,6 @@
 package me.ddivad.judgebot.conversations.rules
 
-import com.gitlab.kordlib.core.entity.Guild
+import dev.kord.core.entity.Guild
 import me.ddivad.judgebot.services.DatabaseService
 import me.jakejmattson.discordkt.api.arguments.IntegerArg
 import me.jakejmattson.discordkt.api.dsl.conversation

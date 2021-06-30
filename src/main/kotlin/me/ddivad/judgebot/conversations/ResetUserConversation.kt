@@ -1,13 +1,14 @@
 package me.ddivad.judgebot.conversations
 
-import com.gitlab.kordlib.core.entity.Guild
-import com.gitlab.kordlib.core.entity.User
-import com.gitlab.kordlib.kordx.emoji.Emojis
-import com.gitlab.kordlib.kordx.emoji.toReaction
-import com.gitlab.kordlib.rest.Image
+import dev.kord.common.kColor
+import dev.kord.core.entity.Guild
+import dev.kord.core.entity.User
+import dev.kord.rest.Image
+import dev.kord.x.emoji.Emojis
 import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.embeds.createHistoryEmbed
 import me.ddivad.judgebot.services.DatabaseService
+import me.jakejmattson.discordkt.api.dsl.PromptedReaction
 import me.jakejmattson.discordkt.api.dsl.conversation
 import me.jakejmattson.discordkt.api.extensions.toSnowflake
 import java.awt.Color
@@ -21,13 +22,11 @@ class ResetUserConversation(private val databaseService: DatabaseService, privat
         if (linkedAccounts.isNotEmpty()) {
             val linkedUsers = linkedAccounts.map { guild.kord.getUser(it.toSnowflake()) }
             val resetLinked = promptReaction(
-                mapOf(
-                    Emojis.whiteCheckMark.toReaction() to true,
-                    Emojis.x.toReaction() to false
-                )
+                PromptedReaction(Emojis.whiteCheckMark, "", true),
+                PromptedReaction(Emojis.x, "", false)
             ) {
                 title = "Reset linked accounts"
-                color = Color.MAGENTA
+                color = Color.MAGENTA.kColor
                 thumbnail {
                     url = target.asUser().avatar.url
                 }

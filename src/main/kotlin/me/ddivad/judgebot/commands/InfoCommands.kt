@@ -1,8 +1,8 @@
 package me.ddivad.judgebot.commands
 
-import com.gitlab.kordlib.common.exception.RequestException
-import com.gitlab.kordlib.kordx.emoji.Emojis
-import com.gitlab.kordlib.kordx.emoji.addReaction
+import dev.kord.common.exception.RequestException
+import dev.kord.x.emoji.Emojis
+import dev.kord.x.emoji.addReaction
 import me.ddivad.judgebot.arguments.LowerMemberArg
 import me.ddivad.judgebot.dataclasses.Info
 import me.ddivad.judgebot.embeds.createInformationEmbed
@@ -31,7 +31,7 @@ fun createInformationCommands(databaseService: DatabaseService) = commands("Info
                 return@execute
             }
             val user = databaseService.users.getOrCreateUser(target, guild)
-            val information = Info(content, author.id.value)
+            val information = Info(content, author.id.asString)
             databaseService.users.addInfo(guild, user, information)
             target.sendPrivateMessage {
                 createInformationEmbed(guild, target, information)
@@ -46,7 +46,7 @@ fun createInformationCommands(databaseService: DatabaseService) = commands("Info
         execute(LowerMemberArg, IntegerArg("Info ID")) {
             val (target, id) = args
             val user = databaseService.users.getOrCreateUser(target, guild)
-            if (user.getGuildInfo(guild.id.value).info.isEmpty()) {
+            if (user.getGuildInfo(guild.id.asString).info.isEmpty()) {
                 respond("${target.mention} has no information records.")
                 return@execute
             }
