@@ -59,7 +59,7 @@ suspend fun main(args: Array<String>) {
             field {
                 name = "Build Info"
                 value = "```" +
-                    "Version:   2.2.0\n" +
+                    "Version:   2.2.1\n" +
                     "DiscordKt: ${versions.library}\n" +
                     "Kotlin:    $kotlinVersion" +
                     "```"
