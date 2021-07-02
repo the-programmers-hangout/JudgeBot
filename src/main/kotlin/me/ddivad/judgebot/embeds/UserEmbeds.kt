@@ -366,14 +366,14 @@ suspend fun MenuBuilder.createLinkedAccountMenu(
         page {
             createCondensedHistoryEmbed(linkedUser, linkedUserRecord, guild, config)
         }
+    }
 
-        buttons {
-            button("Prev.", Emojis.arrowLeft) {
-                previousPage()
-            }
-            button("Next", Emojis.arrowRight) {
-                nextPage()
-            }
+    buttons {
+        button("Prev.", Emojis.arrowLeft) {
+            previousPage()
+        }
+        button("Next", Emojis.arrowRight) {
+            nextPage()
         }
     }
 }
