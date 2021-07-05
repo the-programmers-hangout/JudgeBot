@@ -16,6 +16,7 @@ dependencies {
     implementation("me.jakejmattson:DiscordKt:${Versions.DISCORDKT}")
     implementation("org.litote.kmongo:kmongo-coroutine:4.2.8")
     implementation("joda-time:joda-time:2.10.10")
+    implementation("org.slf4j:slf4j-simple:1.7.30")
 }
 
 tasks {
