@@ -1,6 +1,7 @@
 package me.ddivad.judgebot
 
 import dev.kord.common.kColor
+import dev.kord.core.supplier.EntitySupplyStrategy
 import dev.kord.gateway.Intent
 import dev.kord.gateway.Intents
 import dev.kord.gateway.PrivilegedIntent
@@ -32,6 +33,7 @@ suspend fun main(args: Array<String>) {
             allowMentionPrefix = true
             commandReaction = null
             theme = Color.MAGENTA
+            entitySupplyStrategy = EntitySupplyStrategy.cacheWithCachingRestFallback
         }
 
         mentionEmbed {
