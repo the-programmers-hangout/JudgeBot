@@ -41,7 +41,6 @@ fun onStaffReactionAdd(
         ) {
             when (this.emoji.name) {
                 guildConfiguration.reactions.gagReaction -> {
-                    loggingService.staffReactionUsed(guild, staffMember, messageAuthor, this.emoji)
                     msg.deleteReaction(this.emoji)
                     if (muteService.checkRoleState(guild, messageAuthor) == RoleState.Tracked) {
                         staffMember.sendPrivateMessage("${messageAuthor.mention} is already muted.")
@@ -49,9 +48,9 @@ fun onStaffReactionAdd(
                     }
                     muteService.gag(guild, messageAuthor, staffMember)
                     staffMember.sendPrivateMessage("${messageAuthor.mention} gagged.")
+                    loggingService.staffReactionUsed(guild, staffMember, messageAuthor, this.emoji)
                 }
                 guildConfiguration.reactions.historyReaction -> {
-                    loggingService.staffReactionUsed(guild, staffMember, messageAuthor, this.emoji)
                     msg.deleteReaction(this.emoji)
                     staffMember.sendPrivateMessage {
                         createCondensedHistoryEmbed(
@@ -61,9 +60,9 @@ fun onStaffReactionAdd(
                             configuration
                         )
                     }
+                    loggingService.staffReactionUsed(guild, staffMember, messageAuthor, this.emoji)
                 }
                 guildConfiguration.reactions.deleteMessageReaction -> {
-                    loggingService.staffReactionUsed(guild, staffMember, messageAuthor, this.emoji)
                     msg.deleteReaction(this.emoji)
                     msg.delete()
                     databaseService.users.addMessageDelete(
@@ -81,6 +80,7 @@ fun onStaffReactionAdd(
                                     " Message deleted without notification."
                         )
                     }
+                    loggingService.staffReactionUsed(guild, staffMember, messageAuthor, this.emoji)
                 }
                 Emojis.question.unicode -> {
                     if (this.user.isSelf() || msg.author != this.message.kord.getSelf()) return@on

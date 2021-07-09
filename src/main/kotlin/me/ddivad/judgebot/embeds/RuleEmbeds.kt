@@ -49,13 +49,11 @@ fun EmbedBuilder.createInfractionRuleEmbed(guild: Guild, rules: List<Rule>) {
     for (rule in rules) {
         description += "**[${rule.number}](${rule.link})**. ${rule.title}\n"
     }
-
+    addField("","Click the rule id you would like to use, or type `cancel` to stop this process")
     footer {
         icon = guild.getIconUrl(Image.Format.PNG) ?: ""
         text = guild.name
     }
-    addField("","")
-    addField("Rule Choice:", "Reply with **rule id**, or **0** for no rule.\nYou can also type **cancel** to stop this process.")
 }
 
 fun EmbedBuilder.createRulesEmbedDetailed(guild: Guild, rules: List<Rule>) {

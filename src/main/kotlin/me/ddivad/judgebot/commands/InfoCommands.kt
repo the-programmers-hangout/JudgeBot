@@ -8,10 +8,13 @@ import me.ddivad.judgebot.dataclasses.Info
 import me.ddivad.judgebot.embeds.createInformationEmbed
 import me.ddivad.judgebot.extensions.testDmStatus
 import me.ddivad.judgebot.services.DatabaseService
+import me.ddivad.judgebot.services.HelpService
 import me.ddivad.judgebot.services.PermissionLevel
 import me.ddivad.judgebot.services.requiredPermissionLevel
+import me.jakejmattson.discordkt.api.arguments.CommandArg
 import me.jakejmattson.discordkt.api.arguments.EveryArg
 import me.jakejmattson.discordkt.api.arguments.IntegerArg
+import me.jakejmattson.discordkt.api.arguments.UnicodeEmojiArg
 import me.jakejmattson.discordkt.api.dsl.commands
 import me.jakejmattson.discordkt.api.extensions.sendPrivateMessage
 
