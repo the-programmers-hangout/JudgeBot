@@ -49,6 +49,9 @@ class PermissionsService(private val configuration: Configuration) {
     private suspend fun Member.isAdministrator() = roles.any { configuration[guild.id.value]!!.adminRoles.contains(it.id.asString) }
     private suspend fun Member.isStaff() = roles.any { configuration[guild.id.value]!!.staffRoles.contains(it.id.asString) }
     private suspend fun Member.isModerator() = roles.any { configuration[guild.id.value]!!.moderatorRoles.contains(it.id.asString) }
+
+    suspend fun isCommandVisible(guild: Guild, user: User, command: Command) =
+        hasClearance(guild, user, command.requiredPermissionLevel)
 }
 
 var Command.requiredPermissionLevel: PermissionLevel

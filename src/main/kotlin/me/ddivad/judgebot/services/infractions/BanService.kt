@@ -17,10 +17,12 @@ import me.jakejmattson.discordkt.api.extensions.toSnowflake
 import org.joda.time.DateTime
 
 @Service
-class BanService(private val databaseService: DatabaseService,
-                 private val loggingService: LoggingService,
-                 private val configuration: Configuration,
-                 private val discord: Discord) {
+class BanService(
+    private val databaseService: DatabaseService,
+    private val loggingService: LoggingService,
+    private val configuration: Configuration,
+    private val discord: Discord
+) {
     private val banTracker = hashMapOf<Pair<UserId, GuildID>, Job>()
     private fun toKey(user: User, guild: Guild): Pair<GuildID, UserId> = user.id.asString to guild.id.asString
 
@@ -53,22 +55,25 @@ class BanService(private val databaseService: DatabaseService,
     }
 
     suspend fun initialiseBanTimers() {
-        configuration.guildConfigurations.forEach { config ->
-            val guild = config.value.id.toSnowflake().let { discord.kord.getGuild(it) } ?: return@forEach
-            databaseService.guilds.getPunishmentsForGuild(guild, InfractionType.Ban).forEach() {
-                if (it.clearTime != null) {
-                    val difference = it.clearTime - DateTime.now().millis
-                    guild.kord.getUser(it.userId.toSnowflake())?.let { user ->
-                        val key = toKey(user, guild)
-                        banTracker[key] = GlobalScope.launch {
-                            delay(difference)
-                            guild.unban(user.id)
+        try {
+            configuration.guildConfigurations.forEach { config ->
+                val guild = config.value.id.toSnowflake().let { discord.kord.getGuild(it) } ?: return@forEach
+                databaseService.guilds.getPunishmentsForGuild(guild, InfractionType.Ban).forEach() {
+                    if (it.clearTime != null) {
+                        val difference = it.clearTime - DateTime.now().millis
+                        guild.kord.getUser(it.userId.toSnowflake())?.let { user ->
+                            val key = toKey(user, guild)
+                            banTracker[key] = GlobalScope.launch {
+                                delay(difference)
+                                guild.unban(user.id)
+                            }
                         }
+                        loggingService.initialiseBans(guild)
                     }
-                    loggingService.initialiseBans(guild)
                 }
             }
+        } catch (ex: Exception) {
+            println(ex.message)
         }
-
     }
 }

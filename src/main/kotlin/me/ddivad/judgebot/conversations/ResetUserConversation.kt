@@ -8,7 +8,6 @@ import dev.kord.x.emoji.Emojis
 import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.embeds.createHistoryEmbed
 import me.ddivad.judgebot.services.DatabaseService
-import me.jakejmattson.discordkt.api.dsl.PromptedReaction
 import me.jakejmattson.discordkt.api.dsl.conversation
 import me.jakejmattson.discordkt.api.extensions.toSnowflake
 import java.awt.Color
@@ -21,23 +20,26 @@ class ResetUserConversation(private val databaseService: DatabaseService, privat
         val linkedAccounts = user.getLinkedAccounts(guild)
         if (linkedAccounts.isNotEmpty()) {
             val linkedUsers = linkedAccounts.map { guild.kord.getUser(it.toSnowflake()) }
-            val resetLinked = promptReaction(
-                PromptedReaction(Emojis.whiteCheckMark, "", true),
-                PromptedReaction(Emojis.x, "", false)
-            ) {
-                title = "Reset linked accounts"
-                color = Color.MAGENTA.kColor
-                thumbnail {
-                    url = target.asUser().avatar.url
+            val resetLinked = promptButton<Boolean> {
+                embed {
+                    title = "Reset linked accounts"
+                    color = Color.MAGENTA.kColor
+                    thumbnail {
+                        url = target.asUser().avatar.url
+                    }
+                    description = """
+                        ${target.mention} has linked accounts ${linkedUsers.joinToString { "${it?.mention}" }}
+                        
+                        Reset linked accounts too? (${Emojis.whiteCheckMark.unicode} / ${Emojis.x.unicode})
+                          """.trimIndent()
+                    footer {
+                        icon = guild.getIconUrl(Image.Format.PNG) ?: ""
+                        text = guild.name
+                    }
                 }
-                description = """
-                    ${target.mention} has linked accounts ${linkedUsers.joinToString { "${it?.mention}" }}
-                    
-                    Reset linked accounts too? (${Emojis.whiteCheckMark.unicode} / ${Emojis.x.unicode})
-                      """.trimIndent()
-                footer {
-                    icon = guild.getIconUrl(Image.Format.PNG) ?: ""
-                    text = guild.name
+                buttons {
+                    button("Yes", Emojis.whiteCheckMark, true)
+                    button("No", Emojis.x, false)
                 }
             }
             if (resetLinked) {

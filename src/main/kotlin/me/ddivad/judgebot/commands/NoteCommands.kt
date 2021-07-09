@@ -10,7 +10,7 @@ import me.jakejmattson.discordkt.api.arguments.UserArg
 import me.jakejmattson.discordkt.api.dsl.commands
 
 @Suppress("unused")
-fun noteCommands(databaseService: DatabaseService) = commands("Notes") {
+fun noteCommands(databaseService: DatabaseService) = commands("Note") {
     guildCommand("note") {
         description = "Use this to add a note to a user."
         requiredPermissionLevel = PermissionLevel.Moderator

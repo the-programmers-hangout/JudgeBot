@@ -35,7 +35,7 @@
 | mute     | LowerMemberArg, Time, Reason | Mute a user for a specified time.                       |
 | unmute   | LowerMemberArg               | Unmute a user.                                          |
 
-## Notes
+## Note
 | Commands     | Arguments                        | Description                                       |
 | ------------ | -------------------------------- | ------------------------------------------------- |
 | cleanseNotes | LowerMemberArg                   | Use this to delete (permanently) as user's notes. |
@@ -43,7 +43,7 @@
 | editNote     | User, Note to edit, Note Content | Use this to edit a note.                          |
 | note         | User, Note Content               | Use this to add a note to a user.                 |
 
-## Rules
+## Rule
 | Commands    | Arguments | Description                                                                                       |
 | ----------- | --------- | ------------------------------------------------------------------------------------------------- |
 | addRule     |           | Add a rule to this guild.                                                                         |
@@ -69,7 +69,7 @@
 | whatpfp       | User                                      | Perform a reverse image search of a User's profile picture |
 
 ## Utility
-| Commands | Arguments | Description          |
-| -------- | --------- | -------------------- |
-| Help     | [Command] | Display a help menu. |
+| Commands | Arguments | Description               |
+| -------- | --------- | ------------------------- |
+| help     | [Command] | Display help information. |
 
