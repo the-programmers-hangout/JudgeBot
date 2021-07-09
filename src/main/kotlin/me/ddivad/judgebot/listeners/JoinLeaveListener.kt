@@ -25,7 +25,7 @@ fun onGuildMemberLeave(databaseService: DatabaseService) = listeners {
     on<MemberJoinEvent> {
         // Add delay before creating user in case they are banned immediately (raid, etc...)
         GlobalScope.launch {
-            delay(1000 * 60 * 1)
+            delay(1000 * 10 * 1)
             guild.getMemberOrNull(member.id)?.let {
                 databaseService.joinLeaves.createJoinLeaveRecord(guildId.asString, member)
             }
