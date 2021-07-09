@@ -18,7 +18,7 @@ import me.jakejmattson.discordkt.api.dsl.commands
 
 @Suppress("unused")
 fun ruleCommands(configuration: Configuration,
-                 databaseService: DatabaseService) = commands("Rules") {
+                 databaseService: DatabaseService) = commands("Rule") {
 
     guildCommand("addRule") {
         description = "Add a rule to this guild."

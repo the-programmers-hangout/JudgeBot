@@ -90,8 +90,12 @@ suspend fun main(args: Array<String>) {
                 MuteService::class,
                 BanService::class,
             )
-            muteService.initGuilds()
-            banService.initialiseBanTimers()
+            try {
+                muteService.initGuilds()
+                banService.initialiseBanTimers()
+            } catch (ex: Exception) {
+                println(ex.message)
+            }
         }
     }
 }

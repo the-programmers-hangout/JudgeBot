@@ -43,10 +43,14 @@ class MuteService(val configuration: Configuration,
     private fun toKey(user: User, guild: Guild) = user.id.asString to guild.id.asString
     suspend fun initGuilds() {
         configuration.guildConfigurations.forEach { config ->
-            val guild = config.value.id.toSnowflake().let { discord.kord.getGuild(it) } ?: return@forEach
             runBlocking {
-                initialiseMuteTimers(guild)
-                setupMutedRole(guild)
+                try {
+                    val guild = config.value.id.toSnowflake().let { discord.kord.getGuild(it) } ?: return@runBlocking
+                    initialiseMuteTimers(guild)
+                    setupMutedRole(guild)
+                } catch (ex: Exception) {
+                    println(ex.message)
+                }
             }
         }
     }
