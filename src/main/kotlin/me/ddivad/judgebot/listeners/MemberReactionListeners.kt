@@ -6,8 +6,8 @@ import dev.kord.core.event.message.ReactionAddEvent
 import dev.kord.x.emoji.Emojis
 import dev.kord.x.emoji.addReaction
 import me.ddivad.judgebot.dataclasses.Configuration
-import me.ddivad.judgebot.extensions.jumpLink
 import me.jakejmattson.discordkt.api.dsl.listeners
+import me.jakejmattson.discordkt.api.extensions.jumpLink
 import me.jakejmattson.discordkt.api.extensions.toSnowflake
 
 @Suppress("unused")
@@ -28,7 +28,7 @@ fun onMemberReactionAdd(configuration: Configuration) = listeners {
                                 "\n**User**: ${user.mention}" +
                                 "\n**Channel**: ${message.channel.mention}" +
                                 "\n**Author:** ${message.asMessage().author?.mention}" +
-                                "\n**Message:** ${message.asMessage().jumpLink(guild.id.asString)}"
+                                "\n**Message:** ${message.asMessage().jumpLink()}"
                     )
                     .addReaction(Emojis.question)
             }

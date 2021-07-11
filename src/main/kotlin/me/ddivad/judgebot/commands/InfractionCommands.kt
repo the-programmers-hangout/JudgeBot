@@ -1,5 +1,6 @@
 package me.ddivad.judgebot.commands
 
+import dev.kord.common.entity.Permission
 import me.ddivad.judgebot.arguments.LowerUserArg
 import dev.kord.common.exception.RequestException
 import dev.kord.x.emoji.Emojis
@@ -11,6 +12,7 @@ import me.ddivad.judgebot.dataclasses.Infraction
 import me.ddivad.judgebot.dataclasses.InfractionType
 import me.ddivad.judgebot.extensions.testDmStatus
 import me.ddivad.judgebot.services.*
+import me.ddivad.judgebot.extensions.*
 import me.ddivad.judgebot.services.infractions.BadPfpService
 import me.ddivad.judgebot.services.infractions.BadnameService
 import me.ddivad.judgebot.services.infractions.InfractionService
