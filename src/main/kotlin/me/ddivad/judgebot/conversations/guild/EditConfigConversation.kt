@@ -6,7 +6,7 @@ import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.embeds.createConfigEmbed
 import me.ddivad.judgebot.embeds.createConfigOptionsEmbed
 import me.jakejmattson.discordkt.api.arguments.*
-import me.jakejmattson.discordkt.api.dsl.conversation
+import me.jakejmattson.discordkt.api.conversations.conversation
 import me.jakejmattson.discordkt.api.extensions.toSnowflake
 
 class EditConfigConversation(private val configuration: Configuration) {

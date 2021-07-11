@@ -6,7 +6,7 @@ import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.embeds.createSelfHistoryEmbed
 import me.ddivad.judgebot.services.DatabaseService
 import me.jakejmattson.discordkt.api.arguments.IntegerRangeArg
-import me.jakejmattson.discordkt.api.dsl.conversation
+import me.jakejmattson.discordkt.api.conversations.conversation
 import java.awt.Color
 
 fun guildChoiceConversation(

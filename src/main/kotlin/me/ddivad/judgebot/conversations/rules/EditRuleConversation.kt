@@ -8,7 +8,7 @@ import me.jakejmattson.discordkt.api.arguments.BooleanArg
 import me.jakejmattson.discordkt.api.arguments.EveryArg
 import me.jakejmattson.discordkt.api.arguments.IntegerArg
 import me.jakejmattson.discordkt.api.arguments.UrlArg
-import me.jakejmattson.discordkt.api.dsl.conversation
+import me.jakejmattson.discordkt.api.conversations.conversation
 
 class EditRuleConversation(private val databaseService: DatabaseService) {
     fun createAddRuleConversation(guild: Guild) = conversation("cancel") {
