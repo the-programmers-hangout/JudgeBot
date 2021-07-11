@@ -8,7 +8,7 @@ import dev.kord.x.emoji.Emojis
 import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.embeds.createHistoryEmbed
 import me.ddivad.judgebot.services.DatabaseService
-import me.jakejmattson.discordkt.api.dsl.conversation
+import me.jakejmattson.discordkt.api.conversations.conversation
 import me.jakejmattson.discordkt.api.extensions.toSnowflake
 import java.awt.Color
 

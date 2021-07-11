@@ -7,7 +7,7 @@ import me.ddivad.judgebot.services.infractions.MuteService
 import me.jakejmattson.discordkt.api.arguments.ChannelArg
 import me.jakejmattson.discordkt.api.arguments.EveryArg
 import me.jakejmattson.discordkt.api.arguments.RoleArg
-import me.jakejmattson.discordkt.api.dsl.conversation
+import me.jakejmattson.discordkt.api.conversations.conversation
 
 class GuildSetupConversation(private val configuration: Configuration, private val muteService: MuteService) {
     fun createSetupConversation(guild: Guild) = conversation("cancel") {

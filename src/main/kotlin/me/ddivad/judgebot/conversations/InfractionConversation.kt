@@ -8,7 +8,7 @@ import me.ddivad.judgebot.embeds.createHistoryEmbed
 import me.ddivad.judgebot.embeds.createInfractionRuleEmbed
 import me.ddivad.judgebot.services.DatabaseService
 import me.ddivad.judgebot.services.infractions.InfractionService
-import me.jakejmattson.discordkt.api.dsl.conversation
+import me.jakejmattson.discordkt.api.conversations.conversation
 
 class InfractionConversation(
     private val databaseService: DatabaseService,
