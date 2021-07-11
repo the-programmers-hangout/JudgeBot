@@ -120,7 +120,7 @@ private suspend fun MenuBuilder.buildOverviewPage(
 
             addField(
                 "**__Most Recent Infraction__**",
-                "Type: **${lastInfraction.type} (${lastInfraction.points})**\n " +
+                "Type: **${lastInfraction.type} (${lastInfraction.points})** Rule: **${lastInfraction.ruleNumber ?: "None"}**\n " +
                         "Issued by **${guild.kord.getUser(Snowflake(lastInfraction.moderator))?.username}** " +
                         "on **${SimpleDateFormat("dd/MM/yyyy").format(Date(lastInfraction.dateTime))}**\n" +
                         "Punishment: **${lastInfraction.punishment?.punishment}** ${getDurationText(lastInfraction.punishment)}\n" +
@@ -163,6 +163,7 @@ private suspend fun MenuBuilder.buildInfractionPage(
                 "ID :: ${infraction.id} :: Staff :: __${moderator}__",
                 "Type: **${infraction.type} (${infraction.points})** :: " +
                         "Date: **${SimpleDateFormat("dd/MM/yyyy").format(Date(infraction.dateTime))}**\n " +
+                        "Rule: **${infraction.ruleNumber ?: "None"}**\n" +
                         "Punishment: **${infraction.punishment?.punishment}** ${getDurationText(infraction.punishment)}\n" +
                         infraction.reason
             )
@@ -175,6 +176,7 @@ private suspend fun MenuBuilder.buildInfractionPage(
                 "ID :: ${infraction.id} :: Staff :: __${moderator}__",
                 "Type: **${infraction.type} (${infraction.points})** :: " +
                         "Date: **${SimpleDateFormat("dd/MM/yyyy").format(Date(infraction.dateTime))}**\n " +
+                        "Rule: **${infraction.ruleNumber ?: "None"}**\n" +
                         "Punishment: **${infraction.punishment?.punishment}** ${getDurationText(infraction.punishment)}\n" +
                         infraction.reason
             )

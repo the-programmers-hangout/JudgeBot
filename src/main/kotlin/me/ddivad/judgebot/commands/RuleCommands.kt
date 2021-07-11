@@ -9,12 +9,12 @@ import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.embeds.createRuleEmbed
 import me.ddivad.judgebot.embeds.createRulesEmbed
 import me.ddivad.judgebot.embeds.createRulesEmbedDetailed
-import me.ddivad.judgebot.extensions.jumpLink
 import me.ddivad.judgebot.services.DatabaseService
 import me.ddivad.judgebot.services.PermissionLevel
 import me.ddivad.judgebot.services.requiredPermissionLevel
 import me.jakejmattson.discordkt.api.arguments.MessageArg
 import me.jakejmattson.discordkt.api.dsl.commands
+import me.jakejmattson.discordkt.api.extensions.jumpLink
 
 @Suppress("unused")
 fun ruleCommands(configuration: Configuration,
@@ -57,7 +57,7 @@ fun ruleCommands(configuration: Configuration,
             val messageToEdit = args.first
             if (messageToEdit != null) {
                 messageToEdit.edit { this.embed { createRulesEmbed(guild, databaseService.guilds.getRules(guild)) } }
-                respond("Existing embed updated: ${messageToEdit.jumpLink(guild.id.asString)}")
+                respond("Existing embed updated: ${messageToEdit.jumpLink()}")
             } else {
                 respond {
                     createRulesEmbed(guild, databaseService.guilds.getRules(guild))
@@ -73,7 +73,7 @@ fun ruleCommands(configuration: Configuration,
             val messageToEdit = args.first
             if (messageToEdit != null) {
                 messageToEdit.edit { this.embed { createRulesEmbedDetailed(guild, databaseService.guilds.getRules(guild)) } }
-                respond("Existing embed updated: ${messageToEdit.jumpLink(guild.id.asString)}")
+                respond("Existing embed updated: ${messageToEdit.jumpLink()}")
             } else {
                 respond {
                     createRulesEmbedDetailed(guild, databaseService.guilds.getRules(guild))
