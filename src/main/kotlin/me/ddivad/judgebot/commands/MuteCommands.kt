@@ -4,8 +4,8 @@ import dev.kord.common.exception.RequestException
 import dev.kord.x.emoji.Emojis
 import dev.kord.x.emoji.addReaction
 import me.ddivad.judgebot.arguments.LowerMemberArg
+import me.ddivad.judgebot.dataclasses.Permissions
 import me.ddivad.judgebot.extensions.testDmStatus
-import me.ddivad.judgebot.services.*
 import me.ddivad.judgebot.services.infractions.MuteService
 import me.ddivad.judgebot.services.infractions.RoleState
 import me.ddivad.judgebot.util.timeToString
@@ -18,7 +18,7 @@ import kotlin.math.roundToLong
 fun createMuteCommands(muteService: MuteService) = commands("Mute") {
     guildCommand("mute") {
         description = "Mute a user for a specified time."
-        requiredPermissionLevel = PermissionLevel.Moderator
+        requiredPermission = Permissions.MODERATOR
         execute(LowerMemberArg, TimeArg("Time"), EveryArg("Reason")) {
             val (targetMember, length, reason) = args
             try {
@@ -35,7 +35,7 @@ fun createMuteCommands(muteService: MuteService) = commands("Mute") {
 
     guildCommand("unmute") {
         description = "Unmute a user."
-        requiredPermissionLevel = PermissionLevel.Moderator
+        requiredPermission = Permissions.MODERATOR
         execute(LowerMemberArg) {
             val targetMember = args.first
             if (muteService.checkRoleState(guild, targetMember) == RoleState.None) {
@@ -50,7 +50,7 @@ fun createMuteCommands(muteService: MuteService) = commands("Mute") {
 
     guildCommand("gag") {
         description = "Mute a user for 5 minutes while you deal with something"
-        requiredPermissionLevel = PermissionLevel.Moderator
+        requiredPermission = Permissions.MODERATOR
         execute(LowerMemberArg) {
             val targetMember = args.first
             if (muteService.checkRoleState(guild, targetMember) == RoleState.Tracked) {

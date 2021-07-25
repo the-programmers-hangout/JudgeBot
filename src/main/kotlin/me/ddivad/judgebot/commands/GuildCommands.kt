@@ -4,11 +4,10 @@ import me.ddivad.judgebot.arguments.GuildConfigArg
 import me.ddivad.judgebot.conversations.guild.GuildSetupConversation
 import me.ddivad.judgebot.conversations.guild.EditConfigConversation
 import me.ddivad.judgebot.dataclasses.Configuration
+import me.ddivad.judgebot.dataclasses.Permissions
 import me.ddivad.judgebot.embeds.createActivePunishmentsEmbed
 import me.ddivad.judgebot.services.DatabaseService
 import me.ddivad.judgebot.services.infractions.MuteService
-import me.ddivad.judgebot.services.PermissionLevel
-import me.ddivad.judgebot.services.requiredPermissionLevel
 import me.jakejmattson.discordkt.api.dsl.commands
 
 fun guildConfigCommands(configuration: Configuration,
@@ -16,7 +15,7 @@ fun guildConfigCommands(configuration: Configuration,
                         muteService: MuteService) = commands("Guild") {
     guildCommand("setup") {
         description = "Configure a guild to use Judgebot."
-        requiredPermissionLevel = PermissionLevel.Administrator
+        requiredPermission = Permissions.ADMINISTRATOR
         execute {
             if (configuration.hasGuildConfig(guild.id.value)) {
                 respond("Guild configuration exists. To modify it use the commands to set values.")
@@ -32,7 +31,7 @@ fun guildConfigCommands(configuration: Configuration,
 
     guildCommand("configuration") {
         description = "Update configuration parameters for this guild (conversation)."
-        requiredPermissionLevel = PermissionLevel.Staff
+        requiredPermission = Permissions.STAFF
         execute(GuildConfigArg.optional("options")) {
             if (!configuration.hasGuildConfig(guild.id.value)) {
                 respond("Please run the **setup** command to set this initially.")
@@ -46,7 +45,7 @@ fun guildConfigCommands(configuration: Configuration,
 
     guildCommand("activePunishments") {
         description = "View active punishments for a guild."
-        requiredPermissionLevel = PermissionLevel.Staff
+        requiredPermission = Permissions.STAFF
         execute {
             val punishments = databaseService.guilds.getActivePunishments(guild)
             if (punishments.isEmpty()) {

@@ -5,24 +5,19 @@ import dev.kord.x.emoji.Emojis
 import dev.kord.x.emoji.addReaction
 import kotlinx.coroutines.flow.toList
 import me.ddivad.judgebot.arguments.LowerUserArg
-import me.ddivad.judgebot.conversations.InfractionConversation
 import me.ddivad.judgebot.conversations.ResetUserConversation
 import me.ddivad.judgebot.conversations.guildChoiceConversation
 import me.ddivad.judgebot.dataclasses.*
 import me.ddivad.judgebot.embeds.createHistoryEmbed
-import me.ddivad.judgebot.embeds.createCondensedHistoryEmbed
 import me.ddivad.judgebot.embeds.createLinkedAccountMenu
 import me.ddivad.judgebot.embeds.createSelfHistoryEmbed
 import me.ddivad.judgebot.services.DatabaseService
 import me.ddivad.judgebot.services.LoggingService
-import me.ddivad.judgebot.services.PermissionLevel
 import me.ddivad.judgebot.services.infractions.BanService
-import me.ddivad.judgebot.services.requiredPermissionLevel
 import me.jakejmattson.discordkt.api.arguments.*
 import me.jakejmattson.discordkt.api.dsl.commands
 import me.jakejmattson.discordkt.api.extensions.mutualGuilds
 import me.jakejmattson.discordkt.api.extensions.sendPrivateMessage
-import me.jakejmattson.discordkt.api.extensions.toSnowflake
 import java.awt.Color
 
 @Suppress("unused")
@@ -34,7 +29,7 @@ fun createUserCommands(
 ) = commands("User") {
     guildCommand("history", "h", "H") {
         description = "Use this to view a user's record."
-        requiredPermissionLevel = PermissionLevel.Moderator
+        requiredPermission = Permissions.MODERATOR
         execute(UserArg) {
             val user = databaseService.users.getOrCreateUser(args.first, guild)
             databaseService.users.incrementUserHistory(user, guild)
@@ -47,7 +42,7 @@ fun createUserCommands(
 
     guildCommand("alts") {
         description = "Use this to view a user's alt accounts."
-        requiredPermissionLevel = PermissionLevel.Moderator
+        requiredPermission = Permissions.MODERATOR
         execute(UserArg) {
             val target = args.first
             val user = databaseService.users.getOrCreateUser(args.first, guild)
@@ -67,7 +62,7 @@ fun createUserCommands(
 
     guildCommand("whatpfp") {
         description = "Perform a reverse image search of a User's profile picture"
-        requiredPermissionLevel = PermissionLevel.Moderator
+        requiredPermission = Permissions.MODERATOR
         execute(UserArg) {
             val user = args.first
             val reverseSearchUrl = "<https://www.google.com/searchbyimage?&image_url=${user.avatar.url}>"
@@ -82,7 +77,7 @@ fun createUserCommands(
 
     guildCommand("ban") {
         description = "Ban a member from this guild."
-        requiredPermissionLevel = PermissionLevel.Staff
+        requiredPermission = Permissions.STAFF
         execute(LowerUserArg, IntegerArg("Delete message days").optional(0), EveryArg) {
             val (target, deleteDays, reason) = args
             val ban = Punishment(target.id.asString, InfractionType.Ban, reason, author.id.asString)
@@ -95,7 +90,7 @@ fun createUserCommands(
 
     guildCommand("unban") {
         description = "Unban a banned member from this guild."
-        requiredPermissionLevel = PermissionLevel.Staff
+        requiredPermission = Permissions.STAFF
         execute(UserArg) {
             val user = args.first
             guild.getBanOrNull(user.id)?.let {
@@ -109,7 +104,7 @@ fun createUserCommands(
 
     guildCommand("setBanReason") {
         description = "Set a ban reason for a banned user"
-        requiredPermissionLevel = PermissionLevel.Staff
+        requiredPermission = Permissions.STAFF
         execute(UserArg, EveryArg("Reason")) {
             val (user, reason) = args
             val ban = Ban(user.id.asString, author.id.asString, reason)
@@ -127,7 +122,7 @@ fun createUserCommands(
 
     guildCommand("getBanReason") {
         description = "Get a ban reason for a banned user"
-        requiredPermissionLevel = PermissionLevel.Staff
+        requiredPermission = Permissions.STAFF
         execute(UserArg) {
             val user = args.first
             guild.getBanOrNull(user.id)?.let {
@@ -141,7 +136,7 @@ fun createUserCommands(
 
     command("selfHistory") {
         description = "View your infraction history (contents will be DM'd)"
-        requiredPermissionLevel = PermissionLevel.Everyone
+        requiredPermission = Permissions.NONE
         execute {
             val user = author
             val mutualGuilds = author.mutualGuilds.toList().filter { config[it.id.value] != null }
@@ -162,7 +157,7 @@ fun createUserCommands(
 
     guildCommand("link") {
         description = "Link a user's alt account with their main"
-        requiredPermissionLevel = PermissionLevel.Staff
+        requiredPermission = Permissions.STAFF
         execute(UserArg("Main Account"), UserArg("Alt Account")) {
             val (main, alt) = args
             val mainRecord = databaseService.users.getOrCreateUser(main, guild)
@@ -175,7 +170,7 @@ fun createUserCommands(
 
     guildCommand("unlink") {
         description = "Link a user's alt account with their main"
-        requiredPermissionLevel = PermissionLevel.Staff
+        requiredPermission = Permissions.STAFF
         execute(UserArg("Main Account"), UserArg("Alt Account")) {
             val (main, alt) = args
             val mainRecord = databaseService.users.getOrCreateUser(main, guild)
@@ -188,7 +183,7 @@ fun createUserCommands(
 
     guildCommand("reset") {
         description = "Reset a user's record, and any linked accounts"
-        requiredPermissionLevel = PermissionLevel.Administrator
+        requiredPermission = Permissions.STAFF
         execute(LowerUserArg) {
             val target = args.first
             ResetUserConversation(databaseService, config)

@@ -6,6 +6,7 @@ import dev.kord.gateway.Intent
 import dev.kord.gateway.Intents
 import dev.kord.gateway.PrivilegedIntent
 import me.ddivad.judgebot.dataclasses.Configuration
+import me.ddivad.judgebot.dataclasses.Permissions
 import me.ddivad.judgebot.services.*
 import me.ddivad.judgebot.services.infractions.BanService
 import me.ddivad.judgebot.services.infractions.MuteService
@@ -31,6 +32,7 @@ suspend fun main(args: Array<String>) {
             commandReaction = null
             theme = Color.MAGENTA
             entitySupplyStrategy = EntitySupplyStrategy.cacheWithCachingRestFallback
+            permissions(Permissions.NONE)
         }
 
         mentionEmbed {
@@ -71,15 +73,6 @@ suspend fun main(args: Array<String>) {
                 name = "Source"
                 value = "[Github](https://github.com/the-programmers-hangout/judgebot)"
             }
-        }
-
-        permissions {
-            val permissionsService = discord.getInjectionObjects(PermissionsService::class)
-            val permission = command.requiredPermissionLevel
-            if (guild != null)
-                permissionsService.hasClearance(guild!!, user, permission)
-            else
-                return@permissions command.requiredPermissionLevel == PermissionLevel.Everyone
         }
 
         onStart {
