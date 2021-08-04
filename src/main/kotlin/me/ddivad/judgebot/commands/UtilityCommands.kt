@@ -1,5 +1,6 @@
 package me.ddivad.judgebot.commands
 
+import me.ddivad.judgebot.dataclasses.Permissions
 import me.ddivad.judgebot.services.HelpService
 import me.jakejmattson.discordkt.api.arguments.AnyArg
 import me.jakejmattson.discordkt.api.arguments.CommandArg
@@ -9,6 +10,7 @@ import me.jakejmattson.discordkt.api.dsl.commands
 fun createInformationCommands(helpService: HelpService) = commands("Utility") {
     command("help") {
         description = "Display help information."
+        requiredPermission = Permissions.NONE
         execute(AnyArg("Command").optional("")) {
             val input = args.first
             if (input == "") {

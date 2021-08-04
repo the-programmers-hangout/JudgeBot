@@ -1,9 +1,8 @@
 package me.ddivad.judgebot.commands
 
 import me.ddivad.judgebot.arguments.LowerMemberArg
+import me.ddivad.judgebot.dataclasses.Permissions
 import me.ddivad.judgebot.services.DatabaseService
-import me.ddivad.judgebot.services.PermissionLevel
-import me.ddivad.judgebot.services.requiredPermissionLevel
 import me.jakejmattson.discordkt.api.arguments.EveryArg
 import me.jakejmattson.discordkt.api.arguments.IntegerArg
 import me.jakejmattson.discordkt.api.arguments.UserArg
@@ -13,7 +12,7 @@ import me.jakejmattson.discordkt.api.dsl.commands
 fun noteCommands(databaseService: DatabaseService) = commands("Note") {
     guildCommand("note") {
         description = "Use this to add a note to a user."
-        requiredPermissionLevel = PermissionLevel.Moderator
+        requiredPermission = Permissions.MODERATOR
         execute(UserArg, EveryArg("Note Content")) {
             val (target, note) = args
             val user = databaseService.users.getOrCreateUser(target, guild)
@@ -24,7 +23,7 @@ fun noteCommands(databaseService: DatabaseService) = commands("Note") {
 
     guildCommand("editNote") {
         description = "Use this to edit a note."
-        requiredPermissionLevel = PermissionLevel.Moderator
+        requiredPermission = Permissions.MODERATOR
         execute(UserArg, IntegerArg("Note to edit"), EveryArg("Note Content")) {
             val (target, noteId, note) = args
             val user = databaseService.users.getOrCreateUser(target, guild)
@@ -39,7 +38,7 @@ fun noteCommands(databaseService: DatabaseService) = commands("Note") {
 
     guildCommand("deleteNote") {
         description = "Use this to add a delete a note from a user."
-        requiredPermissionLevel = PermissionLevel.Staff
+        requiredPermission = Permissions.STAFF
         execute(LowerMemberArg, IntegerArg("Note ID")) {
             val (target, noteId) = args
             val user = databaseService.users.getOrCreateUser(target, guild)
@@ -54,7 +53,7 @@ fun noteCommands(databaseService: DatabaseService) = commands("Note") {
 
     guildCommand("cleanseNotes") {
         description = "Use this to delete (permanently) as user's notes."
-        requiredPermissionLevel = PermissionLevel.Administrator
+        requiredPermission = Permissions.ADMINISTRATOR
         execute(LowerMemberArg) {
             val target = args.first
             val user = databaseService.users.getOrCreateUser(target, guild)
