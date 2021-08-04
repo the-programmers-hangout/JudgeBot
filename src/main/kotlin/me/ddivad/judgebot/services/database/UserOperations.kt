@@ -86,8 +86,8 @@ class UserOperations(
     }
 
     suspend fun addInfraction(guild: Guild, user: GuildMember, infraction: Infraction): Infraction {
-        user.addInfraction(infraction, guild)
         infraction.punishment = getPunishmentForPoints(guild, user)
+        user.addInfraction(infraction, guild)
         this.updateUser(user)
         return infraction
     }

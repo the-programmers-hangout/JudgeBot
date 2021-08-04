@@ -33,6 +33,13 @@ suspend fun main(args: Array<String>) {
             theme = Color.MAGENTA
             entitySupplyStrategy = EntitySupplyStrategy.cacheWithCachingRestFallback
             permissions(Permissions.NONE)
+            intents = Intents(
+                Intent.GuildMembers,
+                Intent.DirectMessages,
+                Intent.GuildBans,
+                Intent.Guilds,
+                Intent.GuildMessageReactions
+            )
         }
 
         mentionEmbed {

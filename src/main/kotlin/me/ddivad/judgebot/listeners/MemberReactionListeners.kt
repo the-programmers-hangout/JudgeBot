@@ -12,27 +12,26 @@ import me.jakejmattson.discordkt.api.extensions.toSnowflake
 
 @Suppress("unused")
 fun onMemberReactionAdd(configuration: Configuration) = listeners {
-//    on<ReactionAddEvent> {
-//        println(emoji.name + " added")
-//        val guild = guild?.asGuildOrNull() ?: return@on
-//        val guildConfiguration = configuration[guild.asGuild().id.value]
-//        if (!guildConfiguration?.reactions!!.enabled) return@on
-//
-//        when (this.emoji.name) {
-//            guildConfiguration.reactions.flagMessageReaction -> {
-//                message.deleteReaction(this.emoji)
-//                guild.asGuild()
-//                    .getChannelOf<TextChannel>(guildConfiguration.loggingConfiguration.alertChannel.toSnowflake())
-//                    .asChannel()
-//                    .createMessage(
-//                        "**Message Flagged**" +
-//                                "\n**User**: ${user.mention}" +
-//                                "\n**Channel**: ${message.channel.mention}" +
-//                                "\n**Author:** ${message.asMessage().author?.mention}" +
-//                                "\n**Message:** ${message.asMessage().jumpLink()}"
-//                    )
-//                    .addReaction(Emojis.question)
-//            }
-//        }
-//    }
+    on<ReactionAddEvent> {
+        val guild = guild?.asGuildOrNull() ?: return@on
+        val guildConfiguration = configuration[guild.asGuild().id.value]
+        if (!guildConfiguration?.reactions!!.enabled) return@on
+
+        when (this.emoji.name) {
+            guildConfiguration.reactions.flagMessageReaction -> {
+                message.deleteReaction(this.emoji)
+                guild.asGuild()
+                    .getChannelOf<TextChannel>(guildConfiguration.loggingConfiguration.alertChannel.toSnowflake())
+                    .asChannel()
+                    .createMessage(
+                        "**Message Flagged**" +
+                                "\n**User**: ${user.mention}" +
+                                "\n**Channel**: ${message.channel.mention}" +
+                                "\n**Author:** ${message.asMessage().author?.mention}" +
+                                "\n**Message:** ${message.asMessage().jumpLink()}"
+                    )
+                    .addReaction(Emojis.question)
+            }
+        }
+    }
 }

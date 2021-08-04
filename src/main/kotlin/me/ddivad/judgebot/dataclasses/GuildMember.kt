@@ -99,6 +99,7 @@ data class GuildMember(
         infraction.id = nextId
         this.infractions.add(infraction)
         this.points += infraction.points
+        this.pointDecayTimer = DateTime().millis.plus(infraction.punishment?.duration ?: 0)
         this.lastInfraction = DateTime().millis
     }
 
@@ -112,7 +113,7 @@ data class GuildMember(
     }
 
     fun checkPointDecay(guild: Guild, configuration: GuildConfiguration) = with(this.getGuildInfo(guild.id.asString)) {
-        val weeksSincePointsDecayed = Weeks.weeksBetween(DateTime(this.pointDecayTimer), DateTime()).weeks
+        val weeksSincePointsDecayed = Weeks.weeksBetween(DateTime(this.pointDecayTimer), DateTime().plusWeeks(6)).weeks
         if (weeksSincePointsDecayed > 0) {
             val pointsToRemove = configuration.infractionConfiguration.pointDecayPerWeek * weeksSincePointsDecayed
             this.points -= pointsToRemove

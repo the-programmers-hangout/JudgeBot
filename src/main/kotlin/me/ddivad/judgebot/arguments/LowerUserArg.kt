@@ -20,7 +20,7 @@ open class LowerUserArg(override val name: String = "LowerUserArg") : ArgumentTy
         val author = event.author.asMember(event.guild!!.id)
 
         return when {
-            event.discord.permissions.isHigherLevel(event.discord, author, member) ->
+            event.discord.permissions.isHigherLevel(event.discord, member, author) ->
                 Error("You don't have the permission to use this command on the target user.")
             else -> Success(member.asUser())
         }
