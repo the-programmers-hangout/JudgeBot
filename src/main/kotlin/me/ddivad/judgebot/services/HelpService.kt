@@ -45,7 +45,7 @@ class HelpService(private val discord: Discord) {
                     description = """
                         You have **${commands.size}** commands available based on permissions.
 
-                        Use `${event.prefix()}help` <command> for more information
+                        Use `${event.prefix()}help <command>` for more information
                     """.trimIndent()
                     color = event.discord.configuration.theme?.kColor
 
@@ -53,6 +53,11 @@ class HelpService(private val discord: Discord) {
                         name = "**Commands**"
                         value = "```css\n${joinNames(sorted)}\n```"
                         inline = true
+                    }
+
+                    field {
+                        name = "Don't see what you're looking for?"
+                        value = "Try `search <commmand>`. If the command exists in a bot, it will react with ${Emojis.whiteCheckMark}"
                     }
                 }
             }
