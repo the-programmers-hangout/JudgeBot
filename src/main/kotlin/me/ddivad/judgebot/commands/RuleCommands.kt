@@ -6,12 +6,11 @@ import me.ddivad.judgebot.conversations.rules.AddRuleConversation
 import me.ddivad.judgebot.conversations.rules.ArchiveRuleConversation
 import me.ddivad.judgebot.conversations.rules.EditRuleConversation
 import me.ddivad.judgebot.dataclasses.Configuration
+import me.ddivad.judgebot.dataclasses.Permissions
 import me.ddivad.judgebot.embeds.createRuleEmbed
 import me.ddivad.judgebot.embeds.createRulesEmbed
 import me.ddivad.judgebot.embeds.createRulesEmbedDetailed
 import me.ddivad.judgebot.services.DatabaseService
-import me.ddivad.judgebot.services.PermissionLevel
-import me.ddivad.judgebot.services.requiredPermissionLevel
 import me.jakejmattson.discordkt.api.arguments.MessageArg
 import me.jakejmattson.discordkt.api.dsl.commands
 import me.jakejmattson.discordkt.api.extensions.jumpLink
@@ -22,7 +21,7 @@ fun ruleCommands(configuration: Configuration,
 
     guildCommand("addRule") {
         description = "Add a rule to this guild."
-        requiredPermissionLevel = PermissionLevel.Administrator
+        requiredPermission = Permissions.ADMINISTRATOR
         execute {
             AddRuleConversation(databaseService)
                     .createAddRuleConversation(guild)
@@ -32,7 +31,7 @@ fun ruleCommands(configuration: Configuration,
 
     guildCommand("editRule") {
         description = "Edit a rule in this guild."
-        requiredPermissionLevel = PermissionLevel.Administrator
+        requiredPermission = Permissions.ADMINISTRATOR
         execute {
             EditRuleConversation(databaseService)
                     .createAddRuleConversation(guild)
@@ -42,7 +41,7 @@ fun ruleCommands(configuration: Configuration,
 
     guildCommand("archiveRule") {
         description = "Archive a rule in this guild."
-        requiredPermissionLevel = PermissionLevel.Administrator
+        requiredPermission = Permissions.ADMINISTRATOR
         execute {
             ArchiveRuleConversation(databaseService)
                     .createArchiveRuleConversation(guild)
@@ -52,7 +51,7 @@ fun ruleCommands(configuration: Configuration,
 
     guildCommand("rules") {
         description = "List the rules of this guild. Pass a message ID to edit existing rules embed."
-        requiredPermissionLevel = PermissionLevel.Everyone
+        requiredPermission = Permissions.NONE
         execute(MessageArg.optionalNullable(null)) {
             val messageToEdit = args.first
             if (messageToEdit != null) {
@@ -68,7 +67,7 @@ fun ruleCommands(configuration: Configuration,
 
     guildCommand("longRules") {
         description = "List the rules (with descriptions) of this guild. Pass a message ID to edit existing rules embed."
-        requiredPermissionLevel = PermissionLevel.Staff
+        requiredPermission = Permissions.STAFF
         execute(MessageArg.optionalNullable(null)) {
             val messageToEdit = args.first
             if (messageToEdit != null) {
@@ -84,7 +83,7 @@ fun ruleCommands(configuration: Configuration,
 
     guildCommand("rule") {
         description = "List a rule from this guild."
-        requiredPermissionLevel = PermissionLevel.Everyone
+        requiredPermission = Permissions.NONE
         execute(RuleArg) {
             val rule = databaseService.guilds.getRule(guild, args.first.number)!!
             respond {

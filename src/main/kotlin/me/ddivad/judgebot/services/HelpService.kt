@@ -7,6 +7,7 @@ import dev.kord.core.entity.User
 import dev.kord.x.emoji.DiscordEmoji
 import dev.kord.x.emoji.Emojis
 import kotlinx.coroutines.runBlocking
+import me.jakejmattson.discordkt.api.Discord
 import me.jakejmattson.discordkt.api.annotations.Service
 import me.jakejmattson.discordkt.api.arguments.ArgumentType
 import me.jakejmattson.discordkt.api.arguments.OptionalArg
@@ -15,23 +16,20 @@ import me.jakejmattson.discordkt.api.dsl.CommandEvent
 import me.jakejmattson.discordkt.api.dsl.Execution
 
 @Service
-class HelpService(private val permissionsService: PermissionsService) {
-    private suspend fun Command.isVisible(guild: Guild, user: User) =
-        permissionsService.isCommandVisible(guild, user, this)
-
+class HelpService(private val discord: Discord) {
     suspend fun buildHelpEmbed(event: CommandEvent<*>) = event.respondMenu {
         val container = event.discord.commands
         fun joinNames(value: List<Command>) =
             value.joinToString("\n") { it.names.first() }
 
         val groupedCommands = container
-            .filter { it.isVisible(event.guild!!, event.author) }
+            .filter { it.hasPermissionToRun(event) }
             .groupBy { it.category }
             .toList()
             .sortedByDescending { it.second.size }
 
         val categoryNames = container
-            .filter { it.isVisible(event.guild!!, event.author) }
+            .filter { it.hasPermissionToRun(event) }
             .groupBy { it.category }
             .toList()
             .sortedByDescending { it.second.size }
@@ -47,7 +45,7 @@ class HelpService(private val permissionsService: PermissionsService) {
                     description = """
                         You have **${commands.size}** commands available based on permissions.
 
-                        Use `${event.prefix()}help` <command> for more information
+                        Use `${event.prefix()}help <command>` for more information
                     """.trimIndent()
                     color = event.discord.configuration.theme?.kColor
 
@@ -55,6 +53,11 @@ class HelpService(private val permissionsService: PermissionsService) {
                         name = "**Commands**"
                         value = "```css\n${joinNames(sorted)}\n```"
                         inline = true
+                    }
+
+                    field {
+                        name = "Don't see what you're looking for?"
+                        value = "Try `search <commmand>`. If the command exists in a bot, it will react with ${Emojis.whiteCheckMark}"
                     }
                 }
             }

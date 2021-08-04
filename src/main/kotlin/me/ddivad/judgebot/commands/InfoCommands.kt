@@ -5,16 +5,12 @@ import dev.kord.x.emoji.Emojis
 import dev.kord.x.emoji.addReaction
 import me.ddivad.judgebot.arguments.LowerMemberArg
 import me.ddivad.judgebot.dataclasses.Info
+import me.ddivad.judgebot.dataclasses.Permissions
 import me.ddivad.judgebot.embeds.createInformationEmbed
 import me.ddivad.judgebot.extensions.testDmStatus
 import me.ddivad.judgebot.services.DatabaseService
-import me.ddivad.judgebot.services.HelpService
-import me.ddivad.judgebot.services.PermissionLevel
-import me.ddivad.judgebot.services.requiredPermissionLevel
-import me.jakejmattson.discordkt.api.arguments.CommandArg
 import me.jakejmattson.discordkt.api.arguments.EveryArg
 import me.jakejmattson.discordkt.api.arguments.IntegerArg
-import me.jakejmattson.discordkt.api.arguments.UnicodeEmojiArg
 import me.jakejmattson.discordkt.api.dsl.commands
 import me.jakejmattson.discordkt.api.extensions.sendPrivateMessage
 
@@ -22,7 +18,7 @@ import me.jakejmattson.discordkt.api.extensions.sendPrivateMessage
 fun createInformationCommands(databaseService: DatabaseService) = commands("Information") {
     guildCommand("info") {
         description = "Send an information message to a guild member"
-        requiredPermissionLevel = PermissionLevel.Moderator
+        requiredPermission = Permissions.MODERATOR
         execute(LowerMemberArg, EveryArg("Info Content")) {
             val (target, content) = args
             try {
@@ -45,7 +41,7 @@ fun createInformationCommands(databaseService: DatabaseService) = commands("Info
 
     guildCommand("removeInfo") {
         description = "Remove an information message from a member record."
-        requiredPermissionLevel = PermissionLevel.Staff
+        requiredPermission = Permissions.STAFF
         execute(LowerMemberArg, IntegerArg("Info ID")) {
             val (target, id) = args
             val user = databaseService.users.getOrCreateUser(target, guild)

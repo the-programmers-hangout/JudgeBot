@@ -4,14 +4,12 @@ import dev.kord.common.exception.RequestException
 import dev.kord.core.event.message.ReactionAddEvent
 import dev.kord.x.emoji.Emojis
 import dev.kord.x.emoji.addReaction
-import me.ddivad.judgebot.arguments.isHigherRankedThan
 import me.ddivad.judgebot.dataclasses.Configuration
+import me.ddivad.judgebot.dataclasses.Permissions
 import me.ddivad.judgebot.embeds.createMessageDeleteEmbed
 import me.ddivad.judgebot.embeds.createCondensedHistoryEmbed
 import me.ddivad.judgebot.services.DatabaseService
 import me.ddivad.judgebot.services.LoggingService
-import me.ddivad.judgebot.services.PermissionLevel
-import me.ddivad.judgebot.services.PermissionsService
 import me.ddivad.judgebot.services.infractions.MuteService
 import me.ddivad.judgebot.services.infractions.RoleState
 import me.jakejmattson.discordkt.api.dsl.listeners
@@ -22,7 +20,6 @@ import me.jakejmattson.discordkt.api.extensions.sendPrivateMessage
 fun onStaffReactionAdd(
     muteService: MuteService,
     databaseService: DatabaseService,
-    permissionsService: PermissionsService,
     loggingService: LoggingService,
     configuration: Configuration
 ) = listeners {
@@ -31,13 +28,10 @@ fun onStaffReactionAdd(
         val guildConfiguration = configuration[guild.asGuild().id.value]
         if (!guildConfiguration?.reactions!!.enabled) return@on
         val staffMember = user.asMemberOrNull(guild.id) ?: return@on
-        val messageAuthor = message.asMessage().author?.asMemberOrNull(guild.id) ?: return@on
         val msg = message.asMessage()
-
-        if (permissionsService.hasPermission(staffMember, PermissionLevel.Moderator) && !staffMember.isHigherRankedThan(
-                permissionsService,
-                messageAuthor
-            )
+        val messageAuthor = msg.author?.asMemberOrNull(guild.id) ?: return@on
+        if (discord.permissions.hasPermission(discord, staffMember, Permissions.MODERATOR)
+            && discord.permissions.isHigherLevel(discord, staffMember, messageAuthor)
         ) {
             when (this.emoji.name) {
                 guildConfiguration.reactions.gagReaction -> {
