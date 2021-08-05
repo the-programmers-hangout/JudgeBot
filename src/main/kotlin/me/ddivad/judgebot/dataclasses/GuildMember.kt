@@ -99,12 +99,15 @@ data class GuildMember(
         infraction.id = nextId
         this.infractions.add(infraction)
         this.points += infraction.points
-        this.pointDecayTimer = DateTime().millis.plus(infraction.punishment?.duration ?: 0)
         this.lastInfraction = DateTime().millis
     }
 
     fun incrementHistoryCount(guildId: String) {
         this.getGuildInfo(guildId).historyCount += 1
+    }
+
+    fun updatePointDecayDate(guild: Guild, punishmentDuration: Long) = with(this.getGuildInfo(guild.id.asString)) {
+        this.pointDecayTimer = DateTime().millis.plus(punishmentDuration)
     }
 
     fun addMessageDeleted(guild: Guild, deleteReaction: Boolean) = with(this.getGuildInfo(guild.id.asString)) {
