@@ -107,6 +107,10 @@ data class GuildMember(
         this.getGuildInfo(guildId).historyCount += 1
     }
 
+    fun updatePointDecayDate(guild: Guild, punishmentDuration: Long) = with(this.getGuildInfo(guild.id.asString)) {
+        this.pointDecayTimer = DateTime().millis.plus(punishmentDuration)
+    }
+
     fun addMessageDeleted(guild: Guild, deleteReaction: Boolean) = with(this.getGuildInfo(guild.id.asString)) {
         this.deletedMessageCount.total++
         if (deleteReaction) this.deletedMessageCount.deleteReaction++
