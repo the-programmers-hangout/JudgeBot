@@ -1,7 +1,9 @@
 package me.ddivad.judgebot.listeners
 
+import dev.kord.common.entity.ChannelType
 import dev.kord.core.behavior.getChannelOf
 import dev.kord.core.entity.channel.TextChannel
+import dev.kord.core.entity.channel.thread.ThreadChannel
 import dev.kord.core.event.message.ReactionAddEvent
 import dev.kord.x.emoji.Emojis
 import dev.kord.x.emoji.addReaction
@@ -26,7 +28,7 @@ fun onMemberReactionAdd(configuration: Configuration) = listeners {
                     .createMessage(
                         "**Message Flagged**" +
                                 "\n**User**: ${user.mention}" +
-                                "\n**Channel**: ${message.channel.mention}" +
+                                (if(message.getChannel().type == ChannelType.PublicGuildThread) "\n**Thread**: " else "\n**Channel**: ") + message.channel.mention +
                                 "\n**Author:** ${message.asMessage().author?.mention}" +
                                 "\n**Message:** ${message.asMessage().jumpLink()}"
                     )

@@ -14,17 +14,17 @@ class EditConfigConversation(private val configuration: Configuration) {
         val guildConfiguration = configuration[guild.id.value]!!
         when (parameter) {
             "addadminrole" -> {
-                val role = promptMessage(RoleArg, "Enter Admin role:")
+                val role = prompt(RoleArg, "Enter Admin role:")
                 guildConfiguration.adminRoles.add(role.id.asString)
                 respond("Added **${role.name}** to Admin roles.")
             }
             "addstaffrole" -> {
-                val role = promptMessage(RoleArg, "Enter Staff role:")
+                val role = prompt(RoleArg, "Enter Staff role:")
                 guildConfiguration.staffRoles.add(role.id.asString)
                 respond("Added **${role.name}** to Staff roles.")
             }
             "addmoderatorrole" -> {
-                val role = promptMessage(RoleArg, "Enter Moderator role:")
+                val role = prompt(RoleArg, "Enter Moderator role:")
                 guildConfiguration.moderatorRoles.add(role.id.asString)
                 respond("Added **${role.name}** to moderator roles.")
             }
@@ -59,47 +59,47 @@ class EditConfigConversation(private val configuration: Configuration) {
                 respond("Removed **${role.name}** from Moderator roles.")
             }
             "setmutedrole" -> {
-                val mutedRole = promptMessage(RoleArg, "Enter Mute role:")
+                val mutedRole = prompt(RoleArg, "Enter Mute role:")
                 guildConfiguration.mutedRole = mutedRole.id.asString
                 respond("Muted role set to **${mutedRole.name}**.")
             }
             "setlogchannel" -> {
-                val logChannel = promptMessage(ChannelArg<TextChannel>(), "Enter Logging channel:")
+                val logChannel = prompt(ChannelArg<TextChannel>(), "Enter Logging channel:")
                 guildConfiguration.loggingConfiguration.loggingChannel = logChannel.id.asString
                 respond("Log channel set to ${logChannel.mention}")
             }
             "setalertchannel" -> {
-                val alertChannel = promptMessage(ChannelArg<TextChannel>(), "Enter Logging channel:")
+                val alertChannel = prompt(ChannelArg<TextChannel>(), "Enter Logging channel:")
                 guildConfiguration.loggingConfiguration.alertChannel = alertChannel.id.asString
                 respond("Alert channel set to ${alertChannel.mention}")
             }
             "setprefix" -> {
-                val prefix = promptMessage(EveryArg, "Enter Prefix:")
+                val prefix = prompt(EveryArg, "Enter Prefix:")
                 guildConfiguration.prefix = prefix
                 respond("Prefix set to **${prefix}**")
             }
             "setgagreaction" -> {
-                val reaction = promptMessage(UnicodeEmojiArg, "Enter Reaction:")
+                val reaction = prompt(UnicodeEmojiArg, "Enter Reaction:")
                 guildConfiguration.reactions.gagReaction = reaction.unicode
                 respond("Reaction set to ${reaction.unicode}")
             }
             "sethistoryreaction" -> {
-                val reaction = promptMessage(UnicodeEmojiArg, "Enter Reaction:")
+                val reaction = prompt(UnicodeEmojiArg, "Enter Reaction:")
                 guildConfiguration.reactions.historyReaction = reaction.unicode
                 respond("Reaction set to ${reaction.unicode}")
             }
             "setdeletemessagereaction" -> {
-                val reaction = promptMessage(UnicodeEmojiArg, "Enter Reaction:")
+                val reaction = prompt(UnicodeEmojiArg, "Enter Reaction:")
                 guildConfiguration.reactions.deleteMessageReaction = reaction.unicode
                 respond("Reaction set to ${reaction.unicode}")
             }
             "setflagmessagereaction" -> {
-                val reaction = promptMessage(UnicodeEmojiArg, "Enter Reaction:")
+                val reaction = prompt(UnicodeEmojiArg, "Enter Reaction:")
                 guildConfiguration.reactions.flagMessageReaction = reaction.unicode
                 respond("Reaction set to ${reaction.unicode}")
             }
             "enablereactions" -> {
-                val enabled = promptMessage(BooleanArg("reaactions", "enable", "disable"), "enable / disable:")
+                val enabled = prompt(BooleanArg("reaactions", "enable", "disable"), "enable / disable:")
                 guildConfiguration.reactions.enabled = enabled
                 respond("Reactions set to $enabled")
             }

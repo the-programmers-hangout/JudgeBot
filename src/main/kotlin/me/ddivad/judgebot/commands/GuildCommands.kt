@@ -8,8 +8,9 @@ import me.ddivad.judgebot.dataclasses.Permissions
 import me.ddivad.judgebot.embeds.createActivePunishmentsEmbed
 import me.ddivad.judgebot.services.DatabaseService
 import me.ddivad.judgebot.services.infractions.MuteService
-import me.jakejmattson.discordkt.api.dsl.commands
+import me.jakejmattson.discordkt.api.commands.commands
 
+@Suppress("unused")
 fun guildConfigCommands(configuration: Configuration,
                         databaseService: DatabaseService,
                         muteService: MuteService) = commands("Guild") {

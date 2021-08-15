@@ -7,6 +7,7 @@ import dev.kord.core.entity.Guild
 import dev.kord.core.entity.Member
 import dev.kord.core.entity.PermissionOverwrite
 import dev.kord.core.entity.User
+import dev.kord.core.supplier.EntitySupplyStrategy
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
@@ -160,14 +161,18 @@ class MuteService(val configuration: Configuration,
 
     private suspend fun setupMutedRole(guild: Guild) {
         val mutedRole = guild.getRole(configuration[guild.id.value]!!.mutedRole.toSnowflake())
-        guild.channels.toList().forEach {
+        guild.withStrategy(EntitySupplyStrategy.cachingRest).channels.toList().forEach {
             val deniedPermissions = it.getPermissionOverwritesForRole(mutedRole.id)?.denied ?: Permissions()
-            if (!deniedPermissions.contains(Permission.SendMessages) || !deniedPermissions.contains(Permission.AddReactions)) {
+            if (deniedPermissions.values.any { permission -> permission in setOf(Permission.SendMessages, Permission.AddReactions, Permission.UsePublicThreads, Permission.UsePrivateThreads) }) {
                 try {
+
                     it.addOverwrite(
-                            PermissionOverwrite.forRole(
-                                    mutedRole.id,
-                                    denied = deniedPermissions.plus(Permission.SendMessages).plus(Permission.AddReactions))
+                        PermissionOverwrite.forRole(
+                            mutedRole.id,
+                            denied = deniedPermissions.plus(Permission.SendMessages).plus(Permission.AddReactions)
+                                .plus(Permission.UsePublicThreads).plus(Permission.UsePrivateThreads)
+                        ),
+                        "Judgebot Overwrite"
                     )
                 } catch (ex: RequestException) {
                     println("No permssions to add overwrite to ${it.id.value} - ${it.name}")

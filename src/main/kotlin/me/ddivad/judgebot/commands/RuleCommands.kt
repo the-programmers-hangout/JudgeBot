@@ -12,12 +12,11 @@ import me.ddivad.judgebot.embeds.createRulesEmbed
 import me.ddivad.judgebot.embeds.createRulesEmbedDetailed
 import me.ddivad.judgebot.services.DatabaseService
 import me.jakejmattson.discordkt.api.arguments.MessageArg
-import me.jakejmattson.discordkt.api.dsl.commands
+import me.jakejmattson.discordkt.api.commands.commands
 import me.jakejmattson.discordkt.api.extensions.jumpLink
 
 @Suppress("unused")
-fun ruleCommands(configuration: Configuration,
-                 databaseService: DatabaseService) = commands("Rule") {
+fun ruleCommands(databaseService: DatabaseService) = commands("Rule") {
 
     guildCommand("addRule") {
         description = "Add a rule to this guild."
@@ -55,7 +54,7 @@ fun ruleCommands(configuration: Configuration,
         execute(MessageArg.optionalNullable(null)) {
             val messageToEdit = args.first
             if (messageToEdit != null) {
-                messageToEdit.edit { this.embed { createRulesEmbed(guild, databaseService.guilds.getRules(guild)) } }
+                messageToEdit.edit { this.embeds?.first()?.createRulesEmbed(guild, databaseService.guilds.getRules(guild)) }
                 respond("Existing embed updated: ${messageToEdit.jumpLink()}")
             } else {
                 respond {
@@ -71,7 +70,7 @@ fun ruleCommands(configuration: Configuration,
         execute(MessageArg.optionalNullable(null)) {
             val messageToEdit = args.first
             if (messageToEdit != null) {
-                messageToEdit.edit { this.embed { createRulesEmbedDetailed(guild, databaseService.guilds.getRules(guild)) } }
+                messageToEdit.edit { embeds?.first()?.createRulesEmbedDetailed(guild, databaseService.guilds.getRules(guild))}
                 respond("Existing embed updated: ${messageToEdit.jumpLink()}")
             } else {
                 respond {

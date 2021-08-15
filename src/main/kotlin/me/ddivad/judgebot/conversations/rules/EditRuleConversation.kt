@@ -13,25 +13,25 @@ import me.jakejmattson.discordkt.api.conversations.conversation
 class EditRuleConversation(private val databaseService: DatabaseService) {
     fun createAddRuleConversation(guild: Guild) = conversation("cancel") {
         val rules = databaseService.guilds.getRules(guild)
-        val ruleNumberToUpdate = promptMessage(IntegerArg, "Which rule would you like to update?")
+        val ruleNumberToUpdate = prompt(IntegerArg, "Which rule would you like to update?")
         val ruleToUpdate = rules.find { it.number == ruleNumberToUpdate } ?: return@conversation
         respond("Current Rule:")
         respond {
             createRuleEmbed(guild, ruleToUpdate)
         }
 
-        val updateNumber = promptMessage(BooleanArg(truthValue = "y", falseValue = "n"),
+        val updateNumber = prompt(BooleanArg(truthValue = "y", falseValue = "n"),
                 "Update Rule number? (Y/N)")
         val ruleNumber = when {
             updateNumber -> promptUntil(
-                    argumentType = IntegerArg,
+                    argument = IntegerArg,
                     prompt = "Please enter rule number:",
                     isValid = { number -> !rules.any { it.number == number } },
                     error = "Rule with that number already exists"
             )
             else -> ruleToUpdate.number
         }
-        val updateName = promptMessage(BooleanArg(truthValue = "y", falseValue = "n"),
+        val updateName = prompt(BooleanArg(truthValue = "y", falseValue = "n"),
                 "Update Rule name? (Y/N)")
         val ruleName = when {
             updateName -> promptUntil(
@@ -43,17 +43,17 @@ class EditRuleConversation(private val databaseService: DatabaseService) {
             else -> ruleToUpdate.title
         }
 
-        val updateText = promptMessage(BooleanArg(truthValue = "y", falseValue = "n"),
+        val updateText = prompt(BooleanArg(truthValue = "y", falseValue = "n"),
                 "Update Rule text? (Y/N)")
         val ruleText = when {
-            updateText -> promptMessage(EveryArg, "Please enter rule text:")
+            updateText -> prompt(EveryArg, "Please enter rule text:")
             else -> ruleToUpdate.description
         }
 
-        val updateLink = promptMessage(BooleanArg(truthValue = "y", falseValue = "n"),
+        val updateLink = prompt(BooleanArg(truthValue = "y", falseValue = "n"),
                 "Update Rule link? (Y/N)")
         val ruleLink = when {
-            updateLink -> promptMessage(UrlArg, "Please enter the link")
+            updateLink -> prompt(UrlArg, "Please enter the link")
             else -> ruleToUpdate.link
         }
 

@@ -1,22 +1,21 @@
 package me.ddivad.judgebot.services
 
+import dev.kord.common.annotation.KordPreview
 import dev.kord.common.entity.ButtonStyle
 import dev.kord.common.kColor
-import dev.kord.core.entity.Guild
-import dev.kord.core.entity.User
 import dev.kord.x.emoji.DiscordEmoji
 import dev.kord.x.emoji.Emojis
 import kotlinx.coroutines.runBlocking
-import me.jakejmattson.discordkt.api.Discord
 import me.jakejmattson.discordkt.api.annotations.Service
-import me.jakejmattson.discordkt.api.arguments.ArgumentType
+import me.jakejmattson.discordkt.api.arguments.Argument
 import me.jakejmattson.discordkt.api.arguments.OptionalArg
-import me.jakejmattson.discordkt.api.dsl.Command
-import me.jakejmattson.discordkt.api.dsl.CommandEvent
-import me.jakejmattson.discordkt.api.dsl.Execution
+import me.jakejmattson.discordkt.api.commands.Command
+import me.jakejmattson.discordkt.api.commands.CommandEvent
+import me.jakejmattson.discordkt.api.commands.Execution
 
+@KordPreview
 @Service
-class HelpService(private val discord: Discord) {
+class HelpService {
     suspend fun buildHelpEmbed(event: CommandEvent<*>) = event.respondMenu {
         val container = event.discord.commands
         fun joinNames(value: List<Command>) =
@@ -57,7 +56,7 @@ class HelpService(private val discord: Discord) {
 
                     field {
                         name = "Don't see what you're looking for?"
-                        value = "Try `search <commmand>`. If the command exists in a bot, it will react with ${Emojis.whiteCheckMark}"
+                        value = "Try `search <command>`. If the command exists in a bot, it will react with ${Emojis.whiteCheckMark}"
                     }
                 }
             }
@@ -65,7 +64,7 @@ class HelpService(private val discord: Discord) {
             categoryNames.chunked(5).forEachIndexed { index, category ->
                 buttons {
                     category.forEachIndexed { page, name ->
-                        button("$name", getEmojiForCategory(name), ButtonStyle.Secondary) {
+                        button(name, getEmojiForCategory(name), ButtonStyle.Secondary) {
                             loadPage(page + index * 5)
                         }
                     }
@@ -88,9 +87,9 @@ class HelpService(private val discord: Discord) {
         }
     }
 
-    suspend fun sendHelpEmbed(event: CommandEvent<*>, command: Command) = event.respond() {
+    suspend fun sendHelpEmbed(event: CommandEvent<*>, command: Command) = event.respond {
         color = event.discord.configuration.theme?.kColor
-        title = "${command.names.joinToString(", ")}"
+        title = command.names.joinToString(", ")
         description = command.description
 
         val commandInvocation = "${event.prefix()}${command.names.first()}"
@@ -105,11 +104,11 @@ class HelpService(private val discord: Discord) {
             """.trimMargin()
         }
         field {
-            this.value = helpBundle!!.joinToString("\n\n") { it }
+            this.value = helpBundle.joinToString("\n\n") { it }
         }
     }
 
-    private fun ArgumentType<*>.generateExample(event: CommandEvent<*>) =
+    private fun Argument<*>.generateExample(event: CommandEvent<*>) =
         runBlocking { generateExamples(event) }
             .takeIf { it.isNotEmpty() }
             ?.random()

@@ -4,11 +4,6 @@ import dev.kord.core.entity.Guild
 import org.joda.time.DateTime
 import org.joda.time.Weeks
 
-data class GuildLeave(
-    val joinDate: Long,
-    var leaveDate: Long?
-)
-
 data class GuildMemberDetails(
     val guildId: String,
     val notes: MutableList<Note> = mutableListOf(),

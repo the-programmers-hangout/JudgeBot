@@ -11,13 +11,13 @@ import me.jakejmattson.discordkt.api.conversations.conversation
 
 class GuildSetupConversation(private val configuration: Configuration, private val muteService: MuteService) {
     fun createSetupConversation(guild: Guild) = conversation("cancel") {
-        val prefix = promptMessage(EveryArg, "Bot prefix:")
-        val adminRole = promptMessage(RoleArg, "Admin role:")
-        val staffRole = promptMessage(RoleArg, "Staff role:")
-        val moderatorRole = promptMessage(RoleArg, "Moderator role:")
-        val logChannel = promptMessage(ChannelArg, "Log Channel:")
-        val alertChannel = promptMessage(ChannelArg, "Alert Channel:")
-        val mutedRole = promptMessage(RoleArg, "Muted role:")
+        val prefix = prompt(EveryArg, "Bot prefix:")
+        val adminRole = prompt(RoleArg, "Admin role:")
+        val staffRole = prompt(RoleArg, "Staff role:")
+        val moderatorRole = prompt(RoleArg, "Moderator role:")
+        val logChannel = prompt(ChannelArg, "Log Channel:")
+        val alertChannel = prompt(ChannelArg, "Alert Channel:")
+        val mutedRole = prompt(RoleArg, "Muted role:")
 
         configuration.setup(
                 guild,
