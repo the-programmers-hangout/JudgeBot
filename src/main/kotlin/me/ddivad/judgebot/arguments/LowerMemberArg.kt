@@ -2,10 +2,11 @@ package me.ddivad.judgebot.arguments
 
 import dev.kord.core.entity.Member
 import me.jakejmattson.discordkt.api.arguments.*
-import me.jakejmattson.discordkt.api.dsl.CommandEvent
+import me.jakejmattson.discordkt.api.commands.CommandEvent
+import me.jakejmattson.discordkt.api.extensions.isSelf
 import me.jakejmattson.discordkt.api.extensions.toSnowflakeOrNull
 
-open class LowerMemberArg(override val name: String = "LowerMemberArg") : ArgumentType<Member> {
+open class LowerMemberArg(override val name: String = "LowerMemberArg") : Argument<Member> {
     companion object : LowerMemberArg()
 
     override val description = "A Member with a lower rank"
@@ -19,8 +20,9 @@ open class LowerMemberArg(override val name: String = "LowerMemberArg") : Argume
         val author = event.author.asMember(event.guild!!.id)
 
         return when {
-            event.discord.permissions.isHigherLevel(event.discord, member, author) ->
+            event.discord.permissions.isHigherLevel(event.discord, member, author) || event.author.isSelf() ->
                 Error("You don't have the permission to use this command on the target user.")
+            event.author == member -> Error("You can't use this command on yourself!")
             else -> Success(member)
         }
     }

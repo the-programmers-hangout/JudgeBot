@@ -10,5 +10,4 @@ open class DatabaseService(
     val users: UserOperations,
     val guilds: GuildOperations,
     val joinLeaves: JoinLeaveOperations
-) {
-}
+)

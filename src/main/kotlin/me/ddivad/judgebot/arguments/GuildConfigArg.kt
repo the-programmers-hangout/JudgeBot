@@ -1,7 +1,7 @@
 package me.ddivad.judgebot.arguments
 
 import me.jakejmattson.discordkt.api.arguments.*
-import me.jakejmattson.discordkt.api.dsl.CommandEvent
+import me.jakejmattson.discordkt.api.commands.CommandEvent
 
 val validConfigParameters = mutableListOf(
     "setPrefix",
@@ -23,7 +23,7 @@ val validConfigParameters = mutableListOf(
     "options"
 )
 
-open class GuildConfigArg(override val name: String = "GuildConfig") : ArgumentType<String> {
+open class GuildConfigArg(override val name: String = "GuildConfig") : Argument<String> {
     override val description = "A Guild configuration"
 
     companion object : GuildConfigArg()

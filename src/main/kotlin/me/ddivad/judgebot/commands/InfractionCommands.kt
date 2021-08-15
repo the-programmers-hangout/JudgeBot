@@ -1,5 +1,6 @@
 package me.ddivad.judgebot.commands
 
+import dev.kord.common.annotation.KordPreview
 import me.ddivad.judgebot.arguments.LowerUserArg
 import dev.kord.common.exception.RequestException
 import dev.kord.core.behavior.reply
@@ -19,9 +20,10 @@ import me.ddivad.judgebot.services.infractions.InfractionService
 import me.jakejmattson.discordkt.api.arguments.BooleanArg
 import me.jakejmattson.discordkt.api.arguments.EveryArg
 import me.jakejmattson.discordkt.api.arguments.IntegerArg
+import me.jakejmattson.discordkt.api.commands.commands
 import me.jakejmattson.discordkt.api.conversations.ConversationResult
-import me.jakejmattson.discordkt.api.dsl.commands
 
+@KordPreview
 @Suppress("unused")
 fun createInfractionCommands(databaseService: DatabaseService,
                              config: Configuration,

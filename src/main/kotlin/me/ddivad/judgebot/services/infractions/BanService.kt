@@ -2,7 +2,6 @@ package me.ddivad.judgebot.services.infractions
 
 import dev.kord.core.behavior.ban
 import dev.kord.core.entity.Guild
-import dev.kord.core.entity.Member
 import dev.kord.core.entity.User
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
@@ -58,7 +57,7 @@ class BanService(
         try {
             configuration.guildConfigurations.forEach { config ->
                 val guild = config.value.id.toSnowflake().let { discord.kord.getGuild(it) } ?: return@forEach
-                databaseService.guilds.getPunishmentsForGuild(guild, InfractionType.Ban).forEach() {
+                databaseService.guilds.getPunishmentsForGuild(guild, InfractionType.Ban).forEach {
                     if (it.clearTime != null) {
                         val difference = it.clearTime - DateTime.now().millis
                         guild.kord.getUser(it.userId.toSnowflake())?.let { user ->

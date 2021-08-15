@@ -11,7 +11,7 @@ import me.ddivad.judgebot.extensions.testDmStatus
 import me.ddivad.judgebot.services.DatabaseService
 import me.jakejmattson.discordkt.api.arguments.EveryArg
 import me.jakejmattson.discordkt.api.arguments.IntegerArg
-import me.jakejmattson.discordkt.api.dsl.commands
+import me.jakejmattson.discordkt.api.commands.commands
 import me.jakejmattson.discordkt.api.extensions.sendPrivateMessage
 
 @Suppress("unused")

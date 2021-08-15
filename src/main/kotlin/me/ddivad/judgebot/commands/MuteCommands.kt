@@ -11,7 +11,7 @@ import me.ddivad.judgebot.services.infractions.RoleState
 import me.ddivad.judgebot.util.timeToString
 import me.jakejmattson.discordkt.api.arguments.EveryArg
 import me.jakejmattson.discordkt.api.arguments.TimeArg
-import me.jakejmattson.discordkt.api.dsl.commands
+import me.jakejmattson.discordkt.api.commands.commands
 import kotlin.math.roundToLong
 
 @Suppress("unused")

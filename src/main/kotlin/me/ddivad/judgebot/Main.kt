@@ -1,5 +1,6 @@
 package me.ddivad.judgebot
 
+import dev.kord.common.annotation.KordPreview
 import dev.kord.common.kColor
 import dev.kord.core.supplier.EntitySupplyStrategy
 import dev.kord.gateway.Intent
@@ -14,8 +15,9 @@ import me.jakejmattson.discordkt.api.dsl.bot
 import me.jakejmattson.discordkt.api.extensions.addInlineField
 import java.awt.Color
 
+@KordPreview
 @PrivilegedIntent
-suspend fun main(args: Array<String>) {
+suspend fun main() {
     val token = System.getenv("BOT_TOKEN") ?: null
     val defaultPrefix = System.getenv("DEFAULT_PREFIX") ?: "j!"
 
@@ -31,7 +33,7 @@ suspend fun main(args: Array<String>) {
             allowMentionPrefix = true
             commandReaction = null
             theme = Color.MAGENTA
-            entitySupplyStrategy = EntitySupplyStrategy.cacheWithCachingRestFallback
+            entitySupplyStrategy = EntitySupplyStrategy.cacheWithRestFallback
             permissions(Permissions.NONE)
             intents = Intents(
                 Intent.GuildMembers,
@@ -67,10 +69,11 @@ suspend fun main(args: Array<String>) {
             field {
                 name = "Build Info"
                 value = "```" +
-                    "Version:   2.4.1\n" +
+                    "Version:   2.5.0\n" +
                     "DiscordKt: ${versions.library}\n" +
+                    "Kord: ${versions.kord}\n" +
                     "Kotlin:    $kotlinVersion" +
-                    "```"
+                        "```"
             }
             field {
                 name = "Uptime"

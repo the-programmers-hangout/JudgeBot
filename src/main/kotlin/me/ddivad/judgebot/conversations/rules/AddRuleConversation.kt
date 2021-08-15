@@ -1,7 +1,6 @@
 package me.ddivad.judgebot.conversations.rules
 
 import dev.kord.core.entity.Guild
-import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.dataclasses.Rule
 import me.ddivad.judgebot.embeds.createRuleEmbed
 import me.ddivad.judgebot.services.DatabaseService
@@ -15,12 +14,12 @@ class AddRuleConversation(private val databaseService: DatabaseService) {
         val rules = databaseService.guilds.getRules(guild)
         val nextId = rules.size.plus(1)
 
-        val ruleName = promptMessage(EveryArg, "Please enter rule name:")
-        val ruleText = promptMessage(EveryArg, "Please enter rule text")
-        val addLink = promptMessage(BooleanArg("Add link to rule?", "Y", "N"),
+        val ruleName = prompt(EveryArg, "Please enter rule name:")
+        val ruleText = prompt(EveryArg, "Please enter rule text")
+        val addLink = prompt(BooleanArg("Add link to rule?", "Y", "N"),
                 "Do you want to add a link to the rule? (Y/N)")
         val ruleLink = when {
-            addLink -> promptMessage(UrlArg, "Please enter the link")
+            addLink -> prompt(UrlArg, "Please enter the link")
             else -> ""
         }
 
