@@ -22,13 +22,18 @@ fun onMemberReactionAdd(configuration: Configuration) = listeners {
         when (this.emoji.name) {
             guildConfiguration.reactions.flagMessageReaction -> {
                 message.deleteReaction(this.emoji)
+                val channel = message.getChannel()
+                val isThread = channel.type in setOf(ChannelType.PublicGuildThread, ChannelType.PrivateThread)
                 guild.asGuild()
                     .getChannelOf<TextChannel>(guildConfiguration.loggingConfiguration.alertChannel.toSnowflake())
                     .asChannel()
                     .createMessage(
                         "**Message Flagged**" +
                                 "\n**User**: ${user.mention}" +
-                                (if(message.getChannel().type == ChannelType.PublicGuildThread) "\n**Thread**: " else "\n**Channel**: ") + message.channel.mention +
+                                (if (isThread)
+                                    "\n**Thread**: ${channel.mention} (${(channel as? ThreadChannel)?.parent?.mention})"
+                                else
+                                    "\n**Channel**: ${channel.mention}") +
                                 "\n**Author:** ${message.asMessage().author?.mention}" +
                                 "\n**Message:** ${message.asMessage().jumpLink()}"
                     )
