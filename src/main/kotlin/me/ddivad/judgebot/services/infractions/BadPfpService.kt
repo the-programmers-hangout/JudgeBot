@@ -9,7 +9,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import me.ddivad.judgebot.embeds.createBadPfpEmbed
-import me.ddivad.judgebot.embeds.createUnmuteEmbed
 import me.ddivad.judgebot.services.LoggingService
 import me.jakejmattson.discordkt.api.Discord
 import me.jakejmattson.discordkt.api.annotations.Service

@@ -1,0 +1,19 @@
+name: Post Release to Discord
+
+on:
+  release:
+    types:
+      - created
+
+jobs:
+  run_main:
+    runs-on: ubuntu-18.04
+    name: Discord Webhook
+    steps:
+      - name: Send message
+        uses: ddivad195/discord-styled-releases@main
+        with:
+          project_name: "Judgebot"
+          embed_colour: "1315909"
+          webhook_id: ${{ secrets.DISCORD_WEBHOOK_ID }}
+          webhook_token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}

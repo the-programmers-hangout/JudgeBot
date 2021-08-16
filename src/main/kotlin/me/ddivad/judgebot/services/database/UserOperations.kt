@@ -35,10 +35,6 @@ class UserOperations(
         }
     }
 
-    suspend fun getUserOrNull(target: User): GuildMember? {
-        return userCollection.findOne(GuildMember::userId eq target.id.asString)
-    }
-
     suspend fun addNote(guild: Guild, user: GuildMember, note: String, moderator: String): GuildMember {
         user.addNote(note, moderator, guild)
         return this.updateUser(user)

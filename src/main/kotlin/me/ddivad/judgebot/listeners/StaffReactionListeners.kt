@@ -57,7 +57,6 @@ fun onStaffReactionAdd(
                     loggingService.staffReactionUsed(guild, staffMember, messageAuthor, this.emoji)
                 }
                 guildConfiguration.reactions.deleteMessageReaction -> {
-                    msg.deleteReaction(this.emoji)
                     msg.delete()
                     databaseService.users.addMessageDelete(
                         guild,

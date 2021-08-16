@@ -1,5 +1,6 @@
 package me.ddivad.judgebot.conversations
 
+import dev.kord.common.annotation.KordPreview
 import dev.kord.common.entity.ButtonStyle
 import dev.kord.core.entity.Guild
 import dev.kord.core.entity.Member
@@ -10,6 +11,7 @@ import me.ddivad.judgebot.services.DatabaseService
 import me.ddivad.judgebot.services.infractions.InfractionService
 import me.jakejmattson.discordkt.api.conversations.conversation
 
+@KordPreview
 class InfractionConversation(
     private val databaseService: DatabaseService,
     private val configuration: Configuration,

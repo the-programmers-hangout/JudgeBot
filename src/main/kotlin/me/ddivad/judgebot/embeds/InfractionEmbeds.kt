@@ -187,6 +187,9 @@ fun EmbedBuilder.createMessageDeleteEmbed(guild: Guild, message: Message) {
     if (message.attachments.isNotEmpty()) {
         addField("Filename", "```${message.attachments.first().filename}```")
     }
+    field {
+        value = "If you think this to be unjustified, please **do not** post about it in a public channel but take it up with Modmail."
+    }
     footer {
         icon = guild.getIconUrl(Image.Format.PNG) ?: ""
         text = guild.name

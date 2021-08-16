@@ -4,9 +4,9 @@ import dev.kord.core.entity.Guild
 import me.ddivad.judgebot.dataclasses.Rule
 import me.ddivad.judgebot.services.DatabaseService
 import me.jakejmattson.discordkt.api.arguments.*
-import me.jakejmattson.discordkt.api.dsl.CommandEvent
+import me.jakejmattson.discordkt.api.commands.CommandEvent
 
-open class RuleArg(override val name: String = "Rule") : ArgumentType<Rule> {
+open class RuleArg(override val name: String = "Rule") : Argument<Rule> {
     override val description = "A rule number"
 
     override suspend fun generateExamples(event: CommandEvent<*>): List<String> = mutableListOf("1", "2", "3")

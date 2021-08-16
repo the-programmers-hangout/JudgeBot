@@ -6,7 +6,6 @@ import dev.kord.core.entity.Member
 import kotlinx.coroutines.Job
 import me.ddivad.judgebot.dataclasses.*
 import me.ddivad.judgebot.embeds.createInfractionEmbed
-import me.ddivad.judgebot.embeds.createUnmuteEmbed
 import me.ddivad.judgebot.services.DatabaseService
 import me.ddivad.judgebot.services.LoggingService
 import me.jakejmattson.discordkt.api.annotations.Service

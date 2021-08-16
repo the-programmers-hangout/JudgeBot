@@ -5,6 +5,7 @@ import dev.kord.core.any
 import me.jakejmattson.discordkt.api.dsl.PermissionContext
 import me.jakejmattson.discordkt.api.dsl.PermissionSet
 
+@Suppress("unused")
 enum class Permissions : PermissionSet {
     BOT_OWNER {
         override suspend fun hasPermission(context: PermissionContext) =

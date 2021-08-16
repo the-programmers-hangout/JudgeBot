@@ -1,7 +1,6 @@
 package me.ddivad.judgebot.services.database
 
 import dev.kord.core.entity.Member
-import dev.kord.core.entity.User
 import me.ddivad.judgebot.dataclasses.JoinLeave
 import me.jakejmattson.discordkt.api.annotations.Service
 import org.joda.time.DateTime

@@ -3,8 +3,7 @@ package me.ddivad.judgebot.commands
 import me.ddivad.judgebot.dataclasses.Permissions
 import me.ddivad.judgebot.services.HelpService
 import me.jakejmattson.discordkt.api.arguments.AnyArg
-import me.jakejmattson.discordkt.api.arguments.CommandArg
-import me.jakejmattson.discordkt.api.dsl.commands
+import me.jakejmattson.discordkt.api.commands.commands
 
 @Suppress("unused")
 fun createInformationCommands(helpService: HelpService) = commands("Utility") {

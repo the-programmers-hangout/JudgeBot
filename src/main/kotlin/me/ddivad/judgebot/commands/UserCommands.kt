@@ -15,7 +15,7 @@ import me.ddivad.judgebot.services.DatabaseService
 import me.ddivad.judgebot.services.LoggingService
 import me.ddivad.judgebot.services.infractions.BanService
 import me.jakejmattson.discordkt.api.arguments.*
-import me.jakejmattson.discordkt.api.dsl.commands
+import me.jakejmattson.discordkt.api.commands.commands
 import me.jakejmattson.discordkt.api.extensions.mutualGuilds
 import me.jakejmattson.discordkt.api.extensions.sendPrivateMessage
 import java.awt.Color
@@ -33,7 +33,6 @@ fun createUserCommands(
         execute(UserArg) {
             val user = databaseService.users.getOrCreateUser(args.first, guild)
             databaseService.users.incrementUserHistory(user, guild)
-            val linkedAccounts = user.getLinkedAccounts(guild)
             respondMenu {
                 createHistoryEmbed(args.first, user, guild, config, databaseService)
             }
@@ -148,7 +147,7 @@ fun createUserCommands(
                 user.sendPrivateMessage {
                     createSelfHistoryEmbed(user, guildMember, currentGuild, config)
                 }
-                this.message.addReaction(Emojis.whiteCheckMark)
+                this.message?.addReaction(Emojis.whiteCheckMark)
             } else {
                 guildChoiceConversation(mutualGuilds, config).startPrivately(discord, author)
             }
