@@ -36,11 +36,12 @@ suspend fun main() {
             entitySupplyStrategy = EntitySupplyStrategy.cacheWithRestFallback
             permissions(Permissions.NONE)
             intents = Intents(
+                Intent.Guilds,
+                Intent.GuildBans,
                 Intent.GuildMembers,
                 Intent.DirectMessages,
-                Intent.GuildBans,
-                Intent.Guilds,
-                Intent.GuildMessageReactions
+                Intent.GuildMessageReactions,
+                Intent.DirectMessagesReactions
             )
         }
 
@@ -69,7 +70,7 @@ suspend fun main() {
             field {
                 name = "Build Info"
                 value = "```" +
-                    "Version:   2.5.0\n" +
+                    "Version:   2.5.1\n" +
                     "DiscordKt: ${versions.library}\n" +
                     "Kord: ${versions.kord}\n" +
                     "Kotlin:    $kotlinVersion" +
