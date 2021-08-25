@@ -18,11 +18,11 @@ fun onChannelCreated(configuration: Configuration, loggingService: LoggingServic
         val guildConfiguration = configuration[guild.id.value] ?: return@on
         val mutedRole = guild.getRole(guildConfiguration.mutedRole.toSnowflake())
         val deniedPermissions = channel.getPermissionOverwritesForRole(mutedRole.id)?.denied ?: Permissions()
-        if (deniedPermissions.values.any { it in setOf(Permission.SendMessages, Permission.AddReactions, Permission.UsePublicThreads, Permission.UsePrivateThreads) }) {
+        if (deniedPermissions.values.any { it in setOf(Permission.SendMessages, Permission.AddReactions, Permission.CreatePublicThreads, Permission.CreatePrivateThreads, Permission.SendMessagesInThreads) }) {
             channel.addOverwrite(
                 PermissionOverwrite.forRole(
                     mutedRole.id,
-                    denied = deniedPermissions.plus(Permission.SendMessages).plus(Permission.AddReactions).plus(Permission.UsePublicThreads).plus(Permission.UsePrivateThreads)
+                    denied = deniedPermissions.plus(Permission.SendMessages).plus(Permission.AddReactions).plus(Permission.CreatePrivateThreads).plus(Permission.CreatePrivateThreads).plus(Permission.SendMessagesInThreads)
                 ),
                 "Judgebot Overwrite"
             )

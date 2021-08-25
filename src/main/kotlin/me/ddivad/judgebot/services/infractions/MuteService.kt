@@ -163,14 +163,14 @@ class MuteService(val configuration: Configuration,
         val mutedRole = guild.getRole(configuration[guild.id.value]!!.mutedRole.toSnowflake())
         guild.withStrategy(EntitySupplyStrategy.cachingRest).channels.toList().forEach {
             val deniedPermissions = it.getPermissionOverwritesForRole(mutedRole.id)?.denied ?: Permissions()
-            if (deniedPermissions.values.any { permission -> permission in setOf(Permission.SendMessages, Permission.AddReactions, Permission.UsePublicThreads, Permission.UsePrivateThreads) }) {
+            if (deniedPermissions.values.any { permission -> permission in setOf(Permission.SendMessages, Permission.AddReactions, Permission.CreatePublicThreads, Permission.CreatePrivateThreads, Permission.SendMessagesInThreads) }) {
                 try {
 
                     it.addOverwrite(
                         PermissionOverwrite.forRole(
                             mutedRole.id,
                             denied = deniedPermissions.plus(Permission.SendMessages).plus(Permission.AddReactions)
-                                .plus(Permission.UsePublicThreads).plus(Permission.UsePrivateThreads)
+                                .plus(Permission.CreatePrivateThreads).plus(Permission.CreatePrivateThreads).plus(Permission.SendMessagesInThreads)
                         ),
                         "Judgebot Overwrite"
                     )
