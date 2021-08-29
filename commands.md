@@ -69,7 +69,8 @@
 | whatpfp       | User                                      | Perform a reverse image search of a User's profile picture |
 
 ## Utility
-| Commands | Arguments | Description               |
-| -------- | --------- | ------------------------- |
-| help     | [Command] | Display help information. |
+| Commands | Arguments | Description                              |
+| -------- | --------- | ---------------------------------------- |
+| help     | [Command] | Display help information.                |
+| report   | Message   | Flag a message for moderators to review. |
 

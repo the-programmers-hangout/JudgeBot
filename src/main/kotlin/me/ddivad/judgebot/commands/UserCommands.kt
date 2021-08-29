@@ -79,6 +79,10 @@ fun createUserCommands(
         requiredPermission = Permissions.STAFF
         execute(LowerUserArg, IntegerArg("Delete message days").optional(0), EveryArg) {
             val (target, deleteDays, reason) = args
+            if (deleteDays > 7) {
+                respond("Delete days cannot be more than **7**. You tried with **${deleteDays}**")
+                return@execute
+            }
             val ban = Punishment(target.id.asString, InfractionType.Ban, reason, author.id.asString)
             banService.banUser(target, guild, ban, deleteDays).also {
                 loggingService.userBanned(guild, target, ban)
