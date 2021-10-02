@@ -99,7 +99,7 @@ class EditConfigConversation(private val configuration: Configuration) {
                 respond("Reaction set to ${reaction.unicode}")
             }
             "enablereactions" -> {
-                val enabled = prompt(BooleanArg("reaactions", "enable", "disable"), "enable / disable:")
+                val enabled = prompt(BooleanArg("reactions", "enable", "disable"), "enable / disable:")
                 guildConfiguration.reactions.enabled = enabled
                 respond("Reactions set to $enabled")
             }
