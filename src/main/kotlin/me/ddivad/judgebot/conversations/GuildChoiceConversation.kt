@@ -17,7 +17,7 @@ fun guildChoiceConversation(
         embed {
             color = Color.MAGENTA.kColor
             title = "Select Server"
-            description = "Select the server you to view history for."
+            description = "Select the server you want to view the history for."
             thumbnail {
                 url = discord.kord.getSelf().avatar.url
             }
