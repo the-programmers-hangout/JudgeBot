@@ -14,7 +14,7 @@ import me.jakejmattson.discordkt.api.commands.commands
 fun guildConfigCommands(configuration: Configuration,
                         databaseService: DatabaseService,
                         muteService: MuteService) = commands("Guild") {
-    guildCommand("setup") {
+    command("setup") {
         description = "Configure a guild to use Judgebot."
         requiredPermission = Permissions.ADMINISTRATOR
         execute {
@@ -30,7 +30,7 @@ fun guildConfigCommands(configuration: Configuration,
         }
     }
 
-    guildCommand("configuration") {
+    command("configuration") {
         description = "Update configuration parameters for this guild (conversation)."
         requiredPermission = Permissions.STAFF
         execute(GuildConfigArg.optional("options")) {
@@ -44,7 +44,7 @@ fun guildConfigCommands(configuration: Configuration,
         }
     }
 
-    guildCommand("activePunishments") {
+    command("activePunishments") {
         description = "View active punishments for a guild."
         requiredPermission = Permissions.STAFF
         execute {

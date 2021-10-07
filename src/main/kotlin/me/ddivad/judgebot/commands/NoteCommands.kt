@@ -10,7 +10,7 @@ import me.jakejmattson.discordkt.api.commands.commands
 
 @Suppress("unused")
 fun noteCommands(databaseService: DatabaseService) = commands("Note") {
-    guildCommand("note") {
+    command("note") {
         description = "Use this to add a note to a user."
         requiredPermission = Permissions.MODERATOR
         execute(UserArg, EveryArg("Note Content")) {
@@ -21,7 +21,7 @@ fun noteCommands(databaseService: DatabaseService) = commands("Note") {
         }
     }
 
-    guildCommand("editNote") {
+    command("editNote") {
         description = "Use this to edit a note."
         requiredPermission = Permissions.MODERATOR
         execute(UserArg, IntegerArg("Note to edit"), EveryArg("Note Content")) {
@@ -36,7 +36,7 @@ fun noteCommands(databaseService: DatabaseService) = commands("Note") {
         }
     }
 
-    guildCommand("deleteNote") {
+    command("deleteNote") {
         description = "Use this to add a delete a note from a user."
         requiredPermission = Permissions.STAFF
         execute(LowerMemberArg, IntegerArg("Note ID")) {
@@ -51,7 +51,7 @@ fun noteCommands(databaseService: DatabaseService) = commands("Note") {
         }
     }
 
-    guildCommand("cleanseNotes") {
+    command("cleanseNotes") {
         description = "Use this to delete (permanently) as user's notes."
         requiredPermission = Permissions.ADMINISTRATOR
         execute(LowerMemberArg) {

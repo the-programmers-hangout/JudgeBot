@@ -27,7 +27,7 @@ fun createUserCommands(
     loggingService: LoggingService,
     banService: BanService
 ) = commands("User") {
-    guildCommand("history", "h", "H") {
+    command("history", "h", "H") {
         description = "Use this to view a user's record."
         requiredPermission = Permissions.MODERATOR
         execute(UserArg) {
@@ -39,7 +39,7 @@ fun createUserCommands(
         }
     }
 
-    guildCommand("alts") {
+    command("alts") {
         description = "Use this to view a user's alt accounts."
         requiredPermission = Permissions.MODERATOR
         execute(UserArg) {
@@ -59,7 +59,7 @@ fun createUserCommands(
         }
     }
 
-    guildCommand("whatpfp") {
+    command("whatpfp") {
         description = "Perform a reverse image search of a User's profile picture"
         requiredPermission = Permissions.MODERATOR
         execute(UserArg) {
@@ -74,7 +74,7 @@ fun createUserCommands(
         }
     }
 
-    guildCommand("ban") {
+    command("ban") {
         description = "Ban a member from this guild."
         requiredPermission = Permissions.STAFF
         execute(LowerUserArg, IntegerArg("Delete message days").optional(0), EveryArg) {
@@ -91,7 +91,7 @@ fun createUserCommands(
         }
     }
 
-    guildCommand("unban") {
+    command("unban") {
         description = "Unban a banned member from this guild."
         requiredPermission = Permissions.STAFF
         execute(UserArg) {
@@ -105,7 +105,7 @@ fun createUserCommands(
         }
     }
 
-    guildCommand("setBanReason") {
+    command("setBanReason") {
         description = "Set a ban reason for a banned user"
         requiredPermission = Permissions.STAFF
         execute(UserArg, EveryArg("Reason")) {
@@ -123,7 +123,7 @@ fun createUserCommands(
         }
     }
 
-    guildCommand("getBanReason") {
+    command("getBanReason") {
         description = "Get a ban reason for a banned user"
         requiredPermission = Permissions.STAFF
         execute(UserArg) {
@@ -158,7 +158,7 @@ fun createUserCommands(
         }
     }
 
-    guildCommand("link") {
+    command("link") {
         description = "Link a user's alt account with their main"
         requiredPermission = Permissions.STAFF
         execute(UserArg("Main Account"), UserArg("Alt Account")) {
@@ -171,7 +171,7 @@ fun createUserCommands(
         }
     }
 
-    guildCommand("unlink") {
+    command("unlink") {
         description = "Link a user's alt account with their main"
         requiredPermission = Permissions.STAFF
         execute(UserArg("Main Account"), UserArg("Alt Account")) {
@@ -184,7 +184,7 @@ fun createUserCommands(
         }
     }
 
-    guildCommand("reset") {
+    command("reset") {
         description = "Reset a user's record, and any linked accounts"
         requiredPermission = Permissions.STAFF
         execute(LowerUserArg) {

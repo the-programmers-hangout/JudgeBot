@@ -2,14 +2,16 @@ package me.ddivad.judgebot.dataclasses
 
 import dev.kord.core.entity.Guild
 import dev.kord.core.entity.Role
+import kotlinx.serialization.Serializable
 import me.jakejmattson.discordkt.api.dsl.Data
 
+@Serializable
 data class Configuration(
     val ownerId: String = "insert-owner-id",
     var prefix: String = "judge!",
     val guildConfigurations: MutableMap<Long, GuildConfiguration> = mutableMapOf(),
     val dbConfiguration: DatabaseConfiguration = DatabaseConfiguration()
-) : Data("config/config.json") {
+) : Data() {
     operator fun get(id: Long) = guildConfigurations[id]
     fun hasGuildConfig(guildId: Long) = guildConfigurations.containsKey(guildId)
 
@@ -48,11 +50,13 @@ data class Configuration(
     }
 }
 
+@Serializable
 data class DatabaseConfiguration(
     val address: String = "mongodb://localhost:27017",
     val databaseName: String = "judgebot"
 )
 
+@Serializable
 data class GuildConfiguration(
     val id: String = "",
     var prefix: String = "j!",
@@ -66,6 +70,7 @@ data class GuildConfiguration(
     var reactions: ReactionConfiguration = ReactionConfiguration()
 )
 
+@Serializable
 data class LoggingConfiguration(
     var alertChannel: String = "",
     var loggingChannel: String = "insert_id",
@@ -74,6 +79,7 @@ data class LoggingConfiguration(
     var logPunishments: Boolean = true
 )
 
+@Serializable
 data class InfractionConfiguration(
     var pointCeiling: Int = 50,
     var strikePoints: Int = 10,
@@ -81,12 +87,14 @@ data class InfractionConfiguration(
     var pointDecayPerWeek: Int = 2,
 )
 
+@Serializable
 data class PunishmentLevel(
     var points: Int = 0,
     var punishment: PunishmentType,
     var duration: Long? = null
 )
 
+@Serializable
 data class ReactionConfiguration(
     var enabled: Boolean = true,
     var gagReaction: String = "",
