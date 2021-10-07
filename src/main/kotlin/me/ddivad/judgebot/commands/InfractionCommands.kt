@@ -30,7 +30,7 @@ fun createInfractionCommands(databaseService: DatabaseService,
                              infractionService: InfractionService,
                              badPfpService: BadPfpService,
                              badnameService: BadnameService) = commands("Infraction") {
-    guildCommand("strike", "s", "S") {
+    command("strike", "s", "S") {
         description = "Strike a user."
         requiredPermission = Permissions.STAFF
         execute(LowerMemberArg, IntegerArg("Weight").optional(1), EveryArg("Reason")) {
@@ -59,7 +59,7 @@ fun createInfractionCommands(databaseService: DatabaseService,
         }
     }
 
-    guildCommand("warn", "w", "W") {
+    command("warn", "w", "W") {
         description = "Warn a user."
         requiredPermission = Permissions.MODERATOR
         execute(LowerMemberArg, EveryArg("Reason")) {
@@ -77,7 +77,7 @@ fun createInfractionCommands(databaseService: DatabaseService,
         }
     }
 
-    guildCommand("badpfp") {
+    command("badpfp") {
         description = "Notifies the user that they should change their profile pic and applies a 30 minute mute. Bans the user if they don't change picture."
         requiredPermission = Permissions.STAFF
         execute(BooleanArg("cancel", "apply", "cancel").optional(true), LowerMemberArg) {
@@ -108,7 +108,7 @@ fun createInfractionCommands(databaseService: DatabaseService,
         }
     }
 
-    guildCommand("badname") {
+    command("badname") {
         description = "Rename a guild member that has a bad name."
         requiredPermission = Permissions.MODERATOR
         execute(LowerMemberArg) {
@@ -117,7 +117,7 @@ fun createInfractionCommands(databaseService: DatabaseService,
         }
     }
 
-    guildCommand("cleanseInfractions") {
+    command("cleanseInfractions") {
         description = "Use this to delete (permanently) as user's infractions."
         requiredPermission = Permissions.ADMINISTRATOR
         execute(LowerUserArg) {
@@ -131,7 +131,7 @@ fun createInfractionCommands(databaseService: DatabaseService,
         }
     }
 
-    guildCommand("removeInfraction") {
+    command("removeInfraction") {
         description = "Use this to delete (permanently) an infraction from a user."
         requiredPermission = Permissions.ADMINISTRATOR
         execute(LowerUserArg, IntegerArg("Infraction ID")) {

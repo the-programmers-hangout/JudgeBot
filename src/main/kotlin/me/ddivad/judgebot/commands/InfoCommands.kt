@@ -16,7 +16,7 @@ import me.jakejmattson.discordkt.api.extensions.sendPrivateMessage
 
 @Suppress("unused")
 fun createInformationCommands(databaseService: DatabaseService) = commands("Information") {
-    guildCommand("info") {
+    command("info") {
         description = "Send an information message to a guild member"
         requiredPermission = Permissions.MODERATOR
         execute(LowerMemberArg, EveryArg("Info Content")) {
@@ -39,7 +39,7 @@ fun createInformationCommands(databaseService: DatabaseService) = commands("Info
         }
     }
 
-    guildCommand("removeInfo") {
+    command("removeInfo") {
         description = "Remove an information message from a member record."
         requiredPermission = Permissions.STAFF
         execute(LowerMemberArg, IntegerArg("Info ID")) {

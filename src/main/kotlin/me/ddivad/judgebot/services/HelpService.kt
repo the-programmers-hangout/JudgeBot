@@ -46,7 +46,7 @@ class HelpService {
 
                         Use `${event.prefix()}help <command>` for more information
                     """.trimIndent()
-                    color = event.discord.configuration.theme?.kColor
+                    color = event.discord.configuration.theme
 
                     field {
                         name = "**Commands**"
@@ -88,7 +88,7 @@ class HelpService {
     }
 
     suspend fun sendHelpEmbed(event: CommandEvent<*>, command: Command) = event.respond {
-        color = event.discord.configuration.theme?.kColor
+        color = event.discord.configuration.theme
         title = command.names.joinToString(", ")
         description = command.description
 
