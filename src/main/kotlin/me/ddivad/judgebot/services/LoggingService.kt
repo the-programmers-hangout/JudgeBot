@@ -84,8 +84,8 @@ class LoggingService(private val configuration: Configuration) {
 
         log(
             guild,
-            "**Info ::** Infraction Points for ${user?.descriptor()} " +
-                    "reduced by **$pointsDeducted** to **$newPoints** " +
+            "**Info ::** Infraction point decay for ${user?.descriptor()} " +
+                    "\nPoints reduced by **$pointsDeducted** to **$newPoints** " +
                     "for **$weeksSinceLastInfraction** infraction free weeks."
         )
     }
