@@ -5,9 +5,9 @@ import dev.kord.core.entity.channel.TextChannel
 import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.embeds.createConfigEmbed
 import me.ddivad.judgebot.embeds.createConfigOptionsEmbed
-import me.jakejmattson.discordkt.api.arguments.*
-import me.jakejmattson.discordkt.api.conversations.conversation
-import me.jakejmattson.discordkt.api.extensions.toSnowflake
+import me.jakejmattson.discordkt.arguments.*
+import me.jakejmattson.discordkt.conversations.conversation
+import me.jakejmattson.discordkt.extensions.toSnowflake
 
 class EditConfigConversation(private val configuration: Configuration) {
     fun createEditConfigurationConversation(guild: Guild, parameter: String) = conversation("cancel") {
@@ -15,17 +15,17 @@ class EditConfigConversation(private val configuration: Configuration) {
         when (parameter) {
             "addadminrole" -> {
                 val role = prompt(RoleArg, "Enter Admin role:")
-                guildConfiguration.adminRoles.add(role.id.asString)
+                guildConfiguration.adminRoles.add(role.id.toString())
                 respond("Added **${role.name}** to Admin roles.")
             }
             "addstaffrole" -> {
                 val role = prompt(RoleArg, "Enter Staff role:")
-                guildConfiguration.staffRoles.add(role.id.asString)
+                guildConfiguration.staffRoles.add(role.id.toString())
                 respond("Added **${role.name}** to Staff roles.")
             }
             "addmoderatorrole" -> {
                 val role = prompt(RoleArg, "Enter Moderator role:")
-                guildConfiguration.moderatorRoles.add(role.id.asString)
+                guildConfiguration.moderatorRoles.add(role.id.toString())
                 respond("Added **${role.name}** to moderator roles.")
             }
             "removeadminrole" -> {
@@ -34,8 +34,8 @@ class EditConfigConversation(private val configuration: Configuration) {
                         RoleArg,
                         "Enter role to remove:",
                         "Role not in Admin role list.",
-                        isValid = {role -> guildConfiguration.adminRoles.contains(role.id.asString) })
-                guildConfiguration.adminRoles.removeIf {it == role.id.asString}
+                        isValid = {role -> guildConfiguration.adminRoles.contains(role.id.toString()) })
+                guildConfiguration.adminRoles.removeIf {it == role.id.toString()}
                 respond("Removed **${role.name}** from Admin roles.")
             }
             "removestaffrole" -> {
@@ -44,8 +44,8 @@ class EditConfigConversation(private val configuration: Configuration) {
                         RoleArg,
                         "Enter role to remove:",
                         "Role not in Staff role list.",
-                        isValid = {role -> guildConfiguration.staffRoles.contains(role.id.asString) })
-                guildConfiguration.staffRoles.removeIf {it == role.id.asString}
+                        isValid = {role -> guildConfiguration.staffRoles.contains(role.id.toString()) })
+                guildConfiguration.staffRoles.removeIf {it == role.id.toString()}
                 respond("Removed **${role.name}** from Staff roles.")
             }
             "removemoderatorrole" -> {
@@ -54,23 +54,23 @@ class EditConfigConversation(private val configuration: Configuration) {
                         RoleArg,
                         "Enter role to remove:",
                         "Role not in Moderator role list.",
-                        isValid = {role -> guildConfiguration.moderatorRoles.contains(role.id.asString) })
-                guildConfiguration.moderatorRoles.removeIf {it == role.id.asString}
+                        isValid = {role -> guildConfiguration.moderatorRoles.contains(role.id.toString()) })
+                guildConfiguration.moderatorRoles.removeIf {it == role.id.toString()}
                 respond("Removed **${role.name}** from Moderator roles.")
             }
             "setmutedrole" -> {
                 val mutedRole = prompt(RoleArg, "Enter Mute role:")
-                guildConfiguration.mutedRole = mutedRole.id.asString
+                guildConfiguration.mutedRole = mutedRole.id.toString()
                 respond("Muted role set to **${mutedRole.name}**.")
             }
             "setlogchannel" -> {
                 val logChannel = prompt(ChannelArg<TextChannel>(), "Enter Logging channel:")
-                guildConfiguration.loggingConfiguration.loggingChannel = logChannel.id.asString
+                guildConfiguration.loggingConfiguration.loggingChannel = logChannel.id.toString()
                 respond("Log channel set to ${logChannel.mention}")
             }
             "setalertchannel" -> {
                 val alertChannel = prompt(ChannelArg<TextChannel>(), "Enter Logging channel:")
-                guildConfiguration.loggingConfiguration.alertChannel = alertChannel.id.asString
+                guildConfiguration.loggingConfiguration.alertChannel = alertChannel.id.toString()
                 respond("Alert channel set to ${alertChannel.mention}")
             }
             "setprefix" -> {

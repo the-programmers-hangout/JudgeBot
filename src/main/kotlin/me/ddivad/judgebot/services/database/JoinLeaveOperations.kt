@@ -2,7 +2,7 @@ package me.ddivad.judgebot.services.database
 
 import dev.kord.core.entity.Member
 import me.ddivad.judgebot.dataclasses.JoinLeave
-import me.jakejmattson.discordkt.api.annotations.Service
+import me.jakejmattson.discordkt.annotations.Service
 import org.joda.time.DateTime
 import org.litote.kmongo.and
 import org.litote.kmongo.eq
@@ -13,7 +13,7 @@ class JoinLeaveOperations(connection: ConnectionService) {
     private val joinLeaveCollection = connection.db.getCollection<JoinLeave>("JoinLeaves")
 
     suspend fun createJoinLeaveRecord(guildId: String, target: Member) {
-        val joinLeave = JoinLeave(guildId, target.id.asString, target.joinedAt.toEpochMilliseconds())
+        val joinLeave = JoinLeave(guildId, target.id.toString(), target.joinedAt.toEpochMilliseconds())
         joinLeaveCollection.insertOne(joinLeave)
     }
 
@@ -38,7 +38,7 @@ class JoinLeaveOperations(connection: ConnectionService) {
     }
 
     suspend fun createJoinLeaveRecordIfNotRecorded(guildId: String, target: Member) {
-        if (this.getMemberJoinLeaveDataForGuild(guildId, target.id.asString).isNotEmpty()) {
+        if (this.getMemberJoinLeaveDataForGuild(guildId, target.id.toString()).isNotEmpty()) {
             return
         }
         this.createJoinLeaveRecord(guildId, target)

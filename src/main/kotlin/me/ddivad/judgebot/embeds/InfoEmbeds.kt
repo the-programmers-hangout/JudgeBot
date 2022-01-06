@@ -6,7 +6,7 @@ import dev.kord.core.entity.Member
 import dev.kord.rest.Image
 import dev.kord.rest.builder.message.EmbedBuilder
 import me.ddivad.judgebot.dataclasses.*
-import me.jakejmattson.discordkt.api.extensions.addField
+import me.jakejmattson.discordkt.extensions.addField
 import java.awt.Color
 
 fun EmbedBuilder.createInformationEmbed(guild: Guild, user: Member, information: Info) {

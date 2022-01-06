@@ -1,7 +1,7 @@
 package me.ddivad.judgebot.services.database
 
 import me.ddivad.judgebot.dataclasses.Configuration
-import me.jakejmattson.discordkt.api.annotations.Service
+import me.jakejmattson.discordkt.annotations.Service
 import org.litote.kmongo.coroutine.CoroutineClient
 import org.litote.kmongo.coroutine.CoroutineDatabase
 import org.litote.kmongo.coroutine.coroutine

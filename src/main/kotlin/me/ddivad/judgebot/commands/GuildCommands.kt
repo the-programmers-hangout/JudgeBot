@@ -8,13 +8,13 @@ import me.ddivad.judgebot.dataclasses.Permissions
 import me.ddivad.judgebot.embeds.createActivePunishmentsEmbed
 import me.ddivad.judgebot.services.DatabaseService
 import me.ddivad.judgebot.services.infractions.MuteService
-import me.jakejmattson.discordkt.api.commands.commands
+import me.jakejmattson.discordkt.commands.commands
 
 @Suppress("unused")
 fun guildConfigCommands(configuration: Configuration,
                         databaseService: DatabaseService,
                         muteService: MuteService) = commands("Guild") {
-    guildCommand("setup") {
+    command("setup") {
         description = "Configure a guild to use Judgebot."
         requiredPermission = Permissions.ADMINISTRATOR
         execute {
@@ -30,7 +30,7 @@ fun guildConfigCommands(configuration: Configuration,
         }
     }
 
-    guildCommand("configuration") {
+    command("configuration") {
         description = "Update configuration parameters for this guild (conversation)."
         requiredPermission = Permissions.STAFF
         execute(GuildConfigArg.optional("options")) {
@@ -44,7 +44,7 @@ fun guildConfigCommands(configuration: Configuration,
         }
     }
 
-    guildCommand("activePunishments") {
+    command("activePunishments") {
         description = "View active punishments for a guild."
         requiredPermission = Permissions.STAFF
         execute {

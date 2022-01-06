@@ -11,10 +11,11 @@ import kotlinx.datetime.toJavaInstant
 import me.ddivad.judgebot.dataclasses.*
 import me.ddivad.judgebot.services.DatabaseService
 import me.ddivad.judgebot.util.*
-import me.jakejmattson.discordkt.api.dsl.MenuBuilder
-import me.jakejmattson.discordkt.api.extensions.addField
-import me.jakejmattson.discordkt.api.extensions.addInlineField
-import me.jakejmattson.discordkt.api.extensions.toSnowflake
+import me.jakejmattson.discordkt.dsl.MenuBuilder
+import me.jakejmattson.discordkt.extensions.addField
+import me.jakejmattson.discordkt.extensions.addInlineField
+import me.jakejmattson.discordkt.extensions.pfpUrl
+import me.jakejmattson.discordkt.extensions.toSnowflake
 import org.joda.time.DateTime
 import java.awt.Color
 import java.text.SimpleDateFormat
@@ -27,13 +28,13 @@ suspend fun MenuBuilder.createHistoryEmbed(
     config: Configuration,
     databaseService: DatabaseService
 ) {
-    val userRecord = member.getGuildInfo(guild.id.asString)
+    val userRecord = member.getGuildInfo(guild.id.toString())
     val paginatedNotes = userRecord.notes.chunked(4)
 
     val totalMenuPages = 1 + 1 + 1 + 1 + if (paginatedNotes.isNotEmpty()) paginatedNotes.size else 1
     val guildConfiguration = config[guild.id.value]!!
     val embedColor = getEmbedColour(guild, target, databaseService)
-    val leaveData = databaseService.joinLeaves.getMemberJoinLeaveDataForGuild(guild.id.asString, member.userId)
+    val leaveData = databaseService.joinLeaves.getMemberJoinLeaveDataForGuild(guild.id.toString(), member.userId)
     this.apply {
         buildOverviewPage(guild, guildConfiguration, target, userRecord, embedColor, totalMenuPages, databaseService)
         buildInfractionPage(guild, guildConfiguration, target, userRecord, embedColor, totalMenuPages)
@@ -85,7 +86,7 @@ private suspend fun MenuBuilder.buildOverviewPage(
         color = embedColor.kColor
         title = "${target.asUser().tag}: Overview"
         thumbnail {
-            url = target.asUser().avatar.url
+            url = target.asUser().pfpUrl
         }
         val memberInGuild = target.asMemberOrNull(guild.id)
 
@@ -101,7 +102,7 @@ private suspend fun MenuBuilder.buildOverviewPage(
         addInlineField("Points", "**${userRecord.points} / ${config.infractionConfiguration.pointCeiling}**")
         addInlineField("History Invokes", "${userRecord.historyCount}")
 
-        addInlineField("Created", formatOffsetTime(target.id.timeStamp.toJavaInstant()))
+        addInlineField("Created", formatOffsetTime(target.id.timestamp.toJavaInstant()))
         if (memberInGuild != null) {
             addInlineField("Joined", formatOffsetTime(memberInGuild.joinedAt.toJavaInstant()))
         } else addInlineField("", "")
@@ -146,7 +147,7 @@ private suspend fun MenuBuilder.buildInfractionPage(
         color = embedColor.kColor
         title = "${target.asUser().tag}: Infractions"
         thumbnail {
-            url = target.asUser().avatar.url
+            url = target.asUser().pfpUrl
         }
         val warnings = userRecord.infractions.filter { it.type == InfractionType.Warn }.sortedBy { it.dateTime }
         val strikes = userRecord.infractions.filter { it.type == InfractionType.Strike }.sortedBy { it.dateTime }
@@ -203,7 +204,7 @@ private suspend fun MenuBuilder.buildNotesPages(
             color = embedColor.kColor
             title = "${target.asUser().tag}: Notes"
             thumbnail {
-                url = target.asUser().avatar.url
+                url = target.asUser().pfpUrl
             }
 
             addInlineField("Points", "**${userRecord.points} / ${config.infractionConfiguration.pointCeiling}**")
@@ -223,7 +224,7 @@ private suspend fun MenuBuilder.buildNotesPages(
             color = embedColor.kColor
             title = "${target.asUser().tag}: Notes" + if (paginatedNotes.size > 1) "(${index + 1})" else ""
             thumbnail {
-                url = target.asUser().avatar.url
+                url = target.asUser().pfpUrl
             }
             addInlineField("Notes", "${userRecord.notes.size}")
             addInlineField("Information", "${userRecord.info.size}")
@@ -259,7 +260,7 @@ private suspend fun MenuBuilder.buildInformationPage(
         color = embedColor.kColor
         title = "${target.asUser().tag}: Information"
         thumbnail {
-            url = target.asUser().avatar.url
+            url = target.asUser().pfpUrl
         }
         addInlineField("Notes", "${userRecord.notes.size}")
         addInlineField("Information", "${userRecord.info.size}")
@@ -296,7 +297,7 @@ private suspend fun MenuBuilder.buildJoinLeavePage(
         color = embedColor.kColor
         title = "${target.asUser().tag}: Join / Leave"
         thumbnail {
-            url = target.asUser().avatar.url
+            url = target.asUser().pfpUrl
         }
 
         addInlineField("Joins:", joinLeaves.size.toString())
@@ -346,7 +347,7 @@ private suspend fun getEmbedColour(guild: Guild, target: User, databaseService: 
 
 private suspend fun getStatus(guild: Guild, target: User, databaseService: DatabaseService): String? {
     guild.getBanOrNull(target.id)?.let {
-        val reason = databaseService.guilds.getBanOrNull(guild, target.id.asString)?.reason ?: it.reason
+        val reason = databaseService.guilds.getBanOrNull(guild, target.id.toString())?.reason ?: it.reason
         return "```css\nUser is banned with reason:\n${reason}```"
     }
     if (target.asMemberOrNull(guild.id) == null) return "```css\nUser not currently in this guild```"
@@ -387,7 +388,7 @@ suspend fun EmbedBuilder.createCondensedHistoryEmbed(
     config: Configuration
 ) {
 
-    val userGuildDetails = member.getGuildInfo(guild.id.asString)
+    val userGuildDetails = member.getGuildInfo(guild.id.toString())
     val infractions = userGuildDetails.infractions
     val warnings = userGuildDetails.infractions.filter { it.type == InfractionType.Warn }
     val strikes = userGuildDetails.infractions.filter { it.type == InfractionType.Strike }
@@ -397,7 +398,7 @@ suspend fun EmbedBuilder.createCondensedHistoryEmbed(
     color = Color.MAGENTA.kColor
     title = "${target.asUser().tag}'s Record"
     thumbnail {
-        url = target.asUser().avatar.url
+        url = target.asUser().pfpUrl
     }
     addInlineField("Infractions", "${infractions.size}")
     addInlineField("Notes", "${notes.size}")
@@ -467,7 +468,7 @@ suspend fun EmbedBuilder.createSelfHistoryEmbed(
     config: Configuration
 ) {
 
-    val userGuildDetails = member.getGuildInfo(guild.id.asString)
+    val userGuildDetails = member.getGuildInfo(guild.id.toString())
     val infractions = userGuildDetails.infractions
     val warnings = userGuildDetails.infractions.filter { it.type == InfractionType.Warn }
     val strikes = userGuildDetails.infractions.filter { it.type == InfractionType.Strike }
@@ -476,7 +477,7 @@ suspend fun EmbedBuilder.createSelfHistoryEmbed(
     color = Color.MAGENTA.kColor
     title = "${target.asUser().tag}'s Record"
     thumbnail {
-        url = target.asUser().avatar.url
+        url = target.asUser().pfpUrl
     }
     addInlineField("Infractions", "${infractions.size}")
     addInlineField("Points", "**${member.getPoints(guild)} / $maxPoints**")

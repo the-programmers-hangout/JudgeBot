@@ -6,12 +6,12 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import me.ddivad.judgebot.services.DatabaseService
-import me.jakejmattson.discordkt.api.dsl.listeners
+import me.jakejmattson.discordkt.dsl.listeners
 
 @Suppress("unused")
 fun onGuildMemberLeave(databaseService: DatabaseService) = listeners {
     on<MemberLeaveEvent> {
-        databaseService.joinLeaves.addLeaveData(guildId.asString, user.id.asString)
+        databaseService.joinLeaves.addLeaveData(guildId.toString(), user.id.toString())
     }
 
     on<MemberJoinEvent> {
@@ -19,7 +19,7 @@ fun onGuildMemberLeave(databaseService: DatabaseService) = listeners {
         GlobalScope.launch {
             delay(1000 * 10 * 1)
             guild.getMemberOrNull(member.id)?.let {
-                databaseService.joinLeaves.createJoinLeaveRecord(guildId.asString, member)
+                databaseService.joinLeaves.createJoinLeaveRecord(guildId.toString(), member)
             }
         }
     }

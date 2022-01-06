@@ -7,8 +7,8 @@ import dev.kord.x.emoji.Emojis
 import dev.kord.x.emoji.addReaction
 import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.util.createFlagMessage
-import me.jakejmattson.discordkt.api.dsl.listeners
-import me.jakejmattson.discordkt.api.extensions.toSnowflake
+import me.jakejmattson.discordkt.dsl.listeners
+import me.jakejmattson.discordkt.extensions.toSnowflake
 
 @Suppress("unused")
 fun onMemberReactionAdd(configuration: Configuration) = listeners {

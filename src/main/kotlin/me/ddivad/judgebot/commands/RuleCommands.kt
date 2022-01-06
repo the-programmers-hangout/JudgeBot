@@ -11,14 +11,14 @@ import me.ddivad.judgebot.embeds.createRuleEmbed
 import me.ddivad.judgebot.embeds.createRulesEmbed
 import me.ddivad.judgebot.embeds.createRulesEmbedDetailed
 import me.ddivad.judgebot.services.DatabaseService
-import me.jakejmattson.discordkt.api.arguments.MessageArg
-import me.jakejmattson.discordkt.api.commands.commands
-import me.jakejmattson.discordkt.api.extensions.jumpLink
+import me.jakejmattson.discordkt.arguments.MessageArg
+import me.jakejmattson.discordkt.commands.commands
+import me.jakejmattson.discordkt.extensions.jumpLink
 
 @Suppress("unused")
 fun ruleCommands(databaseService: DatabaseService) = commands("Rule") {
 
-    guildCommand("addRule") {
+    command("addRule") {
         description = "Add a rule to this guild."
         requiredPermission = Permissions.ADMINISTRATOR
         execute {
@@ -28,7 +28,7 @@ fun ruleCommands(databaseService: DatabaseService) = commands("Rule") {
         }
     }
 
-    guildCommand("editRule") {
+    command("editRule") {
         description = "Edit a rule in this guild."
         requiredPermission = Permissions.ADMINISTRATOR
         execute {
@@ -38,7 +38,7 @@ fun ruleCommands(databaseService: DatabaseService) = commands("Rule") {
         }
     }
 
-    guildCommand("archiveRule") {
+    command("archiveRule") {
         description = "Archive a rule in this guild."
         requiredPermission = Permissions.ADMINISTRATOR
         execute {
@@ -48,7 +48,7 @@ fun ruleCommands(databaseService: DatabaseService) = commands("Rule") {
         }
     }
 
-    guildCommand("rules") {
+    command("rules") {
         description = "List the rules of this guild. Pass a message ID to edit existing rules embed."
         requiredPermission = Permissions.NONE
         execute(MessageArg.optionalNullable(null)) {
@@ -64,7 +64,7 @@ fun ruleCommands(databaseService: DatabaseService) = commands("Rule") {
         }
     }
 
-    guildCommand("longRules") {
+    command("longRules") {
         description = "List the rules (with descriptions) of this guild. Pass a message ID to edit existing rules embed."
         requiredPermission = Permissions.STAFF
         execute(MessageArg.optionalNullable(null)) {
@@ -80,7 +80,7 @@ fun ruleCommands(databaseService: DatabaseService) = commands("Rule") {
         }
     }
 
-    guildCommand("rule") {
+    command("rule") {
         description = "List a rule from this guild."
         requiredPermission = Permissions.NONE
         execute(RuleArg) {

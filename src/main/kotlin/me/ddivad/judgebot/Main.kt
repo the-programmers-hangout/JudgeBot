@@ -1,7 +1,6 @@
 package me.ddivad.judgebot
 
 import dev.kord.common.annotation.KordPreview
-import dev.kord.common.kColor
 import dev.kord.core.supplier.EntitySupplyStrategy
 import dev.kord.gateway.Intent
 import dev.kord.gateway.Intents
@@ -11,8 +10,9 @@ import me.ddivad.judgebot.dataclasses.Permissions
 import me.ddivad.judgebot.services.*
 import me.ddivad.judgebot.services.infractions.BanService
 import me.ddivad.judgebot.services.infractions.MuteService
-import me.jakejmattson.discordkt.api.dsl.bot
-import me.jakejmattson.discordkt.api.extensions.addInlineField
+import me.jakejmattson.discordkt.dsl.bot
+import me.jakejmattson.discordkt.extensions.addInlineField
+import me.jakejmattson.discordkt.extensions.pfpUrl
 import java.awt.Color
 
 @KordPreview
@@ -24,8 +24,9 @@ suspend fun main() {
     require(token != null) { "Expected the bot token as an environment variable" }
 
     bot(token) {
+        val configuration = data("config/config.json") { Configuration() }
+
         prefix {
-            val configuration = discord.getInjectionObjects(Configuration::class)
             guild?.let { configuration[guild!!.id.value]?.prefix } ?: defaultPrefix
         }
 
@@ -49,11 +50,9 @@ suspend fun main() {
             val botStats = it.discord.getInjectionObjects(BotStatsService::class)
             val channel = it.channel
             val self = channel.kord.getSelf()
-
-            color = it.discord.configuration.theme?.kColor
-
+            color = it.discord.configuration.theme
             thumbnail {
-                url = self.avatar.url
+                url = self.pfpUrl
             }
 
             field {
@@ -70,7 +69,7 @@ suspend fun main() {
             field {
                 name = "Build Info"
                 value = "```" +
-                    "Version:   2.6.0\n" +
+                    "Version:   2.7.0\n" +
                     "DiscordKt: ${versions.library}\n" +
                     "Kord: ${versions.kord}\n" +
                     "Kotlin:    $kotlinVersion" +

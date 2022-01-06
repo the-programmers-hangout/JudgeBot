@@ -5,7 +5,8 @@ import dev.kord.core.entity.Guild
 import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.embeds.createSelfHistoryEmbed
 import me.ddivad.judgebot.services.DatabaseService
-import me.jakejmattson.discordkt.api.conversations.conversation
+import me.jakejmattson.discordkt.conversations.conversation
+import me.jakejmattson.discordkt.extensions.pfpUrl
 import java.awt.Color
 
 fun guildChoiceConversation(
@@ -19,7 +20,7 @@ fun guildChoiceConversation(
             title = "Select Server"
             description = "Select the server you want to view the history for."
             thumbnail {
-                url = discord.kord.getSelf().avatar.url
+                url = discord.kord.getSelf().pfpUrl
             }
         }
 

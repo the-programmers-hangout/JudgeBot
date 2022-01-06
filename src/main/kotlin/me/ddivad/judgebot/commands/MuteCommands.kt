@@ -9,15 +9,15 @@ import me.ddivad.judgebot.extensions.testDmStatus
 import me.ddivad.judgebot.services.infractions.MuteService
 import me.ddivad.judgebot.services.infractions.RoleState
 import me.ddivad.judgebot.util.timeToString
-import me.jakejmattson.discordkt.api.arguments.EveryArg
-import me.jakejmattson.discordkt.api.arguments.TimeArg
-import me.jakejmattson.discordkt.api.arguments.UserArg
-import me.jakejmattson.discordkt.api.commands.commands
+import me.jakejmattson.discordkt.arguments.EveryArg
+import me.jakejmattson.discordkt.arguments.TimeArg
+import me.jakejmattson.discordkt.arguments.UserArg
+import me.jakejmattson.discordkt.commands.commands
 import kotlin.math.roundToLong
 
 @Suppress("unused")
 fun createMuteCommands(muteService: MuteService) = commands("Mute") {
-    guildCommand("mute") {
+    command("mute") {
         description = "Mute a user for a specified time."
         requiredPermission = Permissions.MODERATOR
         execute(LowerMemberArg, TimeArg("Time"), EveryArg("Reason")) {
@@ -34,7 +34,7 @@ fun createMuteCommands(muteService: MuteService) = commands("Mute") {
         }
     }
 
-    guildCommand("unmute") {
+    command("unmute") {
         description = "Unmute a user."
         requiredPermission = Permissions.MODERATOR
         execute(LowerMemberArg) {
@@ -49,7 +49,7 @@ fun createMuteCommands(muteService: MuteService) = commands("Mute") {
         }
     }
 
-    guildCommand("gag") {
+    command("gag") {
         description = "Mute a user for 5 minutes while you deal with something"
         requiredPermission = Permissions.MODERATOR
         execute(LowerMemberArg) {

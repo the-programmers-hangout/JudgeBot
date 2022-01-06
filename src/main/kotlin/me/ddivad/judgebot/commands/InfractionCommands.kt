@@ -17,11 +17,11 @@ import me.ddivad.judgebot.services.*
 import me.ddivad.judgebot.services.infractions.BadPfpService
 import me.ddivad.judgebot.services.infractions.BadnameService
 import me.ddivad.judgebot.services.infractions.InfractionService
-import me.jakejmattson.discordkt.api.arguments.BooleanArg
-import me.jakejmattson.discordkt.api.arguments.EveryArg
-import me.jakejmattson.discordkt.api.arguments.IntegerArg
-import me.jakejmattson.discordkt.api.commands.commands
-import me.jakejmattson.discordkt.api.conversations.ConversationResult
+import me.jakejmattson.discordkt.arguments.BooleanArg
+import me.jakejmattson.discordkt.arguments.EveryArg
+import me.jakejmattson.discordkt.arguments.IntegerArg
+import me.jakejmattson.discordkt.commands.commands
+import me.jakejmattson.discordkt.conversations.ConversationResult
 
 @KordPreview
 @Suppress("unused")
@@ -30,7 +30,7 @@ fun createInfractionCommands(databaseService: DatabaseService,
                              infractionService: InfractionService,
                              badPfpService: BadPfpService,
                              badnameService: BadnameService) = commands("Infraction") {
-    guildCommand("strike", "s", "S") {
+    command("strike", "s", "S") {
         description = "Strike a user."
         requiredPermission = Permissions.STAFF
         execute(LowerMemberArg, IntegerArg("Weight").optional(1), EveryArg("Reason")) {
@@ -59,7 +59,7 @@ fun createInfractionCommands(databaseService: DatabaseService,
         }
     }
 
-    guildCommand("warn", "w", "W") {
+    command("warn", "w", "W") {
         description = "Warn a user."
         requiredPermission = Permissions.MODERATOR
         execute(LowerMemberArg, EveryArg("Reason")) {
@@ -77,7 +77,7 @@ fun createInfractionCommands(databaseService: DatabaseService,
         }
     }
 
-    guildCommand("badpfp") {
+    command("badpfp") {
         description = "Notifies the user that they should change their profile pic and applies a 30 minute mute. Bans the user if they don't change picture."
         requiredPermission = Permissions.STAFF
         execute(BooleanArg("cancel", "apply", "cancel").optional(true), LowerMemberArg) {
@@ -102,13 +102,13 @@ fun createInfractionCommands(databaseService: DatabaseService,
                 return@execute
             }
 
-            val badPfp = Infraction(author.id.asString, "BadPfp", InfractionType.BadPfp)
+            val badPfp = Infraction(author.id.toString(), "BadPfp", InfractionType.BadPfp)
             badPfpService.applyBadPfp(targetMember, guild, timeLimit)
             respond("${targetMember.mention} has been muted and a badpfp has been triggered with a time limit of $minutesUntilBan minutes.")
         }
     }
 
-    guildCommand("badname") {
+    command("badname") {
         description = "Rename a guild member that has a bad name."
         requiredPermission = Permissions.MODERATOR
         execute(LowerMemberArg) {
@@ -117,12 +117,12 @@ fun createInfractionCommands(databaseService: DatabaseService,
         }
     }
 
-    guildCommand("cleanseInfractions") {
+    command("cleanseInfractions") {
         description = "Use this to delete (permanently) as user's infractions."
         requiredPermission = Permissions.ADMINISTRATOR
         execute(LowerUserArg) {
             val user = databaseService.users.getOrCreateUser(args.first, guild)
-            if (user.getGuildInfo(guild.id.asString).infractions.isEmpty()) {
+            if (user.getGuildInfo(guild.id.toString()).infractions.isEmpty()) {
                 respond("User has no infractions.")
                 return@execute
             }
@@ -131,12 +131,12 @@ fun createInfractionCommands(databaseService: DatabaseService,
         }
     }
 
-    guildCommand("removeInfraction") {
+    command("removeInfraction") {
         description = "Use this to delete (permanently) an infraction from a user."
         requiredPermission = Permissions.ADMINISTRATOR
         execute(LowerUserArg, IntegerArg("Infraction ID")) {
             val user = databaseService.users.getOrCreateUser(args.first, guild)
-            if (user.getGuildInfo(guild.id.asString).infractions.isEmpty()) {
+            if (user.getGuildInfo(guild.id.toString()).infractions.isEmpty()) {
                 respond("User has no infractions.")
                 return@execute
             }

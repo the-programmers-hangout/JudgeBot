@@ -3,9 +3,9 @@ package me.ddivad.judgebot.services
 import dev.kord.core.supplier.EntitySupplyStrategy
 import kotlinx.coroutines.flow.toList
 import me.ddivad.judgebot.dataclasses.Configuration
-import me.jakejmattson.discordkt.api.Discord
-import me.jakejmattson.discordkt.api.annotations.Service
-import me.jakejmattson.discordkt.api.extensions.toSnowflake
+import me.jakejmattson.discordkt.Discord
+import me.jakejmattson.discordkt.annotations.Service
+import me.jakejmattson.discordkt.extensions.toSnowflake
 
 @Service
 class CacheService(private val discord: Discord, private val configuration: Configuration) {
