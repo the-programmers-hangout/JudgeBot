@@ -114,11 +114,14 @@ data class GuildMember(
     suspend fun checkPointDecay(guild: Guild, configuration: GuildConfiguration, loggingService: LoggingService) = with(this.getGuildInfo(guild.id.toString())) {
         val weeksSincePointsDecayed = Weeks.weeksBetween(DateTime(this.pointDecayTimer), DateTime()).weeks
         if (weeksSincePointsDecayed > 0) {
-            val pointsToRemove = configuration.infractionConfiguration.pointDecayPerWeek * weeksSincePointsDecayed
-            this.points -= pointsToRemove
-            if (this.points < 0) this.points = 0
+            if (this.points > 0) {
+                val pointsToRemove = configuration.infractionConfiguration.pointDecayPerWeek * weeksSincePointsDecayed
+                if (pointsToRemove > this.points) {
+                    this.points = 0
+                } else this.points -= pointsToRemove
+                loggingService.pointDecayApplied(guild, this@GuildMember, this.points, pointsToRemove, weeksSincePointsDecayed)
+            }
             this.pointDecayTimer = DateTime().millis
-            loggingService.pointDecayApplied(guild, this@GuildMember, this.points, pointsToRemove, weeksSincePointsDecayed)
         }
     }
 
