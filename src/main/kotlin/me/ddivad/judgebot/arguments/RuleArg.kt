@@ -3,8 +3,8 @@ package me.ddivad.judgebot.arguments
 import dev.kord.core.entity.Guild
 import me.ddivad.judgebot.dataclasses.Rule
 import me.ddivad.judgebot.services.DatabaseService
-import me.jakejmattson.discordkt.api.arguments.*
-import me.jakejmattson.discordkt.api.commands.CommandEvent
+import me.jakejmattson.discordkt.arguments.*
+import me.jakejmattson.discordkt.commands.CommandEvent
 
 open class RuleArg(override val name: String = "Rule") : Argument<Rule> {
     override val description = "A rule number"

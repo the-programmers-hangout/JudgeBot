@@ -9,10 +9,10 @@ import me.ddivad.judgebot.extensions.testDmStatus
 import me.ddivad.judgebot.services.infractions.MuteService
 import me.ddivad.judgebot.services.infractions.RoleState
 import me.ddivad.judgebot.util.timeToString
-import me.jakejmattson.discordkt.api.arguments.EveryArg
-import me.jakejmattson.discordkt.api.arguments.TimeArg
-import me.jakejmattson.discordkt.api.arguments.UserArg
-import me.jakejmattson.discordkt.api.commands.commands
+import me.jakejmattson.discordkt.arguments.EveryArg
+import me.jakejmattson.discordkt.arguments.TimeArg
+import me.jakejmattson.discordkt.arguments.UserArg
+import me.jakejmattson.discordkt.commands.commands
 import kotlin.math.roundToLong
 
 @Suppress("unused")

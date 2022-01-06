@@ -7,29 +7,32 @@ import me.ddivad.judgebot.dataclasses.GuildMember
 import me.ddivad.judgebot.dataclasses.Infraction
 import dev.kord.core.entity.User
 import me.ddivad.judgebot.dataclasses.*
-import me.jakejmattson.discordkt.api.annotations.Service
+import me.ddivad.judgebot.services.LoggingService
+import me.jakejmattson.discordkt.annotations.Service
 import org.litote.kmongo.eq
 
 @Service
 class UserOperations(
     connection: ConnectionService,
     private val configuration: Configuration,
-    private val joinLeaveService: JoinLeaveOperations
+    private val joinLeaveService: JoinLeaveOperations,
+    private val loggingService: LoggingService
 ) {
     private val userCollection = connection.db.getCollection<GuildMember>("Users")
 
     suspend fun getOrCreateUser(target: User, guild: Guild): GuildMember {
-        val userRecord = userCollection.findOne(GuildMember::userId eq target.id.asString)
+        val userRecord = userCollection.findOne(GuildMember::userId eq target.id.toString())
         return if (userRecord != null) {
-            userRecord.ensureGuildDetailsPresent(guild.id.asString)
-            userRecord.checkPointDecay(guild, configuration[guild.id.value]!!)
+            userRecord.ensureGuildDetailsPresent(guild.id.toString())
+            userRecord.checkPointDecay(guild, configuration[guild.id.value]!!, loggingService)
+            this.updateUser(userRecord)
             target.asMemberOrNull(guild.id)?.let {
-                joinLeaveService.createJoinLeaveRecordIfNotRecorded(guild.id.asString, it)
+                joinLeaveService.createJoinLeaveRecordIfNotRecorded(guild.id.toString(), it)
             }
             userRecord
         } else {
-            val guildMember = GuildMember(target.id.asString)
-            guildMember.guilds.add(GuildMemberDetails(guild.id.asString))
+            val guildMember = GuildMember(target.id.toString())
+            guildMember.guilds.add(GuildMemberDetails(guild.id.toString()))
             userCollection.insertOne(guildMember)
             guildMember
         }
@@ -105,7 +108,7 @@ class UserOperations(
     }
 
     suspend fun incrementUserHistory(user: GuildMember, guild: Guild): GuildMember {
-        user.incrementHistoryCount(guild.id.asString)
+        user.incrementHistoryCount(guild.id.toString())
         return this.updateUser(user)
     }
 
@@ -122,7 +125,7 @@ class UserOperations(
     private fun getPunishmentForPoints(guild: Guild, guildMember: GuildMember): PunishmentLevel {
         val punishmentLevels = configuration[guild.id.value]?.punishments
         return punishmentLevels!!.filter {
-            it.points <= guildMember.getGuildInfo(guild.id.asString).points
+            it.points <= guildMember.getGuildInfo(guild.id.toString()).points
         }.maxByOrNull { it.points }!!
     }
 }

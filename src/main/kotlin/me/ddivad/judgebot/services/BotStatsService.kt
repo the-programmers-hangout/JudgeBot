@@ -1,8 +1,8 @@
 package me.ddivad.judgebot.services
 
 import me.ddivad.judgebot.util.timeToString
-import me.jakejmattson.discordkt.api.Discord
-import me.jakejmattson.discordkt.api.annotations.Service
+import me.jakejmattson.discordkt.Discord
+import me.jakejmattson.discordkt.annotations.Service
 import java.util.*
 
 @Service

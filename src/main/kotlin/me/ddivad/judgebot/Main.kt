@@ -1,7 +1,6 @@
 package me.ddivad.judgebot
 
 import dev.kord.common.annotation.KordPreview
-import dev.kord.common.kColor
 import dev.kord.core.supplier.EntitySupplyStrategy
 import dev.kord.gateway.Intent
 import dev.kord.gateway.Intents
@@ -11,8 +10,9 @@ import me.ddivad.judgebot.dataclasses.Permissions
 import me.ddivad.judgebot.services.*
 import me.ddivad.judgebot.services.infractions.BanService
 import me.ddivad.judgebot.services.infractions.MuteService
-import me.jakejmattson.discordkt.api.dsl.bot
-import me.jakejmattson.discordkt.api.extensions.addInlineField
+import me.jakejmattson.discordkt.dsl.bot
+import me.jakejmattson.discordkt.extensions.addInlineField
+import me.jakejmattson.discordkt.extensions.pfpUrl
 import java.awt.Color
 
 @KordPreview
@@ -25,6 +25,7 @@ suspend fun main() {
 
     bot(token) {
         val configuration = data("config/config.json") { Configuration() }
+
         prefix {
             guild?.let { configuration[guild!!.id.value]?.prefix } ?: defaultPrefix
         }
@@ -49,11 +50,9 @@ suspend fun main() {
             val botStats = it.discord.getInjectionObjects(BotStatsService::class)
             val channel = it.channel
             val self = channel.kord.getSelf()
-
             color = it.discord.configuration.theme
-
             thumbnail {
-                url = self.avatar.url
+                url = self.pfpUrl
             }
 
             field {

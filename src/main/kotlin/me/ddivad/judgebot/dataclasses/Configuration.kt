@@ -3,17 +3,17 @@ package me.ddivad.judgebot.dataclasses
 import dev.kord.core.entity.Guild
 import dev.kord.core.entity.Role
 import kotlinx.serialization.Serializable
-import me.jakejmattson.discordkt.api.dsl.Data
+import me.jakejmattson.discordkt.dsl.Data
 
 @Serializable
 data class Configuration(
     val ownerId: String = "insert-owner-id",
     var prefix: String = "judge!",
-    val guildConfigurations: MutableMap<Long, GuildConfiguration> = mutableMapOf(),
+    val guildConfigurations: MutableMap<ULong, GuildConfiguration> = mutableMapOf(),
     val dbConfiguration: DatabaseConfiguration = DatabaseConfiguration()
 ) : Data() {
-    operator fun get(id: Long) = guildConfigurations[id]
-    fun hasGuildConfig(guildId: Long) = guildConfigurations.containsKey(guildId)
+    operator fun get(id: ULong) = guildConfigurations[id]
+    fun hasGuildConfig(guildId: ULong) = guildConfigurations.containsKey(guildId)
 
     fun setup(
         guild: Guild,
@@ -27,12 +27,12 @@ data class Configuration(
         if (guildConfigurations[guild.id.value] != null) return
 
         val newConfiguration = GuildConfiguration(
-            guild.id.asString,
+            guild.id.toString(),
             prefix,
-            mutableListOf(moderatorRole.id.asString),
-            mutableListOf(staffRole.id.asString),
-            mutableListOf(adminRole.id.asString),
-            mutedRole.id.asString,
+            mutableListOf(moderatorRole.id.toString()),
+            mutableListOf(staffRole.id.toString()),
+            mutableListOf(adminRole.id.toString()),
+            mutedRole.id.toString(),
             logging
         )
 

@@ -14,10 +14,11 @@ import me.ddivad.judgebot.embeds.createSelfHistoryEmbed
 import me.ddivad.judgebot.services.DatabaseService
 import me.ddivad.judgebot.services.LoggingService
 import me.ddivad.judgebot.services.infractions.BanService
-import me.jakejmattson.discordkt.api.arguments.*
-import me.jakejmattson.discordkt.api.commands.commands
-import me.jakejmattson.discordkt.api.extensions.mutualGuilds
-import me.jakejmattson.discordkt.api.extensions.sendPrivateMessage
+import me.jakejmattson.discordkt.arguments.*
+import me.jakejmattson.discordkt.commands.commands
+import me.jakejmattson.discordkt.extensions.mutualGuilds
+import me.jakejmattson.discordkt.extensions.pfpUrl
+import me.jakejmattson.discordkt.extensions.sendPrivateMessage
 import java.awt.Color
 
 @Suppress("unused")
@@ -64,12 +65,12 @@ fun createUserCommands(
         requiredPermission = Permissions.MODERATOR
         execute(UserArg) {
             val user = args.first
-            val reverseSearchUrl = "<https://www.google.com/searchbyimage?&image_url=${user.avatar.url}>"
+            val reverseSearchUrl = "<https://www.google.com/searchbyimage?&image_url=${user.pfpUrl}>"
             respond {
                 title = "${user.tag}'s pfp"
                 color = Color.MAGENTA.kColor
                 description = "[Reverse Search]($reverseSearchUrl)"
-                image = "${user.avatar.url}?size=512"
+                image = "${user.pfpUrl}?size=512"
             }
         }
     }
@@ -83,7 +84,7 @@ fun createUserCommands(
                 respond("Delete days cannot be more than **7**. You tried with **${deleteDays}**")
                 return@execute
             }
-            val ban = Punishment(target.id.asString, InfractionType.Ban, reason, author.id.asString)
+            val ban = Punishment(target.id.toString(), InfractionType.Ban, reason, author.id.toString())
             banService.banUser(target, guild, ban, deleteDays).also {
                 loggingService.userBanned(guild, target, ban)
                 respond("User ${target.mention} banned")
@@ -110,12 +111,12 @@ fun createUserCommands(
         requiredPermission = Permissions.STAFF
         execute(UserArg, EveryArg("Reason")) {
             val (user, reason) = args
-            val ban = Ban(user.id.asString, author.id.asString, reason)
+            val ban = Ban(user.id.toString(), author.id.toString(), reason)
             if (guild.getBanOrNull(user.id) != null) {
-                if (!databaseService.guilds.checkBanExists(guild, user.id.asString)) {
+                if (!databaseService.guilds.checkBanExists(guild, user.id.toString())) {
                     databaseService.guilds.addBan(guild, ban)
                 } else {
-                    databaseService.guilds.editBanReason(guild, user.id.asString, reason)
+                    databaseService.guilds.editBanReason(guild, user.id.toString(), reason)
                 }
                 respond("Ban reason for ${user.username} set to: $reason")
             } else respond("User ${user.username} isn't banned")
@@ -129,7 +130,7 @@ fun createUserCommands(
         execute(UserArg) {
             val user = args.first
             guild.getBanOrNull(user.id)?.let {
-                val reason = databaseService.guilds.getBanOrNull(guild, user.id.asString)?.reason ?: it.reason
+                val reason = databaseService.guilds.getBanOrNull(guild, user.id.toString())?.reason ?: it.reason
                 respond(reason ?: "No reason logged")
                 return@execute
             }
@@ -165,8 +166,8 @@ fun createUserCommands(
             val (main, alt) = args
             val mainRecord = databaseService.users.getOrCreateUser(main, guild)
             val altRecord = databaseService.users.getOrCreateUser(alt, guild)
-            databaseService.users.addLinkedAccount(guild, mainRecord, alt.id.asString)
-            databaseService.users.addLinkedAccount(guild, altRecord, main.id.asString)
+            databaseService.users.addLinkedAccount(guild, mainRecord, alt.id.toString())
+            databaseService.users.addLinkedAccount(guild, altRecord, main.id.toString())
             respond("Linked accounts ${main.mention} and ${alt.mention}")
         }
     }
@@ -178,8 +179,8 @@ fun createUserCommands(
             val (main, alt) = args
             val mainRecord = databaseService.users.getOrCreateUser(main, guild)
             val altRecord = databaseService.users.getOrCreateUser(alt, guild)
-            databaseService.users.removeLinkedAccount(guild, mainRecord, alt.id.asString)
-            databaseService.users.removeLinkedAccount(guild, altRecord, main.id.asString)
+            databaseService.users.removeLinkedAccount(guild, mainRecord, alt.id.toString())
+            databaseService.users.removeLinkedAccount(guild, altRecord, main.id.toString())
             respond("Unlinked accounts ${main.mention} and ${alt.mention}")
         }
     }

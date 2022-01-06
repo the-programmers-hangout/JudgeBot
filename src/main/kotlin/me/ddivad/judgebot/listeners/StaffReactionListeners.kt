@@ -12,9 +12,9 @@ import me.ddivad.judgebot.services.DatabaseService
 import me.ddivad.judgebot.services.LoggingService
 import me.ddivad.judgebot.services.infractions.MuteService
 import me.ddivad.judgebot.services.infractions.RoleState
-import me.jakejmattson.discordkt.api.dsl.listeners
-import me.jakejmattson.discordkt.api.extensions.isSelf
-import me.jakejmattson.discordkt.api.extensions.sendPrivateMessage
+import me.jakejmattson.discordkt.dsl.listeners
+import me.jakejmattson.discordkt.extensions.isSelf
+import me.jakejmattson.discordkt.extensions.sendPrivateMessage
 
 @Suppress("unused")
 fun onStaffReactionAdd(

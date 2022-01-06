@@ -19,10 +19,10 @@ import me.ddivad.judgebot.embeds.createUnmuteEmbed
 import me.ddivad.judgebot.services.DatabaseService
 import me.ddivad.judgebot.services.LoggingService
 import me.ddivad.judgebot.util.applyRoleWithTimer
-import me.jakejmattson.discordkt.api.Discord
-import me.jakejmattson.discordkt.api.annotations.Service
-import me.jakejmattson.discordkt.api.extensions.sendPrivateMessage
-import me.jakejmattson.discordkt.api.extensions.toSnowflake
+import me.jakejmattson.discordkt.Discord
+import me.jakejmattson.discordkt.annotations.Service
+import me.jakejmattson.discordkt.extensions.sendPrivateMessage
+import me.jakejmattson.discordkt.extensions.toSnowflake
 import org.joda.time.DateTime
 
 typealias GuildID = String
@@ -41,7 +41,7 @@ class MuteService(val configuration: Configuration,
                   private val loggingService: LoggingService) {
     private val muteTimerMap = hashMapOf<Pair<UserId, GuildID>, Job>()
     private suspend fun getMutedRole(guild: Guild) = guild.getRole(configuration[guild.id.value]?.mutedRole?.toSnowflake()!!)
-    private fun toKey(user: User, guild: Guild) = user.id.asString to guild.id.asString
+    private fun toKey(user: User, guild: Guild) = user.id.toString() to guild.id.toString()
     suspend fun initGuilds() {
         configuration.guildConfigurations.forEach { config ->
             runBlocking {
@@ -77,13 +77,13 @@ class MuteService(val configuration: Configuration,
         val guild = member.guild.asGuild()
         val user = member.asUser()
         val clearTime = DateTime.now().plus(time).millis
-        val punishment = Punishment(user.id.asString, InfractionType.Mute, reason, "", clearTime)
+        val punishment = Punishment(user.id.toString(), InfractionType.Mute, reason, "", clearTime)
         val muteRole = getMutedRole(guild)
         val key = toKey(user, guild)
         if (key in muteTimerMap) {
             muteTimerMap[key]?.cancel()
             muteTimerMap.remove(key)
-            databaseService.guilds.removePunishment(guild, member.asUser().id.asString, InfractionType.Mute)
+            databaseService.guilds.removePunishment(guild, member.asUser().id.toString(), InfractionType.Mute)
             loggingService.muteOverwritten(guild, member)
         }
         databaseService.guilds.addPunishment(guild.asGuild(), punishment)
@@ -115,7 +115,7 @@ class MuteService(val configuration: Configuration,
                 loggingService.roleRemoved(guild, user, muteRole)
                 if (checkRoleState(guild, it) == RoleState.Untracked) return@runBlocking
             }
-            databaseService.guilds.removePunishment(guild, user.id.asString, InfractionType.Mute)
+            databaseService.guilds.removePunishment(guild, user.id.toString(), InfractionType.Mute)
             muteTimerMap[key]?.cancel()
             muteTimerMap.remove(key)
         }

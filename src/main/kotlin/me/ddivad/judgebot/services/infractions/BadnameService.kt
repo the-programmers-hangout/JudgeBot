@@ -2,7 +2,7 @@ package me.ddivad.judgebot.services.infractions
 
 import dev.kord.core.behavior.edit
 import dev.kord.core.entity.Member
-import me.jakejmattson.discordkt.api.annotations.Service
+import me.jakejmattson.discordkt.annotations.Service
 
 val names = mutableListOf(
     "Stephen","Bob","Joe","Timmy","Arnold","Jeff","Tim","Doug"

@@ -11,9 +11,9 @@ import me.ddivad.judgebot.embeds.createRuleEmbed
 import me.ddivad.judgebot.embeds.createRulesEmbed
 import me.ddivad.judgebot.embeds.createRulesEmbedDetailed
 import me.ddivad.judgebot.services.DatabaseService
-import me.jakejmattson.discordkt.api.arguments.MessageArg
-import me.jakejmattson.discordkt.api.commands.commands
-import me.jakejmattson.discordkt.api.extensions.jumpLink
+import me.jakejmattson.discordkt.arguments.MessageArg
+import me.jakejmattson.discordkt.commands.commands
+import me.jakejmattson.discordkt.extensions.jumpLink
 
 @Suppress("unused")
 fun ruleCommands(databaseService: DatabaseService) = commands("Rule") {

@@ -3,10 +3,10 @@ package me.ddivad.judgebot.commands
 import me.ddivad.judgebot.arguments.LowerMemberArg
 import me.ddivad.judgebot.dataclasses.Permissions
 import me.ddivad.judgebot.services.DatabaseService
-import me.jakejmattson.discordkt.api.arguments.EveryArg
-import me.jakejmattson.discordkt.api.arguments.IntegerArg
-import me.jakejmattson.discordkt.api.arguments.UserArg
-import me.jakejmattson.discordkt.api.commands.commands
+import me.jakejmattson.discordkt.arguments.EveryArg
+import me.jakejmattson.discordkt.arguments.IntegerArg
+import me.jakejmattson.discordkt.arguments.UserArg
+import me.jakejmattson.discordkt.commands.commands
 
 @Suppress("unused")
 fun noteCommands(databaseService: DatabaseService) = commands("Note") {
@@ -16,7 +16,7 @@ fun noteCommands(databaseService: DatabaseService) = commands("Note") {
         execute(UserArg, EveryArg("Note Content")) {
             val (target, note) = args
             val user = databaseService.users.getOrCreateUser(target, guild)
-            databaseService.users.addNote(guild, user, note, author.id.asString)
+            databaseService.users.addNote(guild, user, note, author.id.toString())
             respond("Note added to ${target.mention}.")
         }
     }
@@ -27,11 +27,11 @@ fun noteCommands(databaseService: DatabaseService) = commands("Note") {
         execute(UserArg, IntegerArg("Note to edit"), EveryArg("Note Content")) {
             val (target, noteId, note) = args
             val user = databaseService.users.getOrCreateUser(target, guild)
-            if (user.getGuildInfo(guild.id.asString).notes.none{ it.id == noteId }) {
+            if (user.getGuildInfo(guild.id.toString()).notes.none{ it.id == noteId }) {
                 respond("User has no note with ID $noteId.")
                 return@execute
             }
-            databaseService.users.editNote(guild, user, noteId, note, author.id.asString)
+            databaseService.users.editNote(guild, user, noteId, note, author.id.toString())
             respond("Note edited.")
         }
     }
@@ -42,7 +42,7 @@ fun noteCommands(databaseService: DatabaseService) = commands("Note") {
         execute(LowerMemberArg, IntegerArg("Note ID")) {
             val (target, noteId) = args
             val user = databaseService.users.getOrCreateUser(target, guild)
-            if (user.getGuildInfo(guild.id.asString).notes.isEmpty()) {
+            if (user.getGuildInfo(guild.id.toString()).notes.isEmpty()) {
                 respond("User has no notes.")
                 return@execute
             }
@@ -57,7 +57,7 @@ fun noteCommands(databaseService: DatabaseService) = commands("Note") {
         execute(LowerMemberArg) {
             val target = args.first
             val user = databaseService.users.getOrCreateUser(target, guild)
-            if (user.getGuildInfo(guild.id.asString).notes.isEmpty()) {
+            if (user.getGuildInfo(guild.id.toString()).notes.isEmpty()) {
                 respond("User has no notes.")
                 return@execute
             }

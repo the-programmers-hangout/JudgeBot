@@ -1,7 +1,7 @@
 package me.ddivad.judgebot.arguments
 
-import me.jakejmattson.discordkt.api.arguments.*
-import me.jakejmattson.discordkt.api.commands.CommandEvent
+import me.jakejmattson.discordkt.arguments.*
+import me.jakejmattson.discordkt.commands.CommandEvent
 
 val validConfigParameters = mutableListOf(
     "setPrefix",

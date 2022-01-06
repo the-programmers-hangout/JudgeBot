@@ -5,7 +5,7 @@ import dev.kord.core.entity.Member
 import dev.kord.core.entity.User
 import kotlinx.coroutines.runBlocking
 import me.ddivad.judgebot.dataclasses.*
-import me.jakejmattson.discordkt.api.annotations.Service
+import me.jakejmattson.discordkt.annotations.Service
 import org.litote.kmongo.eq
 
 // Note: RunBlocking is needed for DB operations in this service, as they are used in a conversation (which does not support "suspend" functions)
@@ -15,7 +15,7 @@ class GuildOperations(connection: ConnectionService) {
     private val guildCollection = connection.db.getCollection<GuildInformation>("Guilds")
 
     suspend fun setupGuild(guild: Guild): GuildInformation {
-        val guildConfig = GuildInformation(guild.id.asString, guild.name)
+        val guildConfig = GuildInformation(guild.id.toString(), guild.name)
         this.guildCollection.insertOne(guildConfig)
         return guildConfig
     }
@@ -83,7 +83,7 @@ class GuildOperations(connection: ConnectionService) {
     }
 
     suspend fun checkPunishmentExists(guild: Guild, member: Member, type: InfractionType): List<Punishment> {
-        return this.getGuild(guild).getPunishmentByType(type, member.asUser().id.asString)
+        return this.getGuild(guild).getPunishmentByType(type, member.asUser().id.toString())
     }
 
     suspend fun getPunishmentByType(guild: Guild, userId: String, type: InfractionType): List<Punishment> {
@@ -91,7 +91,7 @@ class GuildOperations(connection: ConnectionService) {
     }
 
     suspend fun getPunishmentsForUser(guild: Guild, user: User): List<Punishment> {
-        return this.getGuild(guild).getPunishmentsByUser(user.id.asString)
+        return this.getGuild(guild).getPunishmentsByUser(user.id.toString())
     }
 
     suspend fun getBanOrNull(guild: Guild, userId: String): Ban? {
@@ -107,8 +107,8 @@ class GuildOperations(connection: ConnectionService) {
     }
 
     private suspend fun getGuild(guild: Guild): GuildInformation {
-        return guildCollection.findOne(GuildInformation::guildId eq guild.id.asString)
-                ?: GuildInformation(guild.id.asString, guild.name)
+        return guildCollection.findOne(GuildInformation::guildId eq guild.id.toString())
+                ?: GuildInformation(guild.id.toString(), guild.name)
     }
 
     private suspend fun updateGuild(guildInformation: GuildInformation): GuildInformation {

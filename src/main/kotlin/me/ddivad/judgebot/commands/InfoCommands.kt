@@ -9,10 +9,10 @@ import me.ddivad.judgebot.dataclasses.Permissions
 import me.ddivad.judgebot.embeds.createInformationEmbed
 import me.ddivad.judgebot.extensions.testDmStatus
 import me.ddivad.judgebot.services.DatabaseService
-import me.jakejmattson.discordkt.api.arguments.EveryArg
-import me.jakejmattson.discordkt.api.arguments.IntegerArg
-import me.jakejmattson.discordkt.api.commands.commands
-import me.jakejmattson.discordkt.api.extensions.sendPrivateMessage
+import me.jakejmattson.discordkt.arguments.EveryArg
+import me.jakejmattson.discordkt.arguments.IntegerArg
+import me.jakejmattson.discordkt.commands.commands
+import me.jakejmattson.discordkt.extensions.sendPrivateMessage
 
 @Suppress("unused")
 fun createInformationCommands(databaseService: DatabaseService) = commands("Information") {
@@ -30,7 +30,7 @@ fun createInformationCommands(databaseService: DatabaseService) = commands("Info
                 return@execute
             }
             val user = databaseService.users.getOrCreateUser(target, guild)
-            val information = Info(content, author.id.asString)
+            val information = Info(content, author.id.toString())
             databaseService.users.addInfo(guild, user, information)
             target.sendPrivateMessage {
                 createInformationEmbed(guild, target, information)
@@ -45,7 +45,7 @@ fun createInformationCommands(databaseService: DatabaseService) = commands("Info
         execute(LowerMemberArg, IntegerArg("Info ID")) {
             val (target, id) = args
             val user = databaseService.users.getOrCreateUser(target, guild)
-            if (user.getGuildInfo(guild.id.asString).info.isEmpty()) {
+            if (user.getGuildInfo(guild.id.toString()).info.isEmpty()) {
                 respond("${target.mention} has no information records.")
                 return@execute
             }

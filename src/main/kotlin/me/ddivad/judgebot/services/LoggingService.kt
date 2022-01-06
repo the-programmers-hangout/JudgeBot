@@ -5,11 +5,14 @@ import dev.kord.core.behavior.getChannelOf
 import dev.kord.core.entity.*
 import dev.kord.core.entity.channel.TextChannel
 import me.ddivad.judgebot.dataclasses.Configuration
+import me.ddivad.judgebot.dataclasses.GuildMember
 import me.ddivad.judgebot.dataclasses.Infraction
 import me.ddivad.judgebot.dataclasses.Punishment
 import me.ddivad.judgebot.services.infractions.RoleState
 import me.ddivad.judgebot.util.timeBetween
-import me.jakejmattson.discordkt.api.annotations.Service
+import me.jakejmattson.discordkt.annotations.Service
+import me.jakejmattson.discordkt.extensions.descriptor
+import me.jakejmattson.discordkt.extensions.pfpUrl
 import org.joda.time.DateTime
 import java.text.SimpleDateFormat
 import java.util.*
@@ -53,7 +56,7 @@ class LoggingService(private val configuration: Configuration) {
     }
 
     suspend fun badBfpApplied(guild: Guild, user: Member) =
-            log(guild, "**Info ::** User ${user.mention} badPfp triggered for avatar <${user.avatar.url}>")
+            log(guild, "**Info ::** User ${user.mention} badPfp triggered for avatar <${user.pfpUrl}>")
 
     suspend fun badPfpCancelled(guild: Guild, user: Member) =
             log(guild, "**Info ::** BadPfp cancelled for user ${user.mention}")
@@ -75,6 +78,17 @@ class LoggingService(private val configuration: Configuration) {
 
     suspend fun staffReactionUsed(guild: Guild, moderator: User, target: Member, reaction: ReactionEmoji) =
         log(guild, "**Info ::** ${reaction.name} used by ${moderator.username} on ${target.mention}")
+
+    suspend fun pointDecayApplied(guild: Guild, target: GuildMember, newPoints: Int, pointsDeducted: Int, weeksSinceLastInfraction: Int) {
+        val user = guild.kord.getUser(Snowflake(target.userId))
+
+        log(
+            guild,
+            "**Info ::** Infraction Points for ${user?.descriptor()} " +
+                    "reduced by **$pointsDeducted** to **$newPoints** " +
+                    "for **$weeksSinceLastInfraction** infraction free weeks."
+        )
+    }
 
     private suspend fun log(guild: Guild, message: String) {
         getLoggingChannel(guild)?.createMessage(message)

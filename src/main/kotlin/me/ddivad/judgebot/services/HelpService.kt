@@ -6,12 +6,12 @@ import dev.kord.common.kColor
 import dev.kord.x.emoji.DiscordEmoji
 import dev.kord.x.emoji.Emojis
 import kotlinx.coroutines.runBlocking
-import me.jakejmattson.discordkt.api.annotations.Service
-import me.jakejmattson.discordkt.api.arguments.Argument
-import me.jakejmattson.discordkt.api.arguments.OptionalArg
-import me.jakejmattson.discordkt.api.commands.Command
-import me.jakejmattson.discordkt.api.commands.CommandEvent
-import me.jakejmattson.discordkt.api.commands.Execution
+import me.jakejmattson.discordkt.annotations.Service
+import me.jakejmattson.discordkt.arguments.Argument
+import me.jakejmattson.discordkt.arguments.OptionalArg
+import me.jakejmattson.discordkt.commands.Command
+import me.jakejmattson.discordkt.commands.CommandEvent
+import me.jakejmattson.discordkt.commands.Execution
 
 @KordPreview
 @Service
