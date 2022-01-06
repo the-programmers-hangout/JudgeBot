@@ -5,7 +5,7 @@ import dev.kord.core.entity.Message
 import dev.kord.core.entity.User
 import dev.kord.core.entity.channel.MessageChannel
 import dev.kord.core.entity.channel.thread.ThreadChannel
-import me.jakejmattson.discordkt.api.extensions.jumpLink
+import me.jakejmattson.discordkt.extensions.jumpLink
 
 suspend fun createFlagMessage(user: User, message: Message, channel: MessageChannel): String {
     val isThread = channel.type in setOf(ChannelType.PublicGuildThread, ChannelType.PrivateThread)

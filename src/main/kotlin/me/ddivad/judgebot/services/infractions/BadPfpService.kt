@@ -10,16 +10,16 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import me.ddivad.judgebot.embeds.createBadPfpEmbed
 import me.ddivad.judgebot.services.LoggingService
-import me.jakejmattson.discordkt.api.Discord
-import me.jakejmattson.discordkt.api.annotations.Service
-import me.jakejmattson.discordkt.api.extensions.sendPrivateMessage
+import me.jakejmattson.discordkt.Discord
+import me.jakejmattson.discordkt.annotations.Service
+import me.jakejmattson.discordkt.extensions.sendPrivateMessage
 
 @Service
 class BadPfpService(private val muteService: MuteService,
                     private val discord: Discord,
                     private val loggingService: LoggingService) {
     private val badPfpTracker = hashMapOf<Pair<GuildID, UserId>, Job>()
-    private suspend fun toKey(member: Member): Pair<GuildID, UserId> = member.guild.id.asString to member.asUser().id.asString
+    private suspend fun toKey(member: Member): Pair<GuildID, UserId> = member.guild.id.toString() to member.asUser().id.toString()
 
     suspend fun applyBadPfp(target: Member, guild: Guild, timeLimit: Long) {
         try {

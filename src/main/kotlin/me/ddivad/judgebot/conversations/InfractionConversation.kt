@@ -9,7 +9,7 @@ import me.ddivad.judgebot.embeds.createHistoryEmbed
 import me.ddivad.judgebot.embeds.createInfractionRuleEmbed
 import me.ddivad.judgebot.services.DatabaseService
 import me.ddivad.judgebot.services.infractions.InfractionService
-import me.jakejmattson.discordkt.api.conversations.conversation
+import me.jakejmattson.discordkt.conversations.conversation
 
 @KordPreview
 class InfractionConversation(
@@ -50,7 +50,7 @@ class InfractionConversation(
 
             if (rule > 0) rule else null
         } else null
-        val infraction = Infraction(this.user.id.asString, infractionReason, type, points, ruleId)
+        val infraction = Infraction(this.user.id.toString(), infractionReason, type, points, ruleId)
         infractionService.infract(targetUser, guild, user, infraction)
         respondMenu { createHistoryEmbed(targetUser, user, guild, configuration, databaseService) }
     }

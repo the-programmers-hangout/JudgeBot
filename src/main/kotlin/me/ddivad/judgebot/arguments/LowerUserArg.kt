@@ -1,10 +1,10 @@
 package me.ddivad.judgebot.arguments
 
 import dev.kord.core.entity.User
-import me.jakejmattson.discordkt.api.arguments.*
-import me.jakejmattson.discordkt.api.commands.CommandEvent
-import me.jakejmattson.discordkt.api.extensions.isSelf
-import me.jakejmattson.discordkt.api.extensions.toSnowflakeOrNull
+import me.jakejmattson.discordkt.arguments.*
+import me.jakejmattson.discordkt.commands.CommandEvent
+import me.jakejmattson.discordkt.extensions.isSelf
+import me.jakejmattson.discordkt.extensions.toSnowflakeOrNull
 
 open class LowerUserArg(override val name: String = "LowerUserArg") : Argument<User> {
     companion object : LowerUserArg()

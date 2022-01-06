@@ -4,10 +4,10 @@ import dev.kord.core.entity.Guild
 import me.ddivad.judgebot.dataclasses.Rule
 import me.ddivad.judgebot.embeds.createRuleEmbed
 import me.ddivad.judgebot.services.DatabaseService
-import me.jakejmattson.discordkt.api.arguments.BooleanArg
-import me.jakejmattson.discordkt.api.arguments.EveryArg
-import me.jakejmattson.discordkt.api.arguments.UrlArg
-import me.jakejmattson.discordkt.api.conversations.conversation
+import me.jakejmattson.discordkt.arguments.BooleanArg
+import me.jakejmattson.discordkt.arguments.EveryArg
+import me.jakejmattson.discordkt.arguments.UrlArg
+import me.jakejmattson.discordkt.conversations.conversation
 
 class AddRuleConversation(private val databaseService: DatabaseService) {
     fun createAddRuleConversation(guild: Guild) = conversation("cancel") {

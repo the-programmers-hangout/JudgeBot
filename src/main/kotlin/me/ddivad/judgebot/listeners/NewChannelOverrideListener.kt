@@ -7,8 +7,8 @@ import dev.kord.core.event.channel.TextChannelCreateEvent
 import dev.kord.core.event.channel.thread.ThreadChannelCreateEvent
 import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.services.LoggingService
-import me.jakejmattson.discordkt.api.dsl.listeners
-import me.jakejmattson.discordkt.api.extensions.toSnowflake
+import me.jakejmattson.discordkt.dsl.listeners
+import me.jakejmattson.discordkt.extensions.toSnowflake
 
 @Suppress("unused")
 fun onChannelCreated(configuration: Configuration, loggingService: LoggingService) = listeners {

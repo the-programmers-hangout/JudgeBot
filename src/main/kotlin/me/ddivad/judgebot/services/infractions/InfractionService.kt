@@ -8,8 +8,8 @@ import me.ddivad.judgebot.dataclasses.*
 import me.ddivad.judgebot.embeds.createInfractionEmbed
 import me.ddivad.judgebot.services.DatabaseService
 import me.ddivad.judgebot.services.LoggingService
-import me.jakejmattson.discordkt.api.annotations.Service
-import me.jakejmattson.discordkt.api.extensions.sendPrivateMessage
+import me.jakejmattson.discordkt.annotations.Service
+import me.jakejmattson.discordkt.extensions.sendPrivateMessage
 import org.joda.time.DateTime
 
 @Service
@@ -46,7 +46,7 @@ class InfractionService(private val configuration: Configuration,
             PunishmentType.MUTE -> muteService.applyInfractionMute(target, infraction.punishment?.duration!!, "Infraction mute. Please check corresponding infraction embed above.")
             PunishmentType.BAN -> {
                 val clearTime = infraction.punishment!!.duration?.let { DateTime().millis.plus(it) }
-                val punishment = Punishment(target.id.asString, InfractionType.Ban, infraction.reason, infraction.moderator, clearTime)
+                val punishment = Punishment(target.id.toString(), InfractionType.Ban, infraction.reason, infraction.moderator, clearTime)
                 banService.banUser(target, guild, punishment)
             }
         }

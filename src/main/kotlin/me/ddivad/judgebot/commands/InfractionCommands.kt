@@ -17,11 +17,11 @@ import me.ddivad.judgebot.services.*
 import me.ddivad.judgebot.services.infractions.BadPfpService
 import me.ddivad.judgebot.services.infractions.BadnameService
 import me.ddivad.judgebot.services.infractions.InfractionService
-import me.jakejmattson.discordkt.api.arguments.BooleanArg
-import me.jakejmattson.discordkt.api.arguments.EveryArg
-import me.jakejmattson.discordkt.api.arguments.IntegerArg
-import me.jakejmattson.discordkt.api.commands.commands
-import me.jakejmattson.discordkt.api.conversations.ConversationResult
+import me.jakejmattson.discordkt.arguments.BooleanArg
+import me.jakejmattson.discordkt.arguments.EveryArg
+import me.jakejmattson.discordkt.arguments.IntegerArg
+import me.jakejmattson.discordkt.commands.commands
+import me.jakejmattson.discordkt.conversations.ConversationResult
 
 @KordPreview
 @Suppress("unused")
@@ -102,7 +102,7 @@ fun createInfractionCommands(databaseService: DatabaseService,
                 return@execute
             }
 
-            val badPfp = Infraction(author.id.asString, "BadPfp", InfractionType.BadPfp)
+            val badPfp = Infraction(author.id.toString(), "BadPfp", InfractionType.BadPfp)
             badPfpService.applyBadPfp(targetMember, guild, timeLimit)
             respond("${targetMember.mention} has been muted and a badpfp has been triggered with a time limit of $minutesUntilBan minutes.")
         }
@@ -122,7 +122,7 @@ fun createInfractionCommands(databaseService: DatabaseService,
         requiredPermission = Permissions.ADMINISTRATOR
         execute(LowerUserArg) {
             val user = databaseService.users.getOrCreateUser(args.first, guild)
-            if (user.getGuildInfo(guild.id.asString).infractions.isEmpty()) {
+            if (user.getGuildInfo(guild.id.toString()).infractions.isEmpty()) {
                 respond("User has no infractions.")
                 return@execute
             }
@@ -136,7 +136,7 @@ fun createInfractionCommands(databaseService: DatabaseService,
         requiredPermission = Permissions.ADMINISTRATOR
         execute(LowerUserArg, IntegerArg("Infraction ID")) {
             val user = databaseService.users.getOrCreateUser(args.first, guild)
-            if (user.getGuildInfo(guild.id.asString).infractions.isEmpty()) {
+            if (user.getGuildInfo(guild.id.toString()).infractions.isEmpty()) {
                 respond("User has no infractions.")
                 return@execute
             }

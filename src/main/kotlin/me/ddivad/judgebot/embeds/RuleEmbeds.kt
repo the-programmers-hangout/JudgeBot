@@ -4,7 +4,7 @@ import dev.kord.common.kColor
 import dev.kord.core.entity.Guild
 import dev.kord.rest.builder.message.EmbedBuilder
 import me.ddivad.judgebot.dataclasses.Rule
-import me.jakejmattson.discordkt.api.extensions.addField
+import me.jakejmattson.discordkt.extensions.addField
 import java.awt.Color
 import dev.kord.rest.Image
 

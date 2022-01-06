@@ -9,7 +9,7 @@ import dev.kord.rest.Image
 import dev.kord.rest.builder.message.EmbedBuilder
 import me.ddivad.judgebot.dataclasses.*
 import me.ddivad.judgebot.util.timeToString
-import me.jakejmattson.discordkt.api.extensions.addField
+import me.jakejmattson.discordkt.extensions.addField
 import java.awt.Color
 
 fun EmbedBuilder.createInfractionEmbed(guild: Guild, configuration: GuildConfiguration, user: User, guildMember: GuildMember, infraction: Infraction, rule: Rule?) {

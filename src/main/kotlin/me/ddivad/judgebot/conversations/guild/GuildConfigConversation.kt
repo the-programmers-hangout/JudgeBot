@@ -4,10 +4,10 @@ import dev.kord.core.entity.Guild
 import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.dataclasses.LoggingConfiguration
 import me.ddivad.judgebot.services.infractions.MuteService
-import me.jakejmattson.discordkt.api.arguments.ChannelArg
-import me.jakejmattson.discordkt.api.arguments.EveryArg
-import me.jakejmattson.discordkt.api.arguments.RoleArg
-import me.jakejmattson.discordkt.api.conversations.conversation
+import me.jakejmattson.discordkt.arguments.ChannelArg
+import me.jakejmattson.discordkt.arguments.EveryArg
+import me.jakejmattson.discordkt.arguments.RoleArg
+import me.jakejmattson.discordkt.conversations.conversation
 
 class GuildSetupConversation(private val configuration: Configuration, private val muteService: MuteService) {
     fun createSetupConversation(guild: Guild) = conversation("cancel") {
@@ -26,7 +26,7 @@ class GuildSetupConversation(private val configuration: Configuration, private v
                 staffRole,
                 moderatorRole,
                 mutedRole,
-                LoggingConfiguration(alertChannel.id.asString, logChannel.id.asString),
+                LoggingConfiguration(alertChannel.id.toString(), logChannel.id.toString()),
         )
         muteService.initGuilds()
     }

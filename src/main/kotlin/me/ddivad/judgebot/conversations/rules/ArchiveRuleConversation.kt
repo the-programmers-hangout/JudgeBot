@@ -2,8 +2,8 @@ package me.ddivad.judgebot.conversations.rules
 
 import dev.kord.core.entity.Guild
 import me.ddivad.judgebot.services.DatabaseService
-import me.jakejmattson.discordkt.api.arguments.IntegerArg
-import me.jakejmattson.discordkt.api.conversations.conversation
+import me.jakejmattson.discordkt.arguments.IntegerArg
+import me.jakejmattson.discordkt.conversations.conversation
 
 class ArchiveRuleConversation(private val databaseService: DatabaseService) {
     fun createArchiveRuleConversation(guild: Guild) = conversation("cancel") {

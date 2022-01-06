@@ -8,8 +8,9 @@ import dev.kord.x.emoji.Emojis
 import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.embeds.createHistoryEmbed
 import me.ddivad.judgebot.services.DatabaseService
-import me.jakejmattson.discordkt.api.conversations.conversation
-import me.jakejmattson.discordkt.api.extensions.toSnowflake
+import me.jakejmattson.discordkt.conversations.conversation
+import me.jakejmattson.discordkt.extensions.pfpUrl
+import me.jakejmattson.discordkt.extensions.toSnowflake
 import java.awt.Color
 
 class ResetUserConversation(private val databaseService: DatabaseService, private val configuration: Configuration) {
@@ -25,7 +26,7 @@ class ResetUserConversation(private val databaseService: DatabaseService, privat
                     title = "Reset linked accounts"
                     color = Color.MAGENTA.kColor
                     thumbnail {
-                        url = target.asUser().avatar.url
+                        url = target.asUser().pfpUrl
                     }
                     description = """
                         ${target.mention} has linked accounts ${linkedUsers.joinToString { "${it?.mention}" }}

@@ -10,8 +10,8 @@ import me.ddivad.judgebot.dataclasses.GuildConfiguration
 import me.ddivad.judgebot.dataclasses.Punishment
 import me.ddivad.judgebot.util.timeBetween
 import me.ddivad.judgebot.util.timeToString
-import me.jakejmattson.discordkt.api.extensions.addField
-import me.jakejmattson.discordkt.api.extensions.toSnowflake
+import me.jakejmattson.discordkt.extensions.addField
+import me.jakejmattson.discordkt.extensions.toSnowflake
 import org.joda.time.DateTime
 import java.awt.Color
 

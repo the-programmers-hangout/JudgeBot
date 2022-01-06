@@ -10,9 +10,9 @@ import kotlinx.coroutines.launch
 import me.ddivad.judgebot.dataclasses.*
 import me.ddivad.judgebot.services.DatabaseService
 import me.ddivad.judgebot.services.LoggingService
-import me.jakejmattson.discordkt.api.Discord
-import me.jakejmattson.discordkt.api.annotations.Service
-import me.jakejmattson.discordkt.api.extensions.toSnowflake
+import me.jakejmattson.discordkt.Discord
+import me.jakejmattson.discordkt.annotations.Service
+import me.jakejmattson.discordkt.extensions.toSnowflake
 import org.joda.time.DateTime
 
 @Service
@@ -23,14 +23,14 @@ class BanService(
     private val discord: Discord
 ) {
     private val banTracker = hashMapOf<Pair<UserId, GuildID>, Job>()
-    private fun toKey(user: User, guild: Guild): Pair<GuildID, UserId> = user.id.asString to guild.id.asString
+    private fun toKey(user: User, guild: Guild): Pair<GuildID, UserId> = user.id.toString() to guild.id.toString()
 
     suspend fun banUser(target: User, guild: Guild, punishment: Punishment, deleteDays: Int = 0) {
         guild.ban(target.id) {
             deleteMessagesDays = deleteDays
             reason = punishment.reason
         }
-        databaseService.guilds.addBan(guild, Ban(target.id.asString, punishment.moderator, punishment.reason))
+        databaseService.guilds.addBan(guild, Ban(target.id.toString(), punishment.moderator, punishment.reason))
         if (punishment.clearTime != null) {
             databaseService.guilds.addPunishment(guild.asGuild(), punishment)
             val key = toKey(target, guild)
@@ -45,11 +45,11 @@ class BanService(
     suspend fun unbanUser(guild: Guild, user: User) {
         val key = toKey(user, guild)
         if (databaseService.guilds.getPunishmentsForUser(guild, user).any { it.type == InfractionType.Ban }) {
-            databaseService.guilds.removePunishment(guild, user.id.asString, InfractionType.Ban)
+            databaseService.guilds.removePunishment(guild, user.id.toString(), InfractionType.Ban)
             banTracker[key]?.cancel()
         }
         guild.unban(user.id)
-        databaseService.guilds.removeBan(guild, user.id.asString)
+        databaseService.guilds.removeBan(guild, user.id.toString())
         loggingService.userUnbanned(guild, user)
     }
 

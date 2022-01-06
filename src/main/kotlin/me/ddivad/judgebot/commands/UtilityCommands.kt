@@ -8,10 +8,10 @@ import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.dataclasses.Permissions
 import me.ddivad.judgebot.services.HelpService
 import me.ddivad.judgebot.util.createFlagMessage
-import me.jakejmattson.discordkt.api.arguments.AnyArg
-import me.jakejmattson.discordkt.api.arguments.MessageArg
-import me.jakejmattson.discordkt.api.commands.commands
-import me.jakejmattson.discordkt.api.extensions.toSnowflake
+import me.jakejmattson.discordkt.arguments.AnyArg
+import me.jakejmattson.discordkt.arguments.MessageArg
+import me.jakejmattson.discordkt.commands.commands
+import me.jakejmattson.discordkt.extensions.toSnowflake
 
 @Suppress("unused")
 fun createInformationCommands(helpService: HelpService, configuration: Configuration) = commands("Utility") {
