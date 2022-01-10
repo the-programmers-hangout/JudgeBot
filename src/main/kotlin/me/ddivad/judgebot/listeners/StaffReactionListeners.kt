@@ -14,6 +14,7 @@ import me.ddivad.judgebot.services.infractions.MuteService
 import me.ddivad.judgebot.services.infractions.RoleState
 import me.jakejmattson.discordkt.dsl.listeners
 import me.jakejmattson.discordkt.extensions.isSelf
+import me.jakejmattson.discordkt.extensions.jumpLink
 import me.jakejmattson.discordkt.extensions.sendPrivateMessage
 
 @Suppress("unused")
@@ -30,8 +31,9 @@ fun onStaffReactionAdd(
         val staffMember = user.asMemberOrNull(guild.id) ?: return@on
         val msg = message.asMessage()
         val messageAuthor = msg.author?.asMemberOrNull(guild.id) ?: return@on
-        if (discord.permissions.hasPermission(discord, staffMember, Permissions.MODERATOR)
+        if ((discord.permissions.hasPermission(discord, staffMember, Permissions.MODERATOR)
             && discord.permissions.isHigherLevel(discord, staffMember, messageAuthor)
+            || staffMember.id.toString() == configuration.ownerId)
         ) {
             when (this.emoji.name) {
                 guildConfiguration.reactions.gagReaction -> {
@@ -57,7 +59,7 @@ fun onStaffReactionAdd(
                     loggingService.staffReactionUsed(guild, staffMember, messageAuthor, this.emoji)
                 }
                 guildConfiguration.reactions.deleteMessageReaction -> {
-                    msg.delete()
+                    message.delete()
                     databaseService.users.addMessageDelete(
                         guild,
                         databaseService.users.getOrCreateUser(messageAuthor, guild.asGuild()),
@@ -73,7 +75,8 @@ fun onStaffReactionAdd(
                                     " Message deleted without notification."
                         )
                     }
-                    loggingService.staffReactionUsed(guild, staffMember, messageAuthor, this.emoji)
+                    val deleteLogMessage = loggingService.deleteReactionUsed(guild, staffMember, messageAuthor, this.emoji, msg)
+                    databaseService.messageDeletes.createMessageDeleteRecord(guildId.toString(), messageAuthor, deleteLogMessage.first()?.jumpLink())
                 }
                 Emojis.question.unicode -> {
                     if (this.user.isSelf() || msg.author != this.message.kord.getSelf()) return@on

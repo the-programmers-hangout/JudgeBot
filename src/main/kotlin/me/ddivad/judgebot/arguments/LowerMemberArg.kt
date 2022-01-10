@@ -1,6 +1,7 @@
 package me.ddivad.judgebot.arguments
 
 import dev.kord.core.entity.Member
+import me.ddivad.judgebot.dataclasses.Configuration
 import me.jakejmattson.discordkt.arguments.*
 import me.jakejmattson.discordkt.commands.CommandEvent
 import me.jakejmattson.discordkt.extensions.isSelf
@@ -15,6 +16,7 @@ open class LowerMemberArg(override val name: String = "LowerMemberArg") : Argume
 
     override suspend fun convert(arg: String, args: List<String>, event: CommandEvent<*>): ArgumentResult<Member> {
         val guild = event.guild ?: return Error("No guild found")
+        val configuration = event.discord.getInjectionObjects(Configuration :: class)
 
         val member = arg.toSnowflakeOrNull()?.let { guild.getMemberOrNull(it) } ?: return Error("Not found")
         val author = event.author.asMember(event.guild!!.id)
@@ -22,7 +24,8 @@ open class LowerMemberArg(override val name: String = "LowerMemberArg") : Argume
         return when {
             event.discord.permissions.isHigherLevel(event.discord, member, author) || event.author.isSelf() ->
                 Error("You don't have the permission to use this command on the target user.")
-            event.author == member -> Error("You can't use this command on yourself!")
+            (event.author == member && member.id.toString() != configuration.ownerId) ->
+                Error("You can't use this command on yourself!")
             else -> Success(member)
         }
     }

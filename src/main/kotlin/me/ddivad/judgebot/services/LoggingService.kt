@@ -79,6 +79,19 @@ class LoggingService(private val configuration: Configuration) {
     suspend fun staffReactionUsed(guild: Guild, moderator: User, target: Member, reaction: ReactionEmoji) =
         log(guild, "**Info ::** ${reaction.name} used by ${moderator.username} on ${target.mention}")
 
+    suspend fun deleteReactionUsed(guild: Guild, moderator: User, target: Member, reaction: ReactionEmoji, message: Message): List<Message?> {
+        val msg = message.content.chunked(1800)
+        val firstMessage = logAndReturnMessage(guild,
+            "**Info ::** ${reaction.name} used by ${moderator.username} on ${target.mention}\n" +
+                    "**Message:**```\n" +
+                    "${msg.first()}\n```")
+
+        val rest = msg.takeLast(msg.size - 1).map {
+            logAndReturnMessage(guild, "**Continued:**```\n$it\n```")}
+
+        return listOf(firstMessage).plus(rest)
+    }
+
     suspend fun pointDecayApplied(guild: Guild, target: GuildMember, newPoints: Int, pointsDeducted: Int, weeksSinceLastInfraction: Int) {
         val user = guild.kord.getUser(Snowflake(target.userId))
 
@@ -93,6 +106,11 @@ class LoggingService(private val configuration: Configuration) {
     private suspend fun log(guild: Guild, message: String) {
         getLoggingChannel(guild)?.createMessage(message)
         println("${SimpleDateFormat("dd/M/yyyy HH:mm:ss").format(Date())} > ${guild.name} > $message")
+    }
+
+    private suspend fun logAndReturnMessage(guild: Guild, message: String): Message? {
+        println("${SimpleDateFormat("dd/M/yyyy HH:mm:ss").format(Date())} > ${guild.name} > $message")
+        return getLoggingChannel(guild)?.createMessage(message)
     }
 
     private suspend fun getLoggingChannel(guild: Guild): TextChannel? {
