@@ -1,6 +1,7 @@
 package me.ddivad.judgebot.commands
 
 import dev.kord.common.kColor
+import dev.kord.rest.Image
 import dev.kord.x.emoji.Emojis
 import dev.kord.x.emoji.addReaction
 import kotlinx.coroutines.flow.toList
@@ -16,10 +17,9 @@ import me.ddivad.judgebot.services.LoggingService
 import me.ddivad.judgebot.services.infractions.BanService
 import me.jakejmattson.discordkt.arguments.*
 import me.jakejmattson.discordkt.commands.commands
-import me.jakejmattson.discordkt.extensions.mutualGuilds
-import me.jakejmattson.discordkt.extensions.pfpUrl
-import me.jakejmattson.discordkt.extensions.sendPrivateMessage
+import me.jakejmattson.discordkt.extensions.*
 import java.awt.Color
+import java.text.SimpleDateFormat
 
 @Suppress("unused")
 fun createUserCommands(
@@ -193,6 +193,59 @@ fun createUserCommands(
             ResetUserConversation(databaseService, config)
                 .createResetConversation(guild, target)
                 .startPublicly(discord, author, channel)
+        }
+    }
+
+    command("deletedMessages") {
+        description = "View a users messages deleted using the delete message reaction"
+        requiredPermission = Permissions.STAFF
+        execute(LowerUserArg) {
+            val target = args.first
+            val guildMember = databaseService.users.getOrCreateUser(target, guild).getGuildInfo(guild.id.toString())
+            val guildConfiguration = config[guild.asGuild().id.value]
+
+            val deletedMessages = databaseService.messageDeletes
+                .getMessageDeletesForMember(guild.id.toString(), target.id.toString())
+                .sortedByDescending { it.dateTime }
+                .map { "Deleted on **${SimpleDateFormat("dd/MM/yyyy HH:mm").format(it.dateTime)}** \n[Message Link](${it.messageLink})" }
+                .chunked(6)
+
+            respondMenu {
+                deletedMessages.forEachIndexed { index, list ->
+                    page {
+                        color = discord.configuration.theme
+                        author {
+                            name = "Deleted messages for ${target.tag}"
+                            icon = target.pfpUrl
+                        }
+                        description = """
+                            **Showing messages deleted using ${guildConfiguration?.reactions?.deleteMessageReaction}**
+                            ${target.tag} has **${guildMember.deletedMessageCount.deleteReaction}** deletions
+                        """.trimIndent()
+
+                        list.forEach {
+                            field {
+                                value = it
+                            }
+                        }
+
+                        footer {
+                            icon = guild.getIconUrl(Image.Format.PNG) ?: ""
+                            text = "${guild.name} | Page ${index + 1} of ${deletedMessages.size}"
+                        }
+                    }
+                }
+                if (deletedMessages.size > 1) {
+                    buttons {
+                        button("Prev.", Emojis.arrowLeft) {
+                            previousPage()
+                        }
+                        button("Next", Emojis.arrowRight) {
+                            nextPage()
+                        }
+                    }
+                }
+            }
         }
     }
 }

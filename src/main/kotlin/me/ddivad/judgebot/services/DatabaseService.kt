@@ -2,6 +2,7 @@ package me.ddivad.judgebot.services
 
 import me.ddivad.judgebot.services.database.GuildOperations
 import me.ddivad.judgebot.services.database.JoinLeaveOperations
+import me.ddivad.judgebot.services.database.MessageDeleteOperations
 import me.ddivad.judgebot.services.database.UserOperations
 import me.jakejmattson.discordkt.annotations.Service
 
@@ -9,5 +10,6 @@ import me.jakejmattson.discordkt.annotations.Service
 open class DatabaseService(
     val users: UserOperations,
     val guilds: GuildOperations,
-    val joinLeaves: JoinLeaveOperations
+    val joinLeaves: JoinLeaveOperations,
+    val messageDeletes: MessageDeleteOperations
 )

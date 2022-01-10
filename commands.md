@@ -54,19 +54,20 @@
 | rules       | [Message] | List the rules of this guild. Pass a message ID to edit existing rules embed.                     |
 
 ## User
-| Commands      | Arguments                                 | Description                                                |
-| ------------- | ----------------------------------------- | ---------------------------------------------------------- |
-| alts          | User                                      | Use this to view a user's alt accounts.                    |
-| ban           | LowerUserArg, [Delete message days], Text | Ban a member from this guild.                              |
-| getBanReason  | User                                      | Get a ban reason for a banned user                         |
-| history, h, H | User                                      | Use this to view a user's record.                          |
-| link          | Main Account, Alt Account                 | Link a user's alt account with their main                  |
-| reset         | LowerUserArg                              | Reset a user's record, and any linked accounts             |
-| selfHistory   |                                           | View your infraction history (contents will be DM'd)       |
-| setBanReason  | User, Reason                              | Set a ban reason for a banned user                         |
-| unban         | User                                      | Unban a banned member from this guild.                     |
-| unlink        | Main Account, Alt Account                 | Link a user's alt account with their main                  |
-| whatpfp       | User                                      | Perform a reverse image search of a User's profile picture |
+| Commands        | Arguments                                 | Description                                                     |
+| --------------- | ----------------------------------------- | --------------------------------------------------------------- |
+| alts            | User                                      | Use this to view a user's alt accounts.                         |
+| ban             | LowerUserArg, [Delete message days], Text | Ban a member from this guild.                                   |
+| deletedMessages | LowerUserArg                              | View a users messages deleted using the delete message reaction |
+| getBanReason    | User                                      | Get a ban reason for a banned user                              |
+| history, h, H   | User                                      | Use this to view a user's record.                               |
+| link            | Main Account, Alt Account                 | Link a user's alt account with their main                       |
+| reset           | LowerUserArg                              | Reset a user's record, and any linked accounts                  |
+| selfHistory     |                                           | View your infraction history (contents will be DM'd)            |
+| setBanReason    | User, Reason                              | Set a ban reason for a banned user                              |
+| unban           | User                                      | Unban a banned member from this guild.                          |
+| unlink          | Main Account, Alt Account                 | Link a user's alt account with their main                       |
+| whatpfp         | User                                      | Perform a reverse image search of a User's profile picture      |
 
 ## Utility
 | Commands | Arguments | Description                              |
