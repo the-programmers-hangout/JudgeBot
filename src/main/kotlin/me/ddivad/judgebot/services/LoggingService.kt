@@ -109,7 +109,6 @@ class LoggingService(private val configuration: Configuration) {
     }
 
     private suspend fun logAndReturnMessage(guild: Guild, message: String): Message? {
-        println("${SimpleDateFormat("dd/M/yyyy HH:mm:ss").format(Date())} > ${guild.name} > $message")
         return getLoggingChannel(guild)?.createMessage(message)
     }
 
