@@ -31,7 +31,6 @@ class InfractionConversation(
                 else guildConfiguration.infractionConfiguration.warnPoints
         val rules = databaseService.guilds.getRules(guild)
         val ruleId = if (rules.isNotEmpty()) {
-
             val rule = promptButton<Int> {
                 embed {
                     createInfractionRuleEmbed(guild, rules)

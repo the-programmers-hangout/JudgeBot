@@ -1,49 +1,28 @@
 package me.ddivad.judgebot.dataclasses
 
-import dev.kord.common.entity.Permission
-import dev.kord.core.any
-import me.jakejmattson.discordkt.dsl.PermissionContext
+import me.jakejmattson.discordkt.dsl.Permission
 import me.jakejmattson.discordkt.dsl.PermissionSet
+import me.jakejmattson.discordkt.dsl.permission
+import me.jakejmattson.discordkt.extensions.toSnowflake
 
 @Suppress("unused")
-enum class Permissions : PermissionSet {
-    BOT_OWNER {
-        override suspend fun hasPermission(context: PermissionContext) =
-            context.discord.getInjectionObjects<Configuration>().ownerId == context.user.id.toString()
-    },
-    GUILD_OWNER {
-        override suspend fun hasPermission(context: PermissionContext) =
-            context.getMember()?.isOwner() ?: false
+object Permissions: PermissionSet{
+    val BOT_OWNER = permission("Bot Owner") { users(discord.getInjectionObjects<Configuration>().ownerId.toSnowflake()) }
+    val GUILD_OWNER = permission("Guild Owner") { guild?.let { users(it.ownerId) } }
+    val ADMINISTRATOR = permission("Admin") { discord.getInjectionObjects<Configuration>()[guild!!.id.value]?.adminRoles?.let {
+        roles(
+            it.map { role -> role.toSnowflake() })
+    } }
+    val STAFF = permission("Staff") { discord.getInjectionObjects<Configuration>()[guild!!.id.value]?.staffRoles?.let {
+        roles(
+            it.map { role -> role.toSnowflake() })
+    } }
+    val MODERATOR = permission("Moderator") { discord.getInjectionObjects<Configuration>()[guild!!.id.value]?.moderatorRoles?.let {
+        roles(
+            it.map { role -> role.toSnowflake() })
+    } }
+    val NONE = permission("None") { guild?.let { roles(it.everyoneRole.id) } }
 
-    },
-    ADMINISTRATOR {
-        override suspend fun hasPermission(context: PermissionContext): Boolean {
-            val guild = context.guild ?: return false
-            val member = context.user.asMember(guild.id)
-            val configuration = context.discord.getInjectionObjects<Configuration>()
-            return member.roles.any { configuration[guild.id.value]!!.adminRoles.contains(it.id.toString()) } || member.getPermissions()
-                .contains(
-                    Permission.Administrator
-                )
-        }
-    },
-    STAFF {
-        override suspend fun hasPermission(context: PermissionContext): Boolean {
-            val guild = context.guild ?: return false
-            val member = context.user.asMember(guild.id)
-            val configuration = context.discord.getInjectionObjects<Configuration>()
-            return member.roles.any { configuration[guild.id.value]!!.staffRoles.contains(it.id.toString()) }
-        }
-    },
-    MODERATOR {
-        override suspend fun hasPermission(context: PermissionContext): Boolean {
-            val guild = context.guild ?: return false
-            val member = context.user.asMember(guild.id)
-            val configuration = context.discord.getInjectionObjects<Configuration>()
-            return member.roles.any { configuration[guild.id.value]!!.moderatorRoles.contains(it.id.toString()) }
-        }
-    },
-    NONE {
-        override suspend fun hasPermission(context: PermissionContext) = true
-    }
+    override val hierarchy: List<Permission> = listOf(NONE, MODERATOR, STAFF, ADMINISTRATOR, GUILD_OWNER, BOT_OWNER)
+    override val commandDefault: Permission = NONE
 }

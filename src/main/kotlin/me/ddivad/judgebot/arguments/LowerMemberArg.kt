@@ -17,12 +17,12 @@ open class LowerMemberArg(override val name: String = "LowerMemberArg") : Argume
     override suspend fun convert(arg: String, args: List<String>, event: CommandEvent<*>): ArgumentResult<Member> {
         val guild = event.guild ?: return Error("No guild found")
         val configuration = event.discord.getInjectionObjects(Configuration :: class)
-
         val member = arg.toSnowflakeOrNull()?.let { guild.getMemberOrNull(it) } ?: return Error("Not found")
         val author = event.author.asMember(event.guild!!.id)
+        val permissions = event.discord.permissions
 
         return when {
-            event.discord.permissions.isHigherLevel(event.discord, member, author) || event.author.isSelf() ->
+            permissions.getPermission(member) > permissions.getPermission(author) || event.author.isSelf() ->
                 Error("You don't have the permission to use this command on the target user.")
             (event.author == member && member.id.toString() != configuration.ownerId) ->
                 Error("You can't use this command on yourself!")

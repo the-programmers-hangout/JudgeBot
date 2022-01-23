@@ -31,8 +31,9 @@ fun onStaffReactionAdd(
         val staffMember = user.asMemberOrNull(guild.id) ?: return@on
         val msg = message.asMessage()
         val messageAuthor = msg.author?.asMemberOrNull(guild.id) ?: return@on
-        if ((discord.permissions.hasPermission(discord, staffMember, Permissions.MODERATOR)
-            && discord.permissions.isHigherLevel(discord, staffMember, messageAuthor)
+
+        if ((discord.permissions.hasPermission(Permissions.MODERATOR, staffMember)
+            && discord.permissions.getPermission(staffMember) > discord.permissions.getPermission(messageAuthor)
             || staffMember.id.toString() == configuration.ownerId)
         ) {
             when (this.emoji.name) {

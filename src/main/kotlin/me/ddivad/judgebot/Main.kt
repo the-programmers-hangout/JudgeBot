@@ -35,7 +35,7 @@ suspend fun main() {
             commandReaction = null
             theme = Color.MAGENTA
             entitySupplyStrategy = EntitySupplyStrategy.cacheWithRestFallback
-            permissions(Permissions.NONE)
+            permissions = Permissions
             intents = Intents(
                 Intent.Guilds,
                 Intent.GuildBans,

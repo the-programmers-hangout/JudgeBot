@@ -81,15 +81,26 @@ class LoggingService(private val configuration: Configuration) {
 
     suspend fun deleteReactionUsed(guild: Guild, moderator: User, target: Member, reaction: ReactionEmoji, message: Message): List<Message?> {
         val msg = message.content.chunked(1800)
-        val firstMessage = logAndReturnMessage(guild,
-            "**Info ::** ${reaction.name} used by ${moderator.username} on ${target.mention}\n" +
-                    "**Message:**```\n" +
-                    "${msg.first()}\n```")
+        println(message.attachments)
+        println(msg)
 
-        val rest = msg.takeLast(msg.size - 1).map {
-            logAndReturnMessage(guild, "**Continued:**```\n$it\n```")}
+        if (msg.isNotEmpty()) {
+            val firstMessage = logAndReturnMessage(guild,
+                "**Info ::** ${reaction.name} used by ${moderator.username} on ${target.mention}\n" +
+                        "**Message:**```\n" +
+                        "${msg.first()}\n```")
 
-        return listOf(firstMessage).plus(rest)
+            val rest = msg.takeLast(msg.size - 1).map {
+                logAndReturnMessage(guild, "**Continued:**```\n$it\n```")}
+
+            return listOf(firstMessage).plus(rest)
+        } else if (message.attachments.isNotEmpty()) {
+            return listOf(logAndReturnMessage(guild,
+                "**Info ::** ${reaction.name} used by ${moderator.username} on ${target.mention}\n" +
+                        "**Message: (message was attachment, so only filename is logged)**```\n" +
+                        "${message.attachments.first().filename}\n```"))
+        }
+        return emptyList()
     }
 
     suspend fun pointDecayApplied(guild: Guild, target: GuildMember, newPoints: Int, pointsDeducted: Int, weeksSinceLastInfraction: Int) {
