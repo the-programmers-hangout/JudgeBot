@@ -8,13 +8,12 @@ import dev.kord.x.emoji.addReaction
 import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.util.createFlagMessage
 import me.jakejmattson.discordkt.dsl.listeners
-import me.jakejmattson.discordkt.extensions.toSnowflake
 
 @Suppress("unused")
 fun onMemberReactionAdd(configuration: Configuration) = listeners {
     on<ReactionAddEvent> {
         val guild = guild?.asGuildOrNull() ?: return@on
-        val guildConfiguration = configuration[guild.asGuild().id.value]
+        val guildConfiguration = configuration[guild.asGuild().id]
         if (!guildConfiguration?.reactions!!.enabled) return@on
 
         when (this.emoji.name) {
@@ -22,7 +21,7 @@ fun onMemberReactionAdd(configuration: Configuration) = listeners {
                 message.deleteReaction(this.emoji)
                 val channel = message.getChannel()
                 guild.asGuild()
-                    .getChannelOf<TextChannel>(guildConfiguration.loggingConfiguration.alertChannel.toSnowflake())
+                    .getChannelOf<TextChannel>(guildConfiguration.loggingConfiguration.alertChannel)
                     .asChannel()
                     .createMessage(createFlagMessage(user.asUser(), message.asMessage(), channel))
                     .addReaction(Emojis.question)

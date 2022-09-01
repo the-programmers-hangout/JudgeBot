@@ -7,17 +7,19 @@ import me.ddivad.judgebot.services.DatabaseService
 import me.jakejmattson.discordkt.arguments.BooleanArg
 import me.jakejmattson.discordkt.arguments.EveryArg
 import me.jakejmattson.discordkt.arguments.UrlArg
-import me.jakejmattson.discordkt.conversations.conversation
+import me.jakejmattson.discordkt.conversations.slashConversation
 
 class AddRuleConversation(private val databaseService: DatabaseService) {
-    fun createAddRuleConversation(guild: Guild) = conversation("cancel") {
+    fun createAddRuleConversation(guild: Guild) = slashConversation("cancel") {
         val rules = databaseService.guilds.getRules(guild)
         val nextId = rules.size.plus(1)
 
         val ruleName = prompt(EveryArg, "Please enter rule name:")
         val ruleText = prompt(EveryArg, "Please enter rule text")
-        val addLink = prompt(BooleanArg("Add link to rule?", "Y", "N"),
-                "Do you want to add a link to the rule? (Y/N)")
+        val addLink = prompt(
+            BooleanArg("Add link to rule?", "Y", "N"),
+            "Do you want to add a link to the rule? (Y/N)"
+        )
         val ruleLink = when {
             addLink -> prompt(UrlArg, "Please enter the link")
             else -> ""
@@ -26,7 +28,7 @@ class AddRuleConversation(private val databaseService: DatabaseService) {
         val newRule = Rule(nextId, ruleName, ruleText, ruleLink)
         databaseService.guilds.addRule(guild, newRule)
         respond("Rule created.")
-        respond{
+        respond {
             createRuleEmbed(guild, newRule)
         }
     }

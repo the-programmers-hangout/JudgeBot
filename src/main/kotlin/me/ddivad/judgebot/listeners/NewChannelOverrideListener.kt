@@ -4,25 +4,33 @@ import dev.kord.common.entity.Permission
 import dev.kord.common.entity.Permissions
 import dev.kord.core.entity.PermissionOverwrite
 import dev.kord.core.event.channel.TextChannelCreateEvent
-import dev.kord.core.event.channel.thread.ThreadChannelCreateEvent
 import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.services.LoggingService
 import me.jakejmattson.discordkt.dsl.listeners
-import me.jakejmattson.discordkt.extensions.toSnowflake
 
 @Suppress("unused")
 fun onChannelCreated(configuration: Configuration, loggingService: LoggingService) = listeners {
     on<TextChannelCreateEvent> {
         val channel = this.channel
         val guild = channel.getGuild()
-        val guildConfiguration = configuration[guild.id.value] ?: return@on
-        val mutedRole = guild.getRole(guildConfiguration.mutedRole.toSnowflake())
+        val guildConfiguration = configuration[guild.id] ?: return@on
+        val mutedRole = guild.getRole(guildConfiguration.mutedRole)
         val deniedPermissions = channel.getPermissionOverwritesForRole(mutedRole.id)?.denied ?: Permissions()
-        if (deniedPermissions.values.any { it in setOf(Permission.SendMessages, Permission.AddReactions, Permission.CreatePublicThreads, Permission.CreatePrivateThreads, Permission.SendMessagesInThreads) }) {
+        if (deniedPermissions.values.any {
+                it in setOf(
+                    Permission.SendMessages,
+                    Permission.AddReactions,
+                    Permission.CreatePublicThreads,
+                    Permission.CreatePrivateThreads,
+                    Permission.SendMessagesInThreads
+                )
+            }) {
             channel.addOverwrite(
                 PermissionOverwrite.forRole(
                     mutedRole.id,
-                    denied = deniedPermissions.plus(Permission.SendMessages).plus(Permission.AddReactions).plus(Permission.CreatePrivateThreads).plus(Permission.CreatePrivateThreads).plus(Permission.SendMessagesInThreads)
+                    denied = deniedPermissions.plus(Permission.SendMessages).plus(Permission.AddReactions)
+                        .plus(Permission.CreatePrivateThreads).plus(Permission.CreatePrivateThreads)
+                        .plus(Permission.SendMessagesInThreads)
                 ),
                 "Judgebot Overwrite"
             )

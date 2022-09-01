@@ -2,11 +2,11 @@ package me.ddivad.judgebot.embeds
 
 import dev.kord.common.kColor
 import dev.kord.core.entity.Guild
+import dev.kord.rest.Image
 import dev.kord.rest.builder.message.EmbedBuilder
 import me.ddivad.judgebot.dataclasses.Rule
 import me.jakejmattson.discordkt.extensions.addField
 import java.awt.Color
-import dev.kord.rest.Image
 
 fun EmbedBuilder.createRuleEmbed(guild: Guild, rule: Rule) {
     title = "__${rule.number}: ${rule.title}__"
@@ -36,20 +36,6 @@ fun EmbedBuilder.createRulesEmbed(guild: Guild, rules: List<Rule>) {
             value += "**[${rule.number}](${rule.link})**. ${rule.title}\n"
         }
     }
-    footer {
-        icon = guild.getIconUrl(Image.Format.PNG) ?: ""
-        text = guild.name
-    }
-}
-
-fun EmbedBuilder.createInfractionRuleEmbed(guild: Guild, rules: List<Rule>) {
-    title = "**__Available Rules__**"
-    color = Color.MAGENTA.kColor
-    description = ""
-    for (rule in rules) {
-        description += "**[${rule.number}](${rule.link})**. ${rule.title}\n"
-    }
-    addField("","Click the rule id you would like to use, or type `cancel` to stop this process")
     footer {
         icon = guild.getIconUrl(Image.Format.PNG) ?: ""
         text = guild.name

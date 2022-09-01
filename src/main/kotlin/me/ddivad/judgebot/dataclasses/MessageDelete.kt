@@ -1,6 +1,6 @@
 package me.ddivad.judgebot.dataclasses
 
-import java.util.Date
+import java.util.*
 
 data class MessageDelete(
     val userId: String,

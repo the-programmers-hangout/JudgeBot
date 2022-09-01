@@ -12,12 +12,40 @@ import me.ddivad.judgebot.util.timeToString
 import me.jakejmattson.discordkt.extensions.addField
 import java.awt.Color
 
-fun EmbedBuilder.createInfractionEmbed(guild: Guild, configuration: GuildConfiguration, user: User, guildMember: GuildMember, infraction: Infraction, rule: Rule?) {
-    if (infraction.type == InfractionType.Warn) createWarnEmbed(guild, configuration, user, guildMember, infraction, rule)
-    else if (infraction.type == InfractionType.Strike) createStrikeEmbed(guild, configuration, user, guildMember, infraction, rule)
+fun EmbedBuilder.createInfractionEmbed(
+    guild: Guild,
+    configuration: GuildConfiguration,
+    user: User,
+    guildMember: GuildMember,
+    infraction: Infraction,
+    rule: Rule?
+) {
+    if (infraction.type == InfractionType.Warn) createWarnEmbed(
+        guild,
+        configuration,
+        user,
+        guildMember,
+        infraction,
+        rule
+    )
+    else if (infraction.type == InfractionType.Strike) createStrikeEmbed(
+        guild,
+        configuration,
+        user,
+        guildMember,
+        infraction,
+        rule
+    )
 }
 
-fun EmbedBuilder.createWarnEmbed(guild: Guild, configuration: GuildConfiguration, user: User, guildMember: GuildMember, infraction: Infraction, rule: Rule?) {
+fun EmbedBuilder.createWarnEmbed(
+    guild: Guild,
+    configuration: GuildConfiguration,
+    user: User,
+    guildMember: GuildMember,
+    infraction: Infraction,
+    rule: Rule?
+) {
     title = "Warn"
     description = "${user.mention}, you have received a **warning** from **${guild.name}**."
 
@@ -49,12 +77,17 @@ fun EmbedBuilder.createWarnEmbed(guild: Guild, configuration: GuildConfiguration
     if (infraction.punishment?.punishment != PunishmentType.NONE) {
         field {
             name = "__Punishment__"
-            value = "${infraction.punishment?.punishment.toString()} ${if (infraction.punishment?.duration != null) "for " + timeToString(infraction.punishment?.duration!!) else "indefinitely"}"
+            value = "${infraction.punishment?.punishment.toString()} ${
+                if (infraction.punishment?.duration != null) "for " + timeToString(infraction.punishment?.duration!!) else "indefinitely"
+            }"
             inline = true
         }
     }
 
-    addField("", "A warning is a way for staff to inform you that your behaviour needs to change or further infractions will follow. \nIf you think this to be unjustified, please **do not** post about it in a public channel but take it up with **Modmail**.")
+    addField(
+        "",
+        "A warning is a way for staff to inform you that your behaviour needs to change or further infractions will follow. \nIf you think this to be unjustified, please **do not** post about it in a public channel but take it up with **Modmail**."
+    )
 
     color = Color.RED.kColor
     thumbnail {
@@ -66,7 +99,14 @@ fun EmbedBuilder.createWarnEmbed(guild: Guild, configuration: GuildConfiguration
     }
 }
 
-fun EmbedBuilder.createStrikeEmbed(guild: Guild, configuration: GuildConfiguration, user: User, guildMember: GuildMember, infraction: Infraction, rule: Rule?) {
+fun EmbedBuilder.createStrikeEmbed(
+    guild: Guild,
+    configuration: GuildConfiguration,
+    user: User,
+    guildMember: GuildMember,
+    infraction: Infraction,
+    rule: Rule?
+) {
     title = "Strike"
     description = "${user.mention}, you have received a **strike** from **${guild.name}**."
 
@@ -98,13 +138,17 @@ fun EmbedBuilder.createStrikeEmbed(guild: Guild, configuration: GuildConfigurati
     if (infraction.punishment?.punishment != PunishmentType.NONE) {
         field {
             name = "__Punishment__"
-            value = "${infraction.punishment?.punishment.toString()} ${if (infraction.punishment?.duration != null) "for " + timeToString(infraction.punishment?.duration!!) else "indefinitely"}"
+            value = "${infraction.punishment?.punishment.toString()} ${
+                if (infraction.punishment?.duration != null) "for " + timeToString(infraction.punishment?.duration!!) else "indefinitely"
+            }"
             inline = true
         }
     }
 
-    addField("", " A strike is a formal warning for breaking the rules.\nIf you think this to be unjustified, please **do not** post about it in a public channel but take it up with **Modmail**.")
-
+    addField(
+        "",
+        " A strike is a formal warning for breaking the rules.\nIf you think this to be unjustified, please **do not** post about it in a public channel but take it up with **Modmail**."
+    )
 
     color = Color.RED.kColor
     thumbnail {
@@ -188,7 +232,8 @@ fun EmbedBuilder.createMessageDeleteEmbed(guild: Guild, message: Message) {
         addField("Filename", "```${message.attachments.first().filename}```")
     }
     field {
-        value = "If you think this to be unjustified, please **do not** post about it in a public channel but take it up with Modmail."
+        value =
+            "If you think this to be unjustified, please **do not** post about it in a public channel but take it up with Modmail."
     }
     footer {
         icon = guild.getIconUrl(Image.Format.PNG) ?: ""

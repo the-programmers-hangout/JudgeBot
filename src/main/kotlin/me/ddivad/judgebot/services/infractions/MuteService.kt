@@ -1,8 +1,9 @@
 package me.ddivad.judgebot.services.infractions
 
-import dev.kord.common.exception.RequestException
 import dev.kord.common.entity.Permission
 import dev.kord.common.entity.Permissions
+import dev.kord.common.exception.RequestException
+import dev.kord.core.behavior.edit
 import dev.kord.core.entity.Guild
 import dev.kord.core.entity.Member
 import dev.kord.core.entity.PermissionOverwrite
@@ -11,6 +12,7 @@ import dev.kord.core.supplier.EntitySupplyStrategy
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
+import kotlinx.datetime.toKotlinInstant
 import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.dataclasses.InfractionType
 import me.ddivad.judgebot.dataclasses.Punishment
@@ -24,6 +26,7 @@ import me.jakejmattson.discordkt.annotations.Service
 import me.jakejmattson.discordkt.extensions.sendPrivateMessage
 import me.jakejmattson.discordkt.extensions.toSnowflake
 import org.joda.time.DateTime
+import java.time.Instant
 
 typealias GuildID = String
 typealias UserId = String
@@ -35,18 +38,20 @@ enum class RoleState {
 }
 
 @Service
-class MuteService(val configuration: Configuration,
-                  private val discord: Discord,
-                  private val databaseService: DatabaseService,
-                  private val loggingService: LoggingService) {
+class MuteService(
+    val configuration: Configuration,
+    private val discord: Discord,
+    private val databaseService: DatabaseService,
+    private val loggingService: LoggingService
+) {
     private val muteTimerMap = hashMapOf<Pair<UserId, GuildID>, Job>()
-    private suspend fun getMutedRole(guild: Guild) = guild.getRole(configuration[guild.id.value]?.mutedRole?.toSnowflake()!!)
+    private suspend fun getMutedRole(guild: Guild) = guild.getRole(configuration[guild.id]?.mutedRole!!)
     private fun toKey(user: User, guild: Guild) = user.id.toString() to guild.id.toString()
     suspend fun initGuilds() {
         configuration.guildConfigurations.forEach { config ->
             runBlocking {
                 try {
-                    val guild = config.value.id.toSnowflake().let { discord.kord.getGuild(it) } ?: return@runBlocking
+                    val guild = config.key.let { discord.kord.getGuild(it) } ?: return@runBlocking
                     initialiseMuteTimers(guild)
                     setupMutedRole(guild)
                 } catch (ex: Exception) {
@@ -56,14 +61,14 @@ class MuteService(val configuration: Configuration,
         }
     }
 
-    suspend fun applyInfractionMute(member: Member, time: Long, reason: String) {
-        applyMute(member, time, reason)
+    suspend fun applyInfractionMute(member: Member, time: Long) {
+        applyMute(member, time)
     }
 
     suspend fun applyMuteAndSendReason(member: Member, time: Long, reason: String) {
         val guild = member.guild.asGuild()
         val user = member.asUser()
-        applyMute(member, time, reason)
+        applyMute(member, time)
         try {
             member.sendPrivateMessage {
                 createMuteEmbed(guild, member, reason, time)
@@ -73,12 +78,13 @@ class MuteService(val configuration: Configuration,
         }
     }
 
-    private suspend fun applyMute(member: Member, time: Long, reason: String) {
+    private suspend fun applyMute(member: Member, time: Long) {
         val guild = member.guild.asGuild()
         val user = member.asUser()
         val clearTime = DateTime.now().plus(time).millis
-        val punishment = Punishment(user.id.toString(), InfractionType.Mute, reason, "", clearTime)
+        val punishment = Punishment(user.id.toString(), InfractionType.Mute, clearTime)
         val muteRole = getMutedRole(guild)
+        val timeoutDuration = Instant.ofEpochMilli(Instant.now().toEpochMilli() + time - 2000)
         val key = toKey(user, guild)
         if (key in muteTimerMap) {
             muteTimerMap[key]?.cancel()
@@ -87,6 +93,7 @@ class MuteService(val configuration: Configuration,
             loggingService.muteOverwritten(guild, member)
         }
         databaseService.guilds.addPunishment(guild.asGuild(), punishment)
+        member.edit { communicationDisabledUntil = timeoutDuration.toKotlinInstant() }
         muteTimerMap[key] = applyRoleWithTimer(member, muteRole, time) {
             removeMute(guild, user)
         }.also {
@@ -95,8 +102,9 @@ class MuteService(val configuration: Configuration,
     }
 
     suspend fun gag(guild: Guild, target: Member, moderator: User) {
+        val muteDuration = configuration[guild.id]?.infractionConfiguration?.gagDuration ?: return
         loggingService.gagApplied(guild, target, moderator)
-        this.applyMuteAndSendReason(target, 1000L * 60 * 5, "You've been muted temporarily by staff.")
+        this.applyMuteAndSendReason(target, muteDuration, "You've been muted temporarily by staff.")
     }
 
     fun removeMute(guild: Guild, user: User) {
@@ -105,6 +113,7 @@ class MuteService(val configuration: Configuration,
             val key = toKey(user, guild)
             guild.getMemberOrNull(user.id)?.let {
                 it.removeRole(muteRole.id)
+                it.edit { communicationDisabledUntil = Instant.now().toKotlinInstant() }
                 try {
                     it.sendPrivateMessage {
                         createUnmuteEmbed(guild, user)
@@ -154,23 +163,32 @@ class MuteService(val configuration: Configuration,
     }
 
     suspend fun checkRoleState(guild: Guild, member: Member) = when {
-        databaseService.guilds.checkPunishmentExists(guild, member, InfractionType.Mute).isNotEmpty() -> RoleState.Tracked
+        databaseService.guilds.checkPunishmentExists(guild, member, InfractionType.Mute)
+            .isNotEmpty() -> RoleState.Tracked
         member.roles.toList().contains(getMutedRole(member.getGuild())) -> RoleState.Untracked
         else -> RoleState.None
     }
 
-    private suspend fun setupMutedRole(guild: Guild) {
-        val mutedRole = guild.getRole(configuration[guild.id.value]!!.mutedRole.toSnowflake())
+    suspend fun setupMutedRole(guild: Guild) {
+        val mutedRole = guild.getRole(configuration[guild.id]!!.mutedRole)
         guild.withStrategy(EntitySupplyStrategy.cachingRest).channels.toList().forEach {
             val deniedPermissions = it.getPermissionOverwritesForRole(mutedRole.id)?.denied ?: Permissions()
-            if (deniedPermissions.values.any { permission -> permission in setOf(Permission.SendMessages, Permission.AddReactions, Permission.CreatePublicThreads, Permission.CreatePrivateThreads, Permission.SendMessagesInThreads) }) {
+            if (deniedPermissions.values.any { permission ->
+                    permission in setOf(
+                        Permission.SendMessages,
+                        Permission.AddReactions,
+                        Permission.CreatePublicThreads,
+                        Permission.CreatePrivateThreads,
+                        Permission.SendMessagesInThreads
+                    )
+                }) {
                 try {
-
                     it.addOverwrite(
                         PermissionOverwrite.forRole(
                             mutedRole.id,
                             denied = deniedPermissions.plus(Permission.SendMessages).plus(Permission.AddReactions)
-                                .plus(Permission.CreatePrivateThreads).plus(Permission.CreatePrivateThreads).plus(Permission.SendMessagesInThreads)
+                                .plus(Permission.CreatePrivateThreads).plus(Permission.CreatePrivateThreads)
+                                .plus(Permission.SendMessagesInThreads)
                         ),
                         "Judgebot Overwrite"
                     )

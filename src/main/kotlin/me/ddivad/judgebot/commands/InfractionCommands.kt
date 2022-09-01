@@ -1,147 +1,156 @@
 package me.ddivad.judgebot.commands
 
 import dev.kord.common.annotation.KordPreview
-import me.ddivad.judgebot.arguments.LowerUserArg
 import dev.kord.common.exception.RequestException
-import dev.kord.core.behavior.reply
-import dev.kord.x.emoji.Emojis
-import dev.kord.x.emoji.addReaction
+import dev.kord.core.behavior.interaction.response.respond
 import me.ddivad.judgebot.arguments.LowerMemberArg
-import me.ddivad.judgebot.conversations.InfractionConversation
+import me.ddivad.judgebot.arguments.autoCompletingRuleArg
+import me.ddivad.judgebot.arguments.autoCompletingWeightArg
 import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.dataclasses.Infraction
 import me.ddivad.judgebot.dataclasses.InfractionType
 import me.ddivad.judgebot.dataclasses.Permissions
+import me.ddivad.judgebot.embeds.createHistoryEmbed
 import me.ddivad.judgebot.extensions.testDmStatus
-import me.ddivad.judgebot.services.*
+import me.ddivad.judgebot.services.DatabaseService
 import me.ddivad.judgebot.services.infractions.BadPfpService
-import me.ddivad.judgebot.services.infractions.BadnameService
 import me.ddivad.judgebot.services.infractions.InfractionService
+import me.jakejmattson.discordkt.arguments.AnyArg
 import me.jakejmattson.discordkt.arguments.BooleanArg
+import me.jakejmattson.discordkt.arguments.ChoiceArg
 import me.jakejmattson.discordkt.arguments.EveryArg
-import me.jakejmattson.discordkt.arguments.IntegerArg
 import me.jakejmattson.discordkt.commands.commands
-import me.jakejmattson.discordkt.conversations.ConversationResult
+import me.jakejmattson.discordkt.extensions.createMenu
 
 @KordPreview
 @Suppress("unused")
-fun createInfractionCommands(databaseService: DatabaseService,
-                             config: Configuration,
-                             infractionService: InfractionService,
-                             badPfpService: BadPfpService,
-                             badnameService: BadnameService) = commands("Infraction") {
-    command("strike", "s", "S") {
-        description = "Strike a user."
-        requiredPermission = Permissions.STAFF
-        execute(LowerMemberArg, IntegerArg("Weight").optional(1), EveryArg("Reason")) {
-            val (targetMember, weight, reason) = args
-            val guildConfiguration = config[guild.id.value] ?: return@execute
-            val maxStrikes = guildConfiguration.infractionConfiguration.pointCeiling / 10
-            if (weight > maxStrikes) {
-                respond("Maximum strike weight is **$maxStrikes (${guildConfiguration.infractionConfiguration.pointCeiling} points)**")
+fun createInfractionCommands(
+    databaseService: DatabaseService,
+    config: Configuration,
+    infractionService: InfractionService,
+    badPfpService: BadPfpService
+) = commands("Infraction") {
+    slash("warn", "Warn a user.", Permissions.MODERATOR) {
+        execute(
+            LowerMemberArg("Member", "Target Member"),
+            autoCompletingRuleArg(databaseService),
+            AnyArg("Reason", "Infraction reason to send to user"),
+            BooleanArg(
+                "Force",
+                "true",
+                "false",
+                "Override recommendation to strike user instead. Please discuss with staff before using this option"
+            ).optional(false)
+        ) {
+            val (targetMember, ruleName, reason, force) = args
+            val guildConfiguration = config[guild.id] ?: return@execute
+            val interactionResponse = interaction?.deferPublicResponse()
+            val dmEnabled: Boolean = try {
+                targetMember.testDmStatus()
+                true
+            } catch (ex: RequestException) {
+                false
+            }
+            val user = databaseService.users.getOrCreateUser(targetMember, guild)
+            if (user.getTotalHistoricalPoints(guild) >= guildConfiguration.infractionConfiguration.warnUpgradeThreshold && !force) {
+                interactionResponse?.respond {
+                    content =
+                        "This user has more than ${guildConfiguration.infractionConfiguration.warnUpgradeThreshold} historical points, so please consider striking (`/strike`) instead. You can use the optional `Force` argument to override this, but please discuss with other staff before doing so."
+                }
                 return@execute
             }
-            try {
-                targetMember.testDmStatus()
-                this.message.addReaction(Emojis.whiteCheckMark)
-            } catch (ex: RequestException) {
-                this.message.addReaction(Emojis.x)
-                respond("${targetMember.mention} has DMs disabled. No messages will be sent.")
+            val infraction = Infraction(
+                author.id.toString(),
+                reason,
+                InfractionType.Warn,
+                guildConfiguration.infractionConfiguration.warnPoints,
+                ruleName.split(" -").first().toInt()
+            )
+            infractionService.infract(targetMember, guild, user, infraction)
+            interactionResponse?.respond {
+                content =
+                    "Updated history for ${targetMember.mention}: ${if (!dmEnabled) "\n**Note**: User has DMs disabled" else ""}"
             }
-            val conversationResult = InfractionConversation(databaseService, config, infractionService)
-                    .createInfractionConversation(guild, targetMember, weight, reason, InfractionType.Strike)
-                    .startPublicly(discord, author, channel)
-            if (conversationResult == ConversationResult.HAS_CONVERSATION) {
-                message.reply { content = "You already have an active Strike conversation. Make sure you selected a rule." }
-            } else if (conversationResult == ConversationResult.EXITED) {
-                message.reply { content = "Infraction cancelled." }
-            }
+            channel.createMenu { createHistoryEmbed(targetMember, user, guild, config, databaseService) }
         }
     }
 
-    command("warn", "w", "W") {
-        description = "Warn a user."
-        requiredPermission = Permissions.MODERATOR
-        execute(LowerMemberArg, EveryArg("Reason")) {
-            val (targetMember, reason) = args
-            try {
+    slash("strike", "Strike a user.", Permissions.STAFF) {
+        execute(
+            LowerMemberArg("Member", "Target Member"),
+            autoCompletingRuleArg(databaseService),
+            EveryArg,
+            autoCompletingWeightArg(config)
+        ) {
+            val (targetMember, ruleName, reason, weight) = args
+            val guildConfiguration = config[guild.id] ?: return@execute
+            val interactionResponse = interaction?.deferPublicResponse()
+            val dmEnabled: Boolean = try {
                 targetMember.testDmStatus()
-                this.message.addReaction(Emojis.whiteCheckMark)
+                true
             } catch (ex: RequestException) {
-                this.message.addReaction(Emojis.x)
-                respond("${targetMember.mention} has DMs disabled. No messages will be sent.")
+                false
             }
-            InfractionConversation(databaseService, config, infractionService)
-                    .createInfractionConversation(guild, targetMember, 1, reason, InfractionType.Warn)
-                    .startPublicly(discord, author, channel)
+            val user = databaseService.users.getOrCreateUser(targetMember, guild)
+            val infraction = Infraction(
+                author.id.toString(),
+                reason,
+                InfractionType.Strike,
+                weight.toInt() * guildConfiguration.infractionConfiguration.strikePoints,
+                ruleName.split(" -").first().toInt()
+            )
+            infractionService.infract(targetMember, guild, user, infraction)
+            interactionResponse?.respond {
+                content =
+                    "Updated history for ${targetMember.mention}: ${if (!dmEnabled) "\n**Note**: User has DMs disabled" else ""}"
+            }
+            channel.createMenu { createHistoryEmbed(targetMember, user, guild, config, databaseService) }
         }
     }
 
-    command("badpfp") {
-        description = "Notifies the user that they should change their profile pic and applies a 30 minute mute. Bans the user if they don't change picture."
-        requiredPermission = Permissions.STAFF
-        execute(BooleanArg("cancel", "apply", "cancel").optional(true), LowerMemberArg) {
-            val (cancel, targetMember) = args
+    slash("badpfp", "Mutes a user and prompts them to change their pfp with a 30 minute ban timer", Permissions.STAFF) {
+        execute(
+            ChoiceArg("Option", "Trigger or cancel badpfp for a user", "Trigger", "Cancel"),
+            LowerMemberArg("Member", "Target Member")
+        ) {
+            val (option, targetMember) = args
+            val interactionResponse = interaction!!.deferPublicResponse()
+            var dmEnabled: Boolean
             try {
                 targetMember.testDmStatus()
-                this.message.addReaction(Emojis.whiteCheckMark)
+                dmEnabled = true
             } catch (ex: RequestException) {
-                this.message.addReaction(Emojis.x)
-                respond("${targetMember.mention} has DMs disabled. No messages will be sent.")
+                dmEnabled = false
+                interactionResponse.respond {
+                    content = "${targetMember.mention} has DMs disabled. No messages will be sent."
+                }
             }
-            val minutesUntilBan = 30L
-            val timeLimit = 1000 * 60 * minutesUntilBan
-            if (!cancel) {
+            if (option == "Cancel") {
                 when (badPfpService.hasActiveBapPfp(targetMember)) {
                     true -> {
                         badPfpService.cancelBadPfp(guild, targetMember)
-                        respond("Badpfp cancelled for ${targetMember.mention}")
+                        interactionResponse.respond { content = "Badpfp cancelled for ${targetMember.mention}" }
                     }
-                    false -> respond("${targetMember.mention} does not have a an active badpfp.")
+                    false -> interactionResponse.respond {
+                        content = "${targetMember.mention} does not have an active badpfp."
+                    }
                 }
                 return@execute
             }
 
             val badPfp = Infraction(author.id.toString(), "BadPfp", InfractionType.BadPfp)
-            badPfpService.applyBadPfp(targetMember, guild, timeLimit)
-            respond("${targetMember.mention} has been muted and a badpfp has been triggered with a time limit of $minutesUntilBan minutes.")
+            badPfpService.applyBadPfp(targetMember, guild)
+            databaseService.users.addInfraction(guild, databaseService.users.getOrCreateUser(targetMember, guild), badPfp)
+            interactionResponse.respond {
+                content = "${targetMember.mention} has been muted and a badpfp has been triggered."
+            }
         }
     }
 
-    command("badname") {
-        description = "Rename a guild member that has a bad name."
-        requiredPermission = Permissions.MODERATOR
-        execute(LowerMemberArg) {
-            badnameService.chooseRandomNickname(args.first)
+    slash("badname", "Rename a guild member that has a bad name.", Permissions.MODERATOR) {
+        execute(LowerMemberArg("Member", "Target Member")) {
+            infractionService.badName(args.first)
             respond("User renamed to ${args.first.mention}")
-        }
-    }
-
-    command("cleanseInfractions") {
-        description = "Use this to delete (permanently) as user's infractions."
-        requiredPermission = Permissions.ADMINISTRATOR
-        execute(LowerUserArg) {
-            val user = databaseService.users.getOrCreateUser(args.first, guild)
-            if (user.getGuildInfo(guild.id.toString()).infractions.isEmpty()) {
-                respond("User has no infractions.")
-                return@execute
-            }
-            databaseService.users.cleanseInfractions(guild, user)
-            respond("Infractions cleansed.")
-        }
-    }
-
-    command("removeInfraction") {
-        description = "Use this to delete (permanently) an infraction from a user."
-        requiredPermission = Permissions.ADMINISTRATOR
-        execute(LowerUserArg, IntegerArg("Infraction ID")) {
-            val user = databaseService.users.getOrCreateUser(args.first, guild)
-            if (user.getGuildInfo(guild.id.toString()).infractions.isEmpty()) {
-                respond("User has no infractions.")
-                return@execute
-            }
-            databaseService.users.removeInfraction(guild, user, args.second)
-            respond("Infractions removed.")
         }
     }
 }

@@ -1,34 +1,44 @@
 package me.ddivad.judgebot.arguments
 
 import dev.kord.core.entity.Member
+import dev.kord.core.entity.User
 import me.ddivad.judgebot.dataclasses.Configuration
-import me.jakejmattson.discordkt.arguments.*
-import me.jakejmattson.discordkt.commands.CommandEvent
-import me.jakejmattson.discordkt.extensions.isSelf
-import me.jakejmattson.discordkt.extensions.toSnowflakeOrNull
+import me.ddivad.judgebot.extensions.getHighestRolePosition
+import me.ddivad.judgebot.extensions.hasAdminRoles
+import me.ddivad.judgebot.extensions.hasStaffRoles
+import me.jakejmattson.discordkt.arguments.Error
+import me.jakejmattson.discordkt.arguments.Result
+import me.jakejmattson.discordkt.arguments.Success
+import me.jakejmattson.discordkt.arguments.UserArgument
+import me.jakejmattson.discordkt.commands.DiscordContext
 
-open class LowerMemberArg(override val name: String = "LowerMemberArg") : Argument<Member> {
+open class LowerMemberArg(
+    override val name: String = "LowerMemberArg",
+    override val description: String = "A Member with a lower rank",
+    private val allowsBot: Boolean = false
+) : UserArgument<Member> {
     companion object : LowerMemberArg()
 
-    override val description = "A Member with a lower rank"
+    override suspend fun transform(input: User, context: DiscordContext): Result<Member> {
+        val configuration = context.discord.getInjectionObjects(Configuration::class)
+        val guild = context.guild ?: return Error("No guild found")
+        val guildConfiguration = configuration[guild.id] ?: return Error("Guild not configured")
+        val targetMember = input.asMemberOrNull(guild.id) ?: return Error("Member not found.")
+        val authorAsMember = context.author.asMemberOrNull(guild.id) ?: return Error("Member not found.")
 
-    override suspend fun generateExamples(event: CommandEvent<*>) = mutableListOf("@User", "197780697866305536", "302134543639511050")
+        if (!allowsBot && targetMember.isBot)
+            return Error("Cannot be a bot")
 
-    override suspend fun convert(arg: String, args: List<String>, event: CommandEvent<*>): ArgumentResult<Member> {
-        val guild = event.guild ?: return Error("No guild found")
-        val configuration = event.discord.getInjectionObjects(Configuration :: class)
-
-        val member = arg.toSnowflakeOrNull()?.let { guild.getMemberOrNull(it) } ?: return Error("Not found")
-        val author = event.author.asMember(event.guild!!.id)
-
-        return when {
-            event.discord.permissions.isHigherLevel(event.discord, member, author) || event.author.isSelf() ->
-                Error("You don't have the permission to use this command on the target user.")
-            (event.author == member && member.id.toString() != configuration.ownerId) ->
-                Error("You can't use this command on yourself!")
-            else -> Success(member)
-        }
+        return if (authorAsMember.id == targetMember.id) {
+            Error("Cannot run command on yourself")
+        } else if (authorAsMember.hasAdminRoles(guildConfiguration) && !targetMember.hasAdminRoles(guildConfiguration)) {
+            Success(targetMember)
+        } else if (targetMember.hasStaffRoles(guildConfiguration)) {
+            Error("Cannot run command on staff members")
+        } else if (authorAsMember.getHighestRolePosition() > targetMember.getHighestRolePosition()) {
+            Success(targetMember)
+        } else Error("Missing permissions to target this member")
     }
 
-    override fun formatData(data: Member) = "@${data.tag}"
+    override suspend fun generateExamples(context: DiscordContext): List<String> = listOf(context.author.mention)
 }

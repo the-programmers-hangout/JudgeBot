@@ -95,7 +95,7 @@ class GuildOperations(connection: ConnectionService) {
     }
 
     suspend fun getBanOrNull(guild: Guild, userId: String): Ban? {
-        return this.getGuild(guild).bans.find {it.userId == userId}
+        return this.getGuild(guild).bans.find { it.userId == userId }
     }
 
     suspend fun getPunishmentsForGuild(guild: Guild, type: InfractionType): List<Punishment> {
@@ -108,7 +108,7 @@ class GuildOperations(connection: ConnectionService) {
 
     private suspend fun getGuild(guild: Guild): GuildInformation {
         return guildCollection.findOne(GuildInformation::guildId eq guild.id.toString())
-                ?: GuildInformation(guild.id.toString(), guild.name)
+            ?: GuildInformation(guild.id.toString(), guild.name)
     }
 
     private suspend fun updateGuild(guildInformation: GuildInformation): GuildInformation {
