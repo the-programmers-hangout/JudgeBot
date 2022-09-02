@@ -11,7 +11,7 @@ import me.ddivad.judgebot.extensions.hasStaffRoles
 import me.ddivad.judgebot.services.DatabaseService
 import me.ddivad.judgebot.services.LoggingService
 import me.ddivad.judgebot.services.infractions.MuteService
-import me.ddivad.judgebot.services.infractions.RoleState
+import me.ddivad.judgebot.services.infractions.MuteState
 import me.jakejmattson.discordkt.dsl.listeners
 import me.jakejmattson.discordkt.extensions.isSelf
 import me.jakejmattson.discordkt.extensions.jumpLink
@@ -36,7 +36,7 @@ fun onStaffReactionAdd(
             when (this.emoji.name) {
                 guildConfiguration.reactions.gagReaction -> {
                     msg.deleteReaction(this.emoji)
-                    if (muteService.checkRoleState(guild, messageAuthor) == RoleState.Tracked) {
+                    if (muteService.checkMuteState(guild, messageAuthor) == MuteState.Tracked) {
                         reactionUser.sendPrivateMessage("${messageAuthor.mention} is already muted.")
                         return@on
                     }

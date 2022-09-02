@@ -10,7 +10,7 @@ import me.ddivad.judgebot.dataclasses.Permissions
 import me.ddivad.judgebot.extensions.getHighestRolePosition
 import me.ddivad.judgebot.extensions.testDmStatus
 import me.ddivad.judgebot.services.infractions.MuteService
-import me.ddivad.judgebot.services.infractions.RoleState
+import me.ddivad.judgebot.services.infractions.MuteState
 import me.jakejmattson.discordkt.arguments.EveryArg
 import me.jakejmattson.discordkt.arguments.MemberArg
 import me.jakejmattson.discordkt.arguments.TimeArg
@@ -43,8 +43,8 @@ fun createMuteCommands(muteService: MuteService, configuration: Configuration) =
         execute(MemberArg) {
             val targetMember = args.first
             val interactionResponse = interaction?.deferPublicResponse()
-            if (muteService.checkRoleState(guild, targetMember) == RoleState.None) {
-                respond("User ${targetMember.mention} isn't muted")
+            if (muteService.checkMuteState(guild, targetMember) == MuteState.None) {
+                interactionResponse?.respond { content = "User ${targetMember.mention} isn't muted" }
                 return@execute
             }
             muteService.removeMute(guild, targetMember.asUser())
@@ -72,7 +72,7 @@ fun createMuteCommands(muteService: MuteService, configuration: Configuration) =
             respond("Missing required permission for target user")
             return@user
         }
-        if (muteService.checkRoleState(guild, targetMember) == RoleState.Tracked) {
+        if (muteService.checkMuteState(guild, targetMember) == MuteState.Tracked) {
             respond("User ${targetMember.mention} is already muted")
             return@user
         }

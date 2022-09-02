@@ -8,7 +8,7 @@ import me.ddivad.judgebot.dataclasses.Ban
 import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.dataclasses.GuildMember
 import me.ddivad.judgebot.dataclasses.Infraction
-import me.ddivad.judgebot.services.infractions.RoleState
+import me.ddivad.judgebot.services.infractions.MuteState
 import me.jakejmattson.discordkt.annotations.Service
 import me.jakejmattson.discordkt.extensions.descriptor
 import me.jakejmattson.discordkt.extensions.pfpUrl
@@ -30,10 +30,10 @@ class LoggingService(private val configuration: Configuration) {
     suspend fun roleRemoved(guild: Guild, user: User, role: Role) =
         log(guild, "**Info ::** Role ${role.mention} :: ${role.id.value} removed from ${user.mention} :: ${user.tag}")
 
-    suspend fun rejoinMute(guild: Guild, user: User, roleState: RoleState) =
+    suspend fun rejoinMute(guild: Guild, user: User, roleState: MuteState) =
         log(
             guild,
-            "**Info ::** User ${user.mention} :: ${user.tag} joined the server with ${if (roleState == RoleState.Tracked) "an infraction" else "a manual"} mute remaining"
+            "**Info ::** User ${user.mention} :: ${user.tag} joined the server with ${if (roleState == MuteState.Tracked) "an infraction" else "a manual"} mute remaining"
         )
 
     suspend fun channelOverrideAdded(guild: Guild, channel: TextChannel) =

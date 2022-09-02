@@ -28,7 +28,7 @@ data class GuildInformation(
     }
 
     fun removePunishment(userId: String, type: InfractionType): GuildInformation = this.apply {
-        val punishment = this.getPunishmentByType(type, userId).first()
+        val punishment = this.getPunishmentByType(type, userId).firstOrNull() ?: return@apply
         this.punishments.remove(punishment)
     }
 

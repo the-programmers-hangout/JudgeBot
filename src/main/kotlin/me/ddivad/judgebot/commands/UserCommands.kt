@@ -1,5 +1,6 @@
 package me.ddivad.judgebot.commands
 
+import dev.kord.common.entity.ApplicationCommandType
 import dev.kord.common.kColor
 import dev.kord.rest.Image
 import dev.kord.x.emoji.Emojis
@@ -115,10 +116,18 @@ fun createUserCommands(
         }
     }
 
-    slash("whatpfp", "Perform a reverse image search of a User's profile picture", Permissions.MODERATOR) {
-        execute(UserArg) {
-            val user = args.first
-            val reverseSearchUrl = "<https://www.google.com/searchbyimage?&image_url=${user.pfpUrl}>"
+    user("PFP Lookup", "whatpfp","Perform a reverse image search of a User's profile picture", Permissions.EVERYONE) {
+        val user = args.first
+        val reverseSearchUrl = "<https://www.google.com/searchbyimage?&image_url=${user.pfpUrl}>"
+
+        if (interaction?.invokedCommandType == ApplicationCommandType.User) {
+            respond {
+                title = "${user.tag}'s pfp"
+                color = Color.MAGENTA.kColor
+                description = "[Reverse Search]($reverseSearchUrl)"
+                image = "${user.pfpUrl}?size=512"
+            }
+        } else {
             respondPublic {
                 title = "${user.tag}'s pfp"
                 color = Color.MAGENTA.kColor
@@ -126,6 +135,7 @@ fun createUserCommands(
                 image = "${user.pfpUrl}?size=512"
             }
         }
+
     }
 
     slash("deletedMessages", "View a users messages deleted using the delete message reaction", Permissions.STAFF) {

@@ -31,10 +31,11 @@ import java.time.Instant
 typealias GuildID = String
 typealias UserId = String
 
-enum class RoleState {
+enum class MuteState {
     None,
     Tracked,
     Untracked,
+    TimedOut
 }
 
 @Service
@@ -122,7 +123,7 @@ class MuteService(
                     loggingService.dmDisabled(guild, user)
                 }
                 loggingService.roleRemoved(guild, user, muteRole)
-                if (checkRoleState(guild, it) == RoleState.Untracked) return@runBlocking
+                if (checkMuteState(guild, it) == MuteState.Untracked) return@runBlocking
             }
             databaseService.guilds.removePunishment(guild, user.id.toString(), InfractionType.Mute)
             muteTimerMap[key]?.cancel()
@@ -162,11 +163,16 @@ class MuteService(
         }
     }
 
-    suspend fun checkRoleState(guild: Guild, member: Member) = when {
-        databaseService.guilds.checkPunishmentExists(guild, member, InfractionType.Mute)
-            .isNotEmpty() -> RoleState.Tracked
-        member.roles.toList().contains(getMutedRole(member.getGuild())) -> RoleState.Untracked
-        else -> RoleState.None
+    suspend fun checkMuteState(guild: Guild, member: Member): MuteState {
+        return if (databaseService.guilds.checkPunishmentExists(guild, member, InfractionType.Mute)
+                .isNotEmpty()
+        ) MuteState.Tracked
+        else if (member.roles.toList().contains(getMutedRole(member.getGuild()))) MuteState.Untracked
+        else if (member.communicationDisabledUntil != null && member.communicationDisabledUntil!! > Instant.now()
+                .toKotlinInstant()
+        ) {
+            MuteState.TimedOut
+        } else MuteState.None
     }
 
     suspend fun setupMutedRole(guild: Guild) {
