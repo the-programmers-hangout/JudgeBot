@@ -150,12 +150,13 @@ private suspend fun MenuBuilder.buildInfractionPage(
         val warnings = userRecord.infractions.filter { it.type == InfractionType.Warn }.sortedBy { it.dateTime }
         val strikes = userRecord.infractions.filter { it.type == InfractionType.Strike }.sortedBy { it.dateTime }
 
-        addInlineField("Points", "**${userRecord.points} / ${config.infractionConfiguration.pointCeiling}**")
-        addInlineField("Warns", "${warnings.size}")
-        addInlineField("Strikes", "${strikes.size}")
+        addInlineField("Current Points", "**${userRecord.points} / ${config.infractionConfiguration.pointCeiling}**")
+        addInlineField("Infraction Count", "${userRecord.infractions.size}")
+        addInlineField("Total Points", "${userRecord.infractions.sumOf { it.points }}")
+
 
         if (userRecord.infractions.isEmpty()) addField("", "**User has no infractions**")
-        if (warnings.isNotEmpty()) addField("", "**__Warnings__**")
+        if (warnings.isNotEmpty()) addField("", "**__Warnings  (${warnings.size})__**")
         warnings.forEachIndexed { _, infraction ->
             val moderator = guild.kord.getUser(Snowflake(infraction.moderator))?.username
             addField(
@@ -173,7 +174,7 @@ private suspend fun MenuBuilder.buildInfractionPage(
             )
         }
 
-        if (strikes.isNotEmpty()) addField("", "**__Strikes__**")
+        if (strikes.isNotEmpty()) addField("", "**__Strikes (${strikes.size})__**")
         strikes.forEachIndexed { _, infraction ->
             val moderator = guild.kord.getUser(Snowflake(infraction.moderator))?.username
             addField(
@@ -353,7 +354,7 @@ private fun getDurationText(level: PunishmentLevel?): String {
             "for **" + timeToString(level.duration!!) + "**"
         }
         else -> {
-            "indefinitely"
+            ""
         }
     }
 }
@@ -376,7 +377,9 @@ private suspend fun getStatus(guild: Guild, target: User, databaseService: Datab
     if (userRecord.pointDecayFrozen) {
         status += "```css\nPoint decay is currently frozen for this user```"
     }
-    if (userRecord.bans.lastOrNull()?.thinIce == true && Instant.now().toEpochMilli() < userRecord.pointDecayTimer) {
+    if (userRecord.bans.lastOrNull()?.thinIce == true && userRecord.pointDecayFrozen && Instant.now()
+            .toEpochMilli() < userRecord.pointDecayTimer
+    ) {
         status += "User is on Thin Ice after being unbanned on ${
             userRecord.bans.last().unbanTime?.let {
                 Instant.ofEpochMilli(

@@ -120,8 +120,12 @@ data class GuildMember(
 
     suspend fun checkPointDecay(guild: Guild, configuration: GuildConfiguration, loggingService: LoggingService) =
         with(this.getGuildInfo(guild.id.toString())) {
-            if (this.pointDecayFrozen) {
-                this.pointDecayTimer = DateTime().millis
+            if (bans.lastOrNull()?.thinIce == true && this.pointDecayFrozen && Instant.now()
+                    .toEpochMilli() >= this.pointDecayTimer
+            ) {
+                this.pointDecayTimer = Instant.now().toEpochMilli()
+                this.pointDecayFrozen = false
+            } else if (this.pointDecayFrozen) {
                 return@with
             }
             val weeksSincePointsDecayed = Weeks.weeksBetween(DateTime(this.pointDecayTimer), DateTime()).weeks
@@ -162,6 +166,7 @@ data class GuildMember(
     fun enableThinIce(guild: Guild) = with(this.getGuildInfo(guild.id.toString())) {
         this.points = 40
         this.pointDecayTimer = Instant.now().toEpochMilli().plus(60.toDuration(DurationUnit.DAYS).inWholeMilliseconds)
+        this.pointDecayFrozen = true
     }
 
     fun addBan(guild: Guild, ban: Ban) = with(this.getGuildInfo(guild.id.toString())) {
