@@ -6,7 +6,9 @@ import me.ddivad.judgebot.dataclasses.Permissions
 import me.ddivad.judgebot.embeds.createActivePunishmentsEmbed
 import me.ddivad.judgebot.services.DatabaseService
 import me.ddivad.judgebot.services.infractions.MuteService
-import me.jakejmattson.discordkt.arguments.*
+import me.jakejmattson.discordkt.arguments.ChoiceArg
+import me.jakejmattson.discordkt.arguments.IntegerArg
+import me.jakejmattson.discordkt.arguments.MemberArg
 import me.jakejmattson.discordkt.commands.commands
 import me.jakejmattson.discordkt.extensions.TimeStamp
 import java.time.Instant
@@ -95,23 +97,23 @@ fun adminCommands(databaseService: DatabaseService, configuration: Configuration
                 when (choice) {
                     "Freeze" -> {
                         databaseService.users.updatePointDecayState(guild, guildMember, true)
+                        respondPublic("Point decay **frozen** for ${user.mention}")
                     }
                     "Unfreeze" -> {
                         databaseService.users.updatePointDecayState(guild, guildMember, false)
+                        respondPublic("Point decay **unfrozen** for ${user.mention}")
                     }
                     else -> {
                         guildMember = databaseService.users.enableThinIceMode(guild, guildMember)
+                        respondPublic(
+                            "Point decay frozen and points set to 40 for ${user.mention}. Point decay will resume on ${
+                                TimeStamp.at(
+                                    Instant.ofEpochMilli(guildMember.getGuildInfo(guild.id.toString()).pointDecayTimer)
+                                )
+                            }"
+                        )
                     }
                 }
-                respondPublic(
-                    "Point decay ${if (choice == "Freeze") "frozen" else if (choice == "Thin Ice") "frozen and points set to 40" else "reset"} for ${user.mention}. ${
-                        if (choice == "Thin Ice") "Point decay will resume on ${
-                            TimeStamp.at(
-                                Instant.ofEpochMilli(guildMember.getGuildInfo(guild.id.toString()).pointDecayTimer)
-                            )
-                        }" else ""
-                    }"
-                )
             }
         }
     }

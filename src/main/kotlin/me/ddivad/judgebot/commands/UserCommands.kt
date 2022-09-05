@@ -2,6 +2,7 @@ package me.ddivad.judgebot.commands
 
 import dev.kord.common.entity.ApplicationCommandType
 import dev.kord.common.kColor
+import dev.kord.core.behavior.interaction.response.respond
 import dev.kord.rest.Image
 import dev.kord.x.emoji.Emojis
 import me.ddivad.judgebot.arguments.LowerUserArg
@@ -30,10 +31,11 @@ fun createUserCommands(
 ) = commands("User") {
     slash("history", "Use this to view a user's record.", Permissions.MODERATOR) {
         execute(UserArg) {
+            val interactionResponse = interaction?.deferPublicResponse()
             val user = databaseService.users.getOrCreateUser(args.first, guild)
             databaseService.users.incrementUserHistory(user, guild)
-            respondPublic("History for ${args.first.mention}:")
             channel.createMenu { createHistoryEmbed(args.first, user, guild, config, databaseService) }
+            interactionResponse?.respond { content = "History for ${args.first.mention}:" }
         }
     }
 

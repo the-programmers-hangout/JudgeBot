@@ -150,7 +150,9 @@ data class GuildMember(
 
     fun updatePointDecayState(guild: Guild, frozen: Boolean) = with(this.getGuildInfo(guild.id.toString())) {
         this.pointDecayFrozen = frozen
-        if (!frozen) {
+        if (frozen) {
+            addNote("Point decay frozen on ${TimeStamp.now()}", "${guild.kord.selfId}", guild)
+        } else {
             this.pointDecayTimer = DateTime().millis
         }
     }
