@@ -12,7 +12,9 @@ import org.litote.kmongo.eq
 
 @Service
 class GuildOperations(connection: ConnectionService) {
-    private val guildCollection = connection.db.getCollection<GuildInformation>("Guilds")
+    companion object: Collection("Guilds")
+
+    private val guildCollection = connection.db.getCollection<GuildInformation>(name)
 
     suspend fun setupGuild(guild: Guild): GuildInformation {
         val guildConfig = GuildInformation(guild.id.toString(), guild.name)

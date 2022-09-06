@@ -25,8 +25,10 @@ import me.jakejmattson.discordkt.Discord
 import me.jakejmattson.discordkt.annotations.Service
 import me.jakejmattson.discordkt.extensions.sendPrivateMessage
 import me.jakejmattson.discordkt.extensions.toSnowflake
-import org.joda.time.DateTime
 import java.time.Instant
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
+import kotlin.time.toJavaDuration
 
 typealias GuildID = String
 typealias UserId = String
@@ -82,7 +84,7 @@ class MuteService(
     private suspend fun applyMute(member: Member, time: Long) {
         val guild = member.guild.asGuild()
         val user = member.asUser()
-        val clearTime = DateTime.now().plus(time).millis
+        val clearTime = Instant.now().plus(time.toDuration(DurationUnit.MILLISECONDS).toJavaDuration()).toEpochMilli()
         val punishment = Punishment(user.id.toString(), InfractionType.Mute, clearTime)
         val muteRole = getMutedRole(guild)
         val timeoutDuration = Instant.ofEpochMilli(Instant.now().toEpochMilli() + time - 2000)
@@ -138,7 +140,7 @@ class MuteService(
             punishments.forEach {
                 if (it.clearTime != null) {
                     println("Adding Existing Timer :: UserId: ${it.userId}, GuildId: ${guild.id.value}, PunishmentId: ${it.id}")
-                    val difference = it.clearTime - DateTime.now().millis
+                    val difference = it.clearTime - Instant.now().toEpochMilli()
                     val member = guild.getMemberOrNull(it.userId.toSnowflake()) ?: return@forEach
                     val user = member.asUser()
                     val key = toKey(user, guild)
@@ -154,7 +156,7 @@ class MuteService(
     suspend fun handleRejoinMute(guild: Guild, member: Member) {
         val mute = databaseService.guilds.checkPunishmentExists(guild, member, InfractionType.Mute).first()
         if (mute.clearTime != null) {
-            val difference = mute.clearTime - DateTime.now().millis
+            val difference = mute.clearTime - Instant.now().toEpochMilli()
             val user = member.asUser()
             val key = toKey(user, guild)
             muteTimerMap[key] = applyRoleWithTimer(member, getMutedRole(guild), difference) {

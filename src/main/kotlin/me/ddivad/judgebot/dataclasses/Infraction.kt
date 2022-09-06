@@ -1,6 +1,6 @@
 package me.ddivad.judgebot.dataclasses
 
-import java.util.*
+import java.time.Instant
 
 enum class InfractionType {
     Warn, Strike, Mute, BadPfp, Ban
@@ -12,7 +12,7 @@ data class Infraction(
     val type: InfractionType,
     var points: Int = 0,
     val ruleNumber: Int? = null,
-    val dateTime: Long = Date().time,
+    val dateTime: Long = Instant.now().toEpochMilli(),
     var punishment: PunishmentLevel? = null,
     var id: Int? = null
 )
@@ -28,7 +28,7 @@ data class Ban(
     val userId: String,
     val moderator: String,
     var reason: String,
-    val dateTime: Long = Date().time,
+    var dateTime: Long? = Instant.now().toEpochMilli(),
     var unbanTime: Long? = null,
     var thinIce: Boolean = false
 )

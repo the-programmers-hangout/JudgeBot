@@ -1,5 +1,13 @@
 package me.ddivad.judgebot.dataclasses
 
+data class Rule(
+    val number: Int,
+    val title: String,
+    val description: String,
+    val link: String,
+    var archived: Boolean = false
+)
+
 data class GuildInformation(
     val guildId: String,
     val guildName: String,
@@ -53,11 +61,3 @@ data class GuildInformation(
         this.bans.remove(ban)
     }
 }
-
-data class Rule(
-    val number: Int,
-    val title: String,
-    val description: String,
-    val link: String,
-    var archived: Boolean = false
-)

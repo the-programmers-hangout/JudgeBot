@@ -5,6 +5,7 @@ import dev.kord.gateway.Intent
 import dev.kord.gateway.Intents
 import dev.kord.gateway.PrivilegedIntent
 import me.ddivad.judgebot.dataclasses.Configuration
+import me.ddivad.judgebot.services.database.MigrationService
 import me.ddivad.judgebot.services.infractions.MuteService
 import me.jakejmattson.discordkt.dsl.bot
 import java.awt.Color
@@ -37,9 +38,11 @@ suspend fun main() {
             )
         }
         onStart {
-            val muteService = this.getInjectionObjects(MuteService::class)
+            val (muteService, migrationService) = this.getInjectionObjects(MuteService::class, MigrationService::class)
             try {
+                migrationService.runMigrations()
                 muteService.initGuilds()
+
             } catch (ex: Exception) {
                 println(ex.message)
             }

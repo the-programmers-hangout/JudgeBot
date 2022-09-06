@@ -1,6 +1,6 @@
 package me.ddivad.judgebot.dataclasses
 
-import org.joda.time.DateTime
+import java.time.Instant
 
 data class Note(
     var note: String,
@@ -12,6 +12,6 @@ data class Note(
 data class Info(
     val message: String,
     val moderator: String,
-    val dateTime: Long = DateTime().millis,
+    val dateTime: Long = Instant.now().toEpochMilli(),
     var id: Int? = null
 )

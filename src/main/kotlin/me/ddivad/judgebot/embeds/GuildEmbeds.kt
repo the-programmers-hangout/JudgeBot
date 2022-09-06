@@ -7,11 +7,12 @@ import dev.kord.rest.Image
 import dev.kord.rest.builder.message.EmbedBuilder
 import me.ddivad.judgebot.dataclasses.GuildConfiguration
 import me.ddivad.judgebot.dataclasses.Punishment
-import me.ddivad.judgebot.util.timeBetween
 import me.ddivad.judgebot.util.timeToString
+import me.jakejmattson.discordkt.extensions.TimeStamp
+import me.jakejmattson.discordkt.extensions.TimeStyle
 import me.jakejmattson.discordkt.extensions.addField
-import org.joda.time.DateTime
 import java.awt.Color
+import java.time.Instant
 
 suspend fun EmbedBuilder.createConfigEmbed(config: GuildConfiguration, guild: Guild) {
     title = "Configuration"
@@ -73,7 +74,14 @@ suspend fun EmbedBuilder.createActivePunishmentsEmbed(guild: Guild, punishments:
     punishments.forEach {
         val user = guild.kord.getUser(Snowflake(it.userId))?.mention
         addField(
-            "${it.id} - ${it.type} - ${timeBetween(DateTime(it.clearTime))} left.",
+            "${it.id} - ${it.type} - ${
+                if (it.clearTime != null) "Cleartime - ${
+                    TimeStamp.at(
+                        Instant.ofEpochMilli(it.clearTime),
+                        TimeStyle.RELATIVE
+                    )
+                }" else ""
+            }",
             "User: $user"
         )
     }

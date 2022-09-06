@@ -14,7 +14,9 @@ class UserOperations(
     private val joinLeaveService: JoinLeaveOperations,
     private val loggingService: LoggingService
 ) {
-    private val userCollection = connection.db.getCollection<GuildMember>("Users")
+    companion object: Collection("Users")
+
+    private val userCollection = connection.db.getCollection<GuildMember>(name)
 
     suspend fun getOrCreateUser(target: User, guild: Guild): GuildMember {
         val userRecord = userCollection.findOne(GuildMember::userId eq target.id.toString())

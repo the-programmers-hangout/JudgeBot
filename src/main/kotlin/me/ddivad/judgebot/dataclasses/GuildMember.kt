@@ -3,9 +3,8 @@ package me.ddivad.judgebot.dataclasses
 import dev.kord.core.entity.Guild
 import me.ddivad.judgebot.services.LoggingService
 import me.jakejmattson.discordkt.extensions.TimeStamp
-import org.joda.time.DateTime
-import org.joda.time.Weeks
 import java.time.Instant
+import java.time.temporal.ChronoUnit
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
@@ -18,7 +17,7 @@ data class GuildMemberDetails(
     val bans: MutableList<Ban> = mutableListOf(),
     var historyCount: Int = 0,
     var points: Int = 0,
-    var pointDecayTimer: Long = DateTime().millis,
+    var pointDecayTimer: Long = Instant.now().toEpochMilli(),
     var lastInfraction: Long = 0,
     val deletedMessageCount: DeletedMessages = DeletedMessages(),
     var pointDecayFrozen: Boolean = false
@@ -35,7 +34,7 @@ data class GuildMember(
 ) {
     fun addNote(note: String, moderator: String, guild: Guild) = with(this.getGuildInfo(guild.id.toString())) {
         val nextId: Int = if (this.notes.isEmpty()) 1 else this.notes.maxByOrNull { it.id }!!.id + 1
-        this.notes.add(Note(note, moderator, DateTime().millis, nextId))
+        this.notes.add(Note(note, moderator,Instant.now().toEpochMilli(), nextId))
     }
 
     fun editNote(guild: Guild, noteId: Int, newNote: String, moderator: String) =
@@ -102,7 +101,7 @@ data class GuildMember(
         infraction.id = nextId
         this.infractions.add(infraction)
         this.points += infraction.points
-        this.lastInfraction = DateTime().millis
+        this.lastInfraction = Instant.now().toEpochMilli()
     }
 
     fun incrementHistoryCount(guildId: String) {
@@ -110,7 +109,7 @@ data class GuildMember(
     }
 
     fun updatePointDecayDate(guild: Guild, punishmentDuration: Long) = with(this.getGuildInfo(guild.id.toString())) {
-        this.pointDecayTimer = DateTime().millis.plus(punishmentDuration)
+        this.pointDecayTimer = Instant.now().toEpochMilli().plus(punishmentDuration)
     }
 
     fun addMessageDeleted(guild: Guild, deleteReaction: Boolean) = with(this.getGuildInfo(guild.id.toString())) {
@@ -128,7 +127,8 @@ data class GuildMember(
             } else if (this.pointDecayFrozen) {
                 return@with
             }
-            val weeksSincePointsDecayed = Weeks.weeksBetween(DateTime(this.pointDecayTimer), DateTime()).weeks
+            val weeksSincePointsDecayed = (ChronoUnit.DAYS.between(Instant.ofEpochMilli(this.pointDecayTimer), Instant.now()) / 7).toInt()
+
             if (weeksSincePointsDecayed > 0) {
                 if (this.points > 0) {
                     val pointsToRemove =
@@ -144,7 +144,7 @@ data class GuildMember(
                         weeksSincePointsDecayed
                     )
                 }
-                this.pointDecayTimer = DateTime().millis
+                this.pointDecayTimer = Instant.now().toEpochMilli()
             }
         }
 
@@ -153,7 +153,7 @@ data class GuildMember(
         if (frozen) {
             addNote("Point decay frozen on ${TimeStamp.now()}", "${guild.kord.selfId}", guild)
         } else {
-            this.pointDecayTimer = DateTime().millis
+            this.pointDecayTimer = Instant.now().toEpochMilli()
         }
     }
 
@@ -176,9 +176,9 @@ data class GuildMember(
     }
 
     fun unban(guild: Guild, thinIce: Boolean, thinIcePoints: Int) = with(this.getGuildInfo(guild.id.toString())) {
-        this.bans.last().let {
-            it.unbanTime = DateTime.now().millis
-            it.thinIce = thinIce
+        this.bans.lastOrNull().let {
+            it?.unbanTime = Instant.now().toEpochMilli()
+            it?.thinIce = thinIce
         }
         if (thinIce) {
             enableThinIce(guild)
