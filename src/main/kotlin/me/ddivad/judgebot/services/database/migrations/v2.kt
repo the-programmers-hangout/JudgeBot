@@ -17,7 +17,6 @@ suspend fun v2(db: CoroutineDatabase) {
     val userCollection = db.getCollection<GuildMember>(UserOperations.name)
     val guildCollection = db.getCollection<GuildInformation>(GuildOperations.name)
     val guildBans = guildCollection.find().toList().map { Result(it.guildId, it.bans) }
-
     val banDocuments = mutableListOf<ReplaceOneModel<GuildInformation>>()
     guildCollection.find().consumeEach { guild ->
         guild.bans.forEach {
@@ -27,7 +26,9 @@ suspend fun v2(db: CoroutineDatabase) {
         }
         banDocuments.add(replaceOne(GuildInformation::guildId eq guild.guildId, guild))
     }
-    guildCollection.bulkWrite(requests = banDocuments)
+    if (banDocuments.isNotEmpty()) {
+        guildCollection.bulkWrite(requests = banDocuments)
+    }
 
     val userDocuments = mutableListOf<ReplaceOneModel<GuildMember>>()
     userCollection.find().consumeEach { user ->
@@ -40,5 +41,7 @@ suspend fun v2(db: CoroutineDatabase) {
         user.guilds.forEach { guildDetails -> guildDetails.pointDecayFrozen = false }
         userDocuments.add(replaceOne(GuildMember::userId eq user.userId, user))
     }
-    userCollection.bulkWrite(requests = userDocuments)
+    if (userDocuments.isNotEmpty()) {
+        userCollection.bulkWrite(requests = userDocuments)
+    }
 }
