@@ -35,6 +35,7 @@ fun onStaffReactionAdd(
         if (reactionUser.hasStaffRoles(guildConfiguration) && reactionUser.getHighestRolePosition() > messageAuthor.getHighestRolePosition()) {
             when (this.emoji.name) {
                 guildConfiguration.reactions.gagReaction -> {
+                    loggingService.staffReactionUsed(guild, reactionUser, messageAuthor, this.emoji)
                     msg.deleteReaction(this.emoji)
                     if (muteService.checkMuteState(guild, messageAuthor) == MuteState.Tracked) {
                         reactionUser.sendPrivateMessage("${messageAuthor.mention} is already muted.")
@@ -42,7 +43,6 @@ fun onStaffReactionAdd(
                     }
                     muteService.gag(guild, messageAuthor, reactionUser)
                     reactionUser.sendPrivateMessage("${messageAuthor.mention} gagged.")
-                    loggingService.staffReactionUsed(guild, reactionUser, messageAuthor, this.emoji)
                 }
                 guildConfiguration.reactions.deleteMessageReaction -> {
                     message.delete()

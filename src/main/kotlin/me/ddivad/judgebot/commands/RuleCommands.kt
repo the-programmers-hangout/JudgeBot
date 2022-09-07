@@ -85,8 +85,8 @@ fun ruleCommands(databaseService: DatabaseService) = commands("Rules") {
     }
 
     slash("viewRule", "List a rule from this guild.", Permissions.EVERYONE) {
-        execute(IntegerArg) {
-            val rule = databaseService.guilds.getRule(guild, args.first)!!
+        execute(autoCompletingRuleArg(databaseService)) {
+            val rule = databaseService.guilds.getRule(guild, args.first.split(" -").first().toInt())!!
             respondPublic {
                 createRuleEmbed(guild, rule)
             }

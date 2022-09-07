@@ -18,7 +18,10 @@ repositories {
 dependencies {
     implementation("me.jakejmattson:DiscordKt:0.23.4")
     implementation("org.litote.kmongo:kmongo-coroutine:4.7.0")
-    implementation("org.slf4j:slf4j-simple:1.7.30")
+    implementation("io.github.microutils:kotlin-logging-jvm:2.1.23")
+    implementation("ch.qos.logback:logback-classic:1.4.0")
+    implementation("ch.qos.logback:logback-core:1.4.0")
+
 }
 
 tasks {

@@ -12,8 +12,8 @@ fun onMemberRejoinWithMute(muteService: MuteService, loggingService: LoggingServ
         val member = this.member
         val guild = this.getGuild()
         if (muteService.checkMuteState(guild, member) == MuteState.Tracked) {
-            muteService.handleRejoinMute(guild, member)
             loggingService.rejoinMute(guild, member.asUser(), MuteState.Tracked)
+            muteService.handleRejoinMute(guild, member)
         }
     }
 }

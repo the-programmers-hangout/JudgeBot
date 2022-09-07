@@ -77,7 +77,7 @@
 |-----------|-----------|---------------------------------------------------------------------------------------------------|
 | longRules | [Message] | List the rules (with descriptions) of this guild. Pass a message ID to edit existing rules embed. |
 | rules     | [Message] | List the rules of this guild. Pass a message ID to edit existing rules embed.                     |
-| viewRule  | Integer   | List a rule from this guild.                                                                      |
+| viewRule  | Rule      | List a rule from this guild.                                                                      |
 
 ## User
 | Commands        | Arguments                    | Description                                                     |

@@ -6,16 +6,21 @@ import me.ddivad.judgebot.dataclasses.GuildInformation
 import me.ddivad.judgebot.dataclasses.GuildMember
 import me.ddivad.judgebot.services.database.GuildOperations
 import me.ddivad.judgebot.services.database.UserOperations
+import mu.KotlinLogging
 import org.litote.kmongo.coroutine.CoroutineDatabase
 import org.litote.kmongo.eq
 import org.litote.kmongo.replaceOne
 
 data class Result(val guildId: String, val bans: List<Ban>)
 
+val logger = KotlinLogging.logger { }
+
 suspend fun v2(db: CoroutineDatabase) {
-    println("Running v2 DB Migration")
+    logger.info { "Running v2 DB Migration" }
     val userCollection = db.getCollection<GuildMember>(UserOperations.name)
     val guildCollection = db.getCollection<GuildInformation>(GuildOperations.name)
+
+    logger.info{ "Updating ban records" }
     val guildBans = guildCollection.find().toList().map { Result(it.guildId, it.bans) }
     val banDocuments = mutableListOf<ReplaceOneModel<GuildInformation>>()
     guildCollection.find().consumeEach { guild ->
@@ -30,6 +35,7 @@ suspend fun v2(db: CoroutineDatabase) {
         guildCollection.bulkWrite(requests = banDocuments)
     }
 
+    logger.info{ "Updating user records" }
     val userDocuments = mutableListOf<ReplaceOneModel<GuildMember>>()
     userCollection.find().consumeEach { user ->
         guildBans.forEach { gb ->

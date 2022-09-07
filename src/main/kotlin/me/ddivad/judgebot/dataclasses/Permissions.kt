@@ -5,8 +5,8 @@ import dev.kord.common.entity.Permissions
 
 @Suppress("unused")
 object Permissions {
-    val GUILD_OWNER = Permissions(Permission.Administrator)
-    val ADMINISTRATOR = Permissions(Permission.Administrator)
+    val GUILD_OWNER = Permissions(Permission.ManageGuild)
+    val ADMINISTRATOR = Permissions(Permission.ManageGuild)
     val STAFF = Permissions(Permission.BanMembers)
     val MODERATOR = Permissions(Permission.ManageMessages)
     val EVERYONE = Permissions(Permission.UseApplicationCommands)

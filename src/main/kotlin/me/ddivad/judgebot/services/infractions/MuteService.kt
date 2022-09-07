@@ -25,6 +25,7 @@ import me.jakejmattson.discordkt.Discord
 import me.jakejmattson.discordkt.annotations.Service
 import me.jakejmattson.discordkt.extensions.sendPrivateMessage
 import me.jakejmattson.discordkt.extensions.toSnowflake
+import mu.KotlinLogging
 import java.time.Instant
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
@@ -47,6 +48,7 @@ class MuteService(
     private val databaseService: DatabaseService,
     private val loggingService: LoggingService
 ) {
+    private val logger = KotlinLogging.logger { }
     private val muteTimerMap = hashMapOf<Pair<UserId, GuildID>, Job>()
     private suspend fun getMutedRole(guild: Guild) = guild.getRole(configuration[guild.id]?.mutedRole!!)
     private fun toKey(user: User, guild: Guild) = user.id.toString() to guild.id.toString()
@@ -136,10 +138,10 @@ class MuteService(
     private suspend fun initialiseMuteTimers(guild: Guild) {
         runBlocking {
             val punishments = databaseService.guilds.getPunishmentsForGuild(guild, InfractionType.Mute)
-            println("Existing Punishments :: ${punishments.size} existing punishments found for ${guild.name}")
+            logger.info { "Existing Punishments :: ${punishments.size} existing punishments found for ${guild.name}" }
             punishments.forEach {
                 if (it.clearTime != null) {
-                    println("Adding Existing Timer :: UserId: ${it.userId}, GuildId: ${guild.id.value}, PunishmentId: ${it.id}")
+                    logger.info { "Adding Existing Timer :: UserId: ${it.userId}, GuildId: ${guild.id.value}, PunishmentId: ${it.id}" }
                     val difference = it.clearTime - Instant.now().toEpochMilli()
                     val member = guild.getMemberOrNull(it.userId.toSnowflake()) ?: return@forEach
                     val user = member.asUser()
@@ -201,7 +203,7 @@ class MuteService(
                         "Judgebot Overwrite"
                     )
                 } catch (ex: RequestException) {
-                    println("No permssions to add overwrite to ${it.id.value} - ${it.name}")
+                    logger.warn { "No permssions to add overwrite to ${it.id.value} - ${it.name}" }
                 }
             }
         }

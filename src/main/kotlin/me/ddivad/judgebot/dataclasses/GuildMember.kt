@@ -3,10 +3,12 @@ package me.ddivad.judgebot.dataclasses
 import dev.kord.core.entity.Guild
 import me.ddivad.judgebot.services.LoggingService
 import me.jakejmattson.discordkt.extensions.TimeStamp
+import mu.KotlinLogging
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
+val logger = KotlinLogging.logger {  }
 
 data class GuildMemberDetails(
     val guildId: String,
@@ -32,6 +34,7 @@ data class GuildMember(
     val userId: String,
     val guilds: MutableList<GuildMemberDetails> = mutableListOf()
 ) {
+
     fun addNote(note: String, moderator: String, guild: Guild) = with(this.getGuildInfo(guild.id.toString())) {
         val nextId: Int = if (this.notes.isEmpty()) 1 else this.notes.maxByOrNull { it.id }!!.id + 1
         this.notes.add(Note(note, moderator,Instant.now().toEpochMilli(), nextId))
@@ -128,7 +131,7 @@ data class GuildMember(
                 return@with
             }
             val weeksSincePointsDecayed = (ChronoUnit.DAYS.between(Instant.ofEpochMilli(this.pointDecayTimer), Instant.now()) / 7).toInt()
-
+            logger.debug { "Point decay: $weeksSincePointsDecayed - $points - $pointDecayTimer" }
             if (weeksSincePointsDecayed > 0) {
                 if (this.points > 0) {
                     val pointsToRemove =
@@ -145,6 +148,7 @@ data class GuildMember(
                     )
                 }
                 this.pointDecayTimer = Instant.now().toEpochMilli()
+                logger.debug { "Point decay timer set to $pointDecayTimer" }
             }
         }
 
