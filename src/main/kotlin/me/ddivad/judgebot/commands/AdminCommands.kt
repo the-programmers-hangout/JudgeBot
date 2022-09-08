@@ -1,5 +1,7 @@
 package me.ddivad.judgebot.commands
 
+import dev.kord.core.behavior.interaction.response.respond
+import dev.kord.rest.builder.message.modify.embed
 import me.ddivad.judgebot.arguments.LowerUserArg
 import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.dataclasses.Permissions
@@ -78,12 +80,13 @@ fun adminCommands(databaseService: DatabaseService, configuration: Configuration
 
         slash("activePunishments", "View active punishments for a guild.", Permissions.ADMINISTRATOR) {
             execute {
+                val interactionResponse = interaction?.deferEphemeralResponse() ?: return@execute
                 val punishments = databaseService.guilds.getActivePunishments(guild)
                 if (punishments.isEmpty()) {
-                    respond("No active punishments found.")
+                    interactionResponse.respond { content = "No active punishments found." }
                     return@execute
                 }
-                respond { createActivePunishmentsEmbed(guild, punishments) }
+                interactionResponse.respond { embed { createActivePunishmentsEmbed(guild, punishments) } }
             }
         }
 

@@ -31,11 +31,11 @@ fun createUserCommands(
 ) = commands("User") {
     slash("history", "Use this to view a user's record.", Permissions.MODERATOR) {
         execute(UserArg) {
-            val interactionResponse = interaction?.deferPublicResponse()
+            val interactionResponse = interaction?.deferPublicResponse() ?: return@execute
             val user = databaseService.users.getOrCreateUser(args.first, guild)
             databaseService.users.incrementUserHistory(user, guild)
             channel.createMenu { createHistoryEmbed(args.first, user, guild, config, databaseService) }
-            interactionResponse?.respond { content = "History for ${args.first.mention}:" }
+            interactionResponse.respond { content = "History for ${args.first.mention}:" }
         }
     }
 
