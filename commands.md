@@ -86,7 +86,7 @@
 | ban             | LowerUserArg, Reason, [Days] | Ban a member from this guild.                                   |
 | deletedMessages | User                         | View a users messages deleted using the delete message reaction |
 | history         | User                         | Use this to view a user's record.                               |
-| unban           | User, Thin-Ice               | Unban a banned member from this guild.                          |
+| unban           | User, [Thin-Ice]             | Unban a banned member from this guild.                          |
 | whatpfp         | User                         | Perform a reverse image search of a User's profile picture      |
 
 ## Utility

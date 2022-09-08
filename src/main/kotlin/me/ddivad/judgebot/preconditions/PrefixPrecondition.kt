@@ -1,8 +1,7 @@
-package me.ddivad.judgebot
+package me.ddivad.judgebot.preconditions
 
 import me.ddivad.judgebot.dataclasses.Configuration
 import me.jakejmattson.discordkt.dsl.precondition
-
 
 @Suppress("unused")
 fun prefixPrecondition(configuration: Configuration) = precondition {
