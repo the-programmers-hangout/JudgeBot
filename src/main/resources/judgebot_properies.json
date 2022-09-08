@@ -1,5 +1,0 @@
-{
-  "version": "${version}",
-  "discordkt": "${discordkt.version}",
-  "repository": "${project.repository}"
-}

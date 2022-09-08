@@ -1,6 +1,8 @@
+import java.util.*
+
 group = "me.ddivad"
-version = Versions.BOT
-description = "judgebot"
+version = "2.0.0-BETA-1"
+description = "A bot for managing discord infractions in an intelligent and user-friendly way."
 
 plugins {
     kotlin("jvm") version "1.6.0"
@@ -14,15 +16,26 @@ repositories {
 }
 
 dependencies {
-    implementation("me.jakejmattson:DiscordKt:${Versions.DISCORDKT}")
-    implementation("org.litote.kmongo:kmongo-coroutine:4.2.8")
-    implementation("joda-time:joda-time:2.10.10")
-    implementation("org.slf4j:slf4j-simple:1.7.30")
+    implementation("me.jakejmattson:DiscordKt:0.23.4")
+    implementation("org.litote.kmongo:kmongo-coroutine:4.7.0")
+    implementation("io.github.microutils:kotlin-logging-jvm:2.1.23")
+    implementation("ch.qos.logback:logback-classic:1.4.0")
+    implementation("ch.qos.logback:logback-core:1.4.0")
+
 }
 
 tasks {
     compileKotlin {
         kotlinOptions.jvmTarget = "1.8"
+
+        Properties().apply {
+            setProperty("name", "Judgebot")
+            setProperty("description", project.description)
+            setProperty("version", version.toString())
+            setProperty("url", "https://github.com/the-programmers-hangout/JudgeBot/")
+
+            store(file("src/main/resources/bot.properties").outputStream(), null)
+        }
     }
 
     shadowJar {
@@ -33,9 +46,4 @@ tasks {
             )
         }
     }
-}
-
-object Versions {
-    const val BOT = "1.0.0"
-    const val DISCORDKT = "0.23.0-SNAPSHOT"
 }

@@ -10,15 +10,12 @@ import dev.kord.x.emoji.Emojis
 import kotlinx.datetime.toJavaInstant
 import me.ddivad.judgebot.dataclasses.*
 import me.ddivad.judgebot.services.DatabaseService
-import me.ddivad.judgebot.util.*
+import me.ddivad.judgebot.util.timeToString
 import me.jakejmattson.discordkt.dsl.MenuBuilder
-import me.jakejmattson.discordkt.extensions.addField
-import me.jakejmattson.discordkt.extensions.addInlineField
-import me.jakejmattson.discordkt.extensions.pfpUrl
-import me.jakejmattson.discordkt.extensions.toSnowflake
-import org.joda.time.DateTime
+import me.jakejmattson.discordkt.extensions.*
 import java.awt.Color
 import java.text.SimpleDateFormat
+import java.time.Instant
 import java.util.*
 
 suspend fun MenuBuilder.createHistoryEmbed(
@@ -32,7 +29,7 @@ suspend fun MenuBuilder.createHistoryEmbed(
     val paginatedNotes = userRecord.notes.chunked(4)
 
     val totalMenuPages = 1 + 1 + 1 + 1 + if (paginatedNotes.isNotEmpty()) paginatedNotes.size else 1
-    val guildConfiguration = config[guild.id.value]!!
+    val guildConfiguration = config[guild.id]!!
     val embedColor = getEmbedColour(guild, target, databaseService)
     val leaveData = databaseService.joinLeaves.getMemberJoinLeaveDataForGuild(guild.id.toString(), member.userId)
     this.apply {
@@ -44,16 +41,19 @@ suspend fun MenuBuilder.createHistoryEmbed(
     }
 
     buttons {
-        button("Overview", Emojis.clipboard) {
+        button(
+            "Overview (${userRecord.points} / ${guildConfiguration.infractionConfiguration.pointCeiling})",
+            Emojis.clipboard
+        ) {
             loadPage(0)
         }
-        button("Infractions", Emojis.warning) {
+        button("Infractions (${userRecord.infractions.size})", Emojis.warning) {
             loadPage(1)
         }
-        button("Notes", Emojis.pencil) {
+        button("Notes (${userRecord.notes.size})", Emojis.pencil) {
             loadPage(2)
         }
-        button("Info", Emojis.informationSource) {
+        button("Messages (${userRecord.info.size})", Emojis.informationSource) {
             loadPage(3 + if (paginatedNotes.isNotEmpty()) paginatedNotes.size - 1 else 0)
         }
         button("Leaves", Emojis.x) {
@@ -84,43 +84,33 @@ private suspend fun MenuBuilder.buildOverviewPage(
 ) {
     page {
         color = embedColor.kColor
-        title = "${target.asUser().tag}: Overview"
+        title = "User Overview (${userRecord.points} / ${config.infractionConfiguration.pointCeiling})"
         thumbnail {
             url = target.asUser().pfpUrl
         }
         val memberInGuild = target.asMemberOrNull(guild.id)
 
-        addInlineField(
-            "Record",
-            """
-                **${userRecord.infractions.size}** Infraction(s)
-                **${userRecord.notes.size}** Note(s)
-                **${userRecord.info.size}** Information(s)
-                **${userRecord.deletedMessageCount.deleteReaction}** Deletes (${config.reactions.deleteMessageReaction})
-            """.trimIndent()
-        )
-        addInlineField("Points", "**${userRecord.points} / ${config.infractionConfiguration.pointCeiling}**")
-        addInlineField("History Invokes", "${userRecord.historyCount}")
+        addInlineField("Infractions", "**${userRecord.infractions.size}**")
+        addInlineField("Notes", "**${userRecord.notes.size}**")
+        addInlineField("Messages", "**${userRecord.info.size}**")
+        addInlineField("History", "${userRecord.historyCount}")
+        addInlineField("Created", TimeStamp.at(target.id.timestamp.toJavaInstant(), TimeStyle.RELATIVE))
 
-        addInlineField("Created", formatOffsetTime(target.id.timestamp.toJavaInstant()))
         if (memberInGuild != null) {
-            addInlineField("Joined", formatOffsetTime(memberInGuild.joinedAt.toJavaInstant()))
+            addInlineField("Joined", TimeStamp.at(memberInGuild.joinedAt.toJavaInstant(), TimeStyle.RELATIVE))
         } else addInlineField("", "")
 
-        if (userRecord.linkedAccounts.isNotEmpty()) {
-            addInlineField(
-                "Alts",
-                userRecord.linkedAccounts.map { guild.kord.getUser(Snowflake(it))?.mention }.joinToString("\n")
-            )
-        }
-
-        getStatus(guild, target, databaseService)?.let { addField("Status", it) }
+        getStatus(guild, target, databaseService)?.let { addField("Current Status", it) }
 
         if (userRecord.infractions.size > 0) {
             val lastInfraction = userRecord.infractions.maxByOrNull { it.dateTime }!!
-
             addField(
-                "**__Most Recent Infraction__**",
+                "**__Most Recent Infraction__**: (${
+                    TimeStamp.at(
+                        Instant.ofEpochMilli(lastInfraction.dateTime),
+                        TimeStyle.RELATIVE
+                    )
+                })",
                 "Type: **${lastInfraction.type} (${lastInfraction.points})** Rule: **${lastInfraction.ruleNumber ?: "None"}**\n " +
                         "Issued by **${guild.kord.getUser(Snowflake(lastInfraction.moderator))?.username}** " +
                         "on **${SimpleDateFormat("dd/MM/yyyy").format(Date(lastInfraction.dateTime))}**\n" +
@@ -128,6 +118,14 @@ private suspend fun MenuBuilder.buildOverviewPage(
                         lastInfraction.reason
             )
         } else addField("", "**User has no recent infractions**")
+
+        addInlineField(
+            "",
+            "**${userRecord.deletedMessageCount.deleteReaction}** Deletes (${config.reactions.deleteMessageReaction})"
+        )
+        addInlineField("", "**${userRecord.bans.size}** Bans (${Emojis.x})")
+        addInlineField("", "**${userRecord.linkedAccounts.size}** Alt(s) (${Emojis.link})")
+
         footer {
             icon = guild.getIconUrl(Image.Format.PNG) ?: ""
             text = "Page 1 of $totalPages"
@@ -145,39 +143,51 @@ private suspend fun MenuBuilder.buildInfractionPage(
 ) {
     page {
         color = embedColor.kColor
-        title = "${target.asUser().tag}: Infractions"
+        title = "Infractions"
         thumbnail {
             url = target.asUser().pfpUrl
         }
         val warnings = userRecord.infractions.filter { it.type == InfractionType.Warn }.sortedBy { it.dateTime }
         val strikes = userRecord.infractions.filter { it.type == InfractionType.Strike }.sortedBy { it.dateTime }
 
-        addInlineField("Points", "**${userRecord.points} / ${config.infractionConfiguration.pointCeiling}**")
-        addInlineField("Warns", "${warnings.size}")
-        addInlineField("Strikes", "${strikes.size}")
+        addInlineField("Current Points", "**${userRecord.points} / ${config.infractionConfiguration.pointCeiling}**")
+        addInlineField("Infraction Count", "${userRecord.infractions.size}")
+        addInlineField("Total Points", "${userRecord.infractions.sumOf { it.points }}")
+
 
         if (userRecord.infractions.isEmpty()) addField("", "**User has no infractions**")
-        if (warnings.isNotEmpty()) addField("", "**__Warnings__**")
+        if (warnings.isNotEmpty()) addField("", "**__Warnings  (${warnings.size})__**")
         warnings.forEachIndexed { _, infraction ->
             val moderator = guild.kord.getUser(Snowflake(infraction.moderator))?.username
             addField(
                 "ID :: ${infraction.id} :: Staff :: __${moderator}__",
                 "Type: **${infraction.type} (${infraction.points})** :: " +
-                        "Date: **${SimpleDateFormat("dd/MM/yyyy").format(Date(infraction.dateTime))}**\n " +
                         "Rule: **${infraction.ruleNumber ?: "None"}**\n" +
+                        "Date: **${SimpleDateFormat("dd/MM/yyyy").format(Date(infraction.dateTime))}** (${
+                            TimeStamp.at(
+                                Instant.ofEpochMilli(infraction.dateTime),
+                                TimeStyle.RELATIVE
+                            )
+                        })\n " +
                         "Punishment: **${infraction.punishment?.punishment}** ${getDurationText(infraction.punishment)}\n" +
                         infraction.reason
             )
         }
 
-        if (strikes.isNotEmpty()) addField("", "**__Strikes__**")
+        if (strikes.isNotEmpty()) addField("", "**__Strikes (${strikes.size})__**")
         strikes.forEachIndexed { _, infraction ->
             val moderator = guild.kord.getUser(Snowflake(infraction.moderator))?.username
             addField(
                 "ID :: ${infraction.id} :: Staff :: __${moderator}__",
                 "Type: **${infraction.type} (${infraction.points})** :: " +
-                        "Date: **${SimpleDateFormat("dd/MM/yyyy").format(Date(infraction.dateTime))}**\n " +
                         "Rule: **${infraction.ruleNumber ?: "None"}**\n" +
+
+                        "Date: **${SimpleDateFormat("dd/MM/yyyy").format(Date(infraction.dateTime))}** (${
+                            TimeStamp.at(
+                                Instant.ofEpochMilli(infraction.dateTime),
+                                TimeStyle.RELATIVE
+                            )
+                        })\n " +
                         "Punishment: **${infraction.punishment?.punishment}** ${getDurationText(infraction.punishment)}\n" +
                         infraction.reason
             )
@@ -202,14 +212,14 @@ private suspend fun MenuBuilder.buildNotesPages(
     if (userRecord.notes.isEmpty()) {
         page {
             color = embedColor.kColor
-            title = "${target.asUser().tag}: Notes"
+            title = "Notes"
             thumbnail {
                 url = target.asUser().pfpUrl
             }
 
             addInlineField("Points", "**${userRecord.points} / ${config.infractionConfiguration.pointCeiling}**")
             addInlineField("Notes", "${userRecord.notes.size}")
-            addInlineField("Information", "${userRecord.info.size}")
+            addInlineField("Messages", "${userRecord.info.size}")
 
             addField("", "**User has no notes**")
             footer {
@@ -222,20 +232,25 @@ private suspend fun MenuBuilder.buildNotesPages(
     paginatedNotes.forEachIndexed { index, list ->
         page {
             color = embedColor.kColor
-            title = "${target.asUser().tag}: Notes" + if (paginatedNotes.size > 1) "(${index + 1})" else ""
+            title = "Notes" + if (paginatedNotes.size > 1) "(${index + 1})" else ""
             thumbnail {
                 url = target.asUser().pfpUrl
             }
             addInlineField("Notes", "${userRecord.notes.size}")
-            addInlineField("Information", "${userRecord.info.size}")
+            addInlineField("Messages", "${userRecord.info.size}")
             addInlineField("Points", "**${userRecord.points} / ${config.infractionConfiguration.pointCeiling}**")
 
             list.forEachIndexed { _, note ->
-                val moderator = guild.kord.getUser(Snowflake(note.moderator))?.username
-
+                val moderator = guild.kord.getUser(Snowflake(note.moderator))?.username ?: note.moderator
                 addField(
                     "ID :: ${note.id} :: Staff :: __${moderator}__",
-                    "Noted by **${moderator}** on **${SimpleDateFormat("dd/MM/yyyy").format(Date(note.dateTime))}**\n" +
+                    "Date: **${SimpleDateFormat("dd/MM/yyyy").format(Date(note.dateTime))}** (${
+                        TimeStamp.at(
+                            Instant.ofEpochMilli(
+                                note.dateTime
+                            ), TimeStyle.RELATIVE
+                        )
+                    })\n" +
                             note.note
                 )
             }
@@ -258,20 +273,26 @@ private suspend fun MenuBuilder.buildInformationPage(
     val paginatedNotes = userRecord.notes.chunked(4)
     page {
         color = embedColor.kColor
-        title = "${target.asUser().tag}: Information"
+        title = "Messages"
         thumbnail {
             url = target.asUser().pfpUrl
         }
         addInlineField("Notes", "${userRecord.notes.size}")
-        addInlineField("Information", "${userRecord.info.size}")
+        addInlineField("Messages", "${userRecord.info.size}")
         addInlineField("Points", "**${userRecord.points} / ${config.infractionConfiguration.pointCeiling}**")
 
-        if (userRecord.info.isEmpty()) addField("", "**User has no information**")
+        if (userRecord.info.isEmpty()) addField("", "**User has no message records**")
         userRecord.info.forEachIndexed { _, info ->
             val moderator = guild.kord.getUser(Snowflake(info.moderator))?.username
             addField(
                 "ID :: ${info.id} :: Staff :: __${moderator}__",
-                "Sent by **${moderator}** on **${SimpleDateFormat("dd/MM/yyyy").format(Date(info.dateTime))}**\n" +
+                "Date: **${SimpleDateFormat("dd/MM/yyyy").format(Date(info.dateTime))}** (${
+                    TimeStamp.at(
+                        Instant.ofEpochMilli(
+                            info.dateTime
+                        ), TimeStyle.RELATIVE
+                    )
+                })\n" +
                         info.message
             )
         }
@@ -295,7 +316,7 @@ private suspend fun MenuBuilder.buildJoinLeavePage(
         val paginatedNotes = userRecord.notes.chunked(4)
 
         color = embedColor.kColor
-        title = "${target.asUser().tag}: Join / Leave"
+        title = "Join / Leave"
         thumbnail {
             url = target.asUser().pfpUrl
         }
@@ -333,7 +354,7 @@ private fun getDurationText(level: PunishmentLevel?): String {
             "for **" + timeToString(level.duration!!) + "**"
         }
         else -> {
-            "indefinitely"
+            ""
         }
     }
 }
@@ -346,15 +367,32 @@ private suspend fun getEmbedColour(guild: Guild, target: User, databaseService: 
 }
 
 private suspend fun getStatus(guild: Guild, target: User, databaseService: DatabaseService): String? {
+    var status = ""
+    val userRecord = databaseService.users.getOrCreateUser(target, guild).getGuildInfo(guild.id.toString())
+    if (target.asMemberOrNull(guild.id) == null) return "```css\nUser not currently in this guild```"
     guild.getBanOrNull(target.id)?.let {
         val reason = databaseService.guilds.getBanOrNull(guild, target.id.toString())?.reason ?: it.reason
         return "```css\nUser is banned with reason:\n${reason}```"
     }
-    if (target.asMemberOrNull(guild.id) == null) return "```css\nUser not currently in this guild```"
-    databaseService.guilds.getPunishmentsForUser(guild, target).firstOrNull()?.let {
-        return "```css\nActive ${it.type} with ${timeBetween(DateTime(it.clearTime))} left```"
+    if (userRecord.pointDecayFrozen) {
+        status += "```css\nPoint decay is currently frozen for this user```"
     }
-    return null
+    if (userRecord.bans.lastOrNull()?.thinIce == true && userRecord.pointDecayFrozen && Instant.now()
+            .toEpochMilli() < userRecord.pointDecayTimer
+    ) {
+        status += "User is on Thin Ice after being unbanned on ${
+            userRecord.bans.last().unbanTime?.let {
+                Instant.ofEpochMilli(
+                    it
+                )
+            }?.let { TimeStamp.at(it) }
+        }. Point decay frozen until ${TimeStamp.at(Instant.ofEpochMilli(userRecord.pointDecayTimer))}"
+    }
+    databaseService.guilds.getPunishmentsForUser(guild, target).firstOrNull()?.let {
+        val clearTime = Instant.ofEpochMilli(it.clearTime!!)
+        status += "\nMuted until ${TimeStamp.at(clearTime)} (${TimeStamp.at(clearTime, TimeStyle.RELATIVE)})"
+    }
+    return status
 }
 
 suspend fun MenuBuilder.createLinkedAccountMenu(
@@ -393,16 +431,24 @@ suspend fun EmbedBuilder.createCondensedHistoryEmbed(
     val warnings = userGuildDetails.infractions.filter { it.type == InfractionType.Warn }
     val strikes = userGuildDetails.infractions.filter { it.type == InfractionType.Strike }
     val notes = userGuildDetails.notes
-    val maxPoints = config[guild.id.value]?.infractionConfiguration?.pointCeiling
+    val maxPoints = config[guild.id]?.infractionConfiguration?.pointCeiling
 
     color = Color.MAGENTA.kColor
-    title = "${target.asUser().tag}'s Record"
+    title = "User Overview (${userGuildDetails.points} / $maxPoints)"
     thumbnail {
         url = target.asUser().pfpUrl
     }
-    addInlineField("Infractions", "${infractions.size}")
-    addInlineField("Notes", "${notes.size}")
-    addInlineField("Points", "**${member.getPoints(guild)} / $maxPoints**")
+    val memberInGuild = target.asMemberOrNull(guild.id)
+
+    addInlineField("Infractions", "**${userGuildDetails.infractions.size}**")
+    addInlineField("Notes", "**${userGuildDetails.notes.size}**")
+    addInlineField("Info", "**${userGuildDetails.info.size}**")
+    addInlineField("History", "${userGuildDetails.historyCount}")
+    addInlineField("Created", TimeStamp.at(target.id.timestamp.toJavaInstant(), TimeStyle.RELATIVE))
+
+    if (memberInGuild != null) {
+        addInlineField("Joined", TimeStamp.at(memberInGuild.joinedAt.toJavaInstant(), TimeStyle.RELATIVE))
+    } else addInlineField("", "")
 
     if (notes.isEmpty()) {
         addField("", "**__Notes__**")
@@ -414,7 +460,12 @@ suspend fun EmbedBuilder.createCondensedHistoryEmbed(
 
             addField(
                 "ID :: ${note.id} :: Staff :: __${moderator}__",
-                "Noted by **${moderator}** on **${SimpleDateFormat("dd/MM/yyyy").format(Date(note.dateTime))}**\n" +
+                "Noted by **${moderator}** on **${SimpleDateFormat("dd/MM/yyyy").format(Date(note.dateTime))}** (${
+                    TimeStamp.at(
+                        Instant.ofEpochMilli(note.dateTime),
+                        TimeStyle.RELATIVE
+                    )
+                })\n" +
                         note.note
             )
         }
@@ -430,10 +481,15 @@ suspend fun EmbedBuilder.createCondensedHistoryEmbed(
             addField(
                 "ID :: $index :: Staff :: $moderator",
                 "Type: **${infraction.type} (${infraction.points})** :: " +
-                        "Date: **${SimpleDateFormat("dd/MM/yyyy").format(Date(infraction.dateTime))}**\n " +
+                        "Date: **${SimpleDateFormat("dd/MM/yyyy").format(Date(infraction.dateTime))}** (${
+                            TimeStamp.at(
+                                Instant.ofEpochMilli(infraction.dateTime),
+                                TimeStyle.RELATIVE
+                            )
+                        })\n " +
                         "Punishment: **${infraction.punishment?.punishment}** ${
                             if (infraction.punishment?.duration != null && infraction.punishment?.punishment !== PunishmentType.NONE)
-                                "for **" + timeToString(infraction.punishment?.duration!!) + "**" else "indefinitely"
+                                "for **" + timeToString(infraction.punishment?.duration!!) + "**" else ""
                         }\n" +
                         infraction.reason
             )
@@ -445,10 +501,15 @@ suspend fun EmbedBuilder.createCondensedHistoryEmbed(
             addField(
                 "ID :: $index :: Staff :: $moderator",
                 "Type: **${infraction.type} (${infraction.points})** :: " +
-                        "Date: **${SimpleDateFormat("dd/MM/yyyy").format(Date(infraction.dateTime))}**\n " +
+                        "Date: **${SimpleDateFormat("dd/MM/yyyy").format(Date(infraction.dateTime))}** (${
+                            TimeStamp.at(
+                                Instant.ofEpochMilli(infraction.dateTime),
+                                TimeStyle.RELATIVE
+                            )
+                        })\n " +
                         "Punishment: **${infraction.punishment?.punishment}** ${
                             if (infraction.punishment?.duration != null && infraction.punishment?.punishment !== PunishmentType.NONE)
-                                "for **" + timeToString(infraction.punishment?.duration!!) + "**" else "indefinitely"
+                                "for **" + timeToString(infraction.punishment?.duration!!) + "**" else ""
                         }\n" +
                         infraction.reason
             )
@@ -467,12 +528,11 @@ suspend fun EmbedBuilder.createSelfHistoryEmbed(
     guild: Guild,
     config: Configuration
 ) {
-
     val userGuildDetails = member.getGuildInfo(guild.id.toString())
     val infractions = userGuildDetails.infractions
     val warnings = userGuildDetails.infractions.filter { it.type == InfractionType.Warn }
     val strikes = userGuildDetails.infractions.filter { it.type == InfractionType.Strike }
-    val maxPoints = config[guild.id.value]?.infractionConfiguration?.pointCeiling
+    val maxPoints = config[guild.id]?.infractionConfiguration?.pointCeiling
 
     color = Color.MAGENTA.kColor
     title = "${target.asUser().tag}'s Record"
@@ -491,10 +551,14 @@ suspend fun EmbedBuilder.createSelfHistoryEmbed(
             addField(
                 "ID :: $index :: Weight :: ${infraction.points}",
                 "Type: **${infraction.type} (${infraction.points})** :: " +
-                        "Date: **${SimpleDateFormat("dd/MM/yyyy").format(Date(infraction.dateTime))}**\n " +
+                        "Date: **${SimpleDateFormat("dd/MM/yyyy").format(Date(infraction.dateTime))}** (${
+                            TimeStamp.at(
+                                Instant.ofEpochMilli(infraction.dateTime), TimeStyle.RELATIVE
+                            )
+                        })\n " +
                         "Punishment: **${infraction.punishment?.punishment}** ${
                             if (infraction.punishment?.duration != null && infraction.punishment?.punishment !== PunishmentType.NONE)
-                                "for **" + timeToString(infraction.punishment?.duration!!) + "**" else "indefinitely"
+                                "for **" + timeToString(infraction.punishment?.duration!!) + "**" else ""
                         }\n" +
                         infraction.reason
             )
@@ -505,10 +569,14 @@ suspend fun EmbedBuilder.createSelfHistoryEmbed(
             addField(
                 "ID :: $index :: Weight :: ${infraction.points}",
                 "Type: **${infraction.type} (${infraction.points})** :: " +
-                        "Date: **${SimpleDateFormat("dd/MM/yyyy").format(Date(infraction.dateTime))}**\n " +
+                        "Date: **${SimpleDateFormat("dd/MM/yyyy").format(Date(infraction.dateTime))}** (${
+                            TimeStamp.at(
+                                Instant.ofEpochMilli(infraction.dateTime), TimeStyle.RELATIVE
+                            )
+                        })\n " +
                         "Punishment: **${infraction.punishment?.punishment}** ${
                             if (infraction.punishment?.duration != null && infraction.punishment?.punishment !== PunishmentType.NONE)
-                                "for **" + timeToString(infraction.punishment?.duration!!) + "**" else "indefinitely"
+                                "for **" + timeToString(infraction.punishment?.duration!!) + "**" else ""
                         }\n" +
                         infraction.reason
             )

@@ -1,70 +1,67 @@
 package me.ddivad.judgebot.dataclasses
 
+import dev.kord.common.entity.Snowflake
 import dev.kord.core.entity.Guild
-import dev.kord.core.entity.Role
+import dev.kord.x.emoji.Emojis
 import kotlinx.serialization.Serializable
 import me.jakejmattson.discordkt.dsl.Data
+import me.jakejmattson.discordkt.dsl.edit
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 @Serializable
 data class Configuration(
-    val ownerId: String = "insert-owner-id",
-    var prefix: String = "judge!",
-    val guildConfigurations: MutableMap<ULong, GuildConfiguration> = mutableMapOf(),
+    val guildConfigurations: MutableMap<Snowflake, GuildConfiguration> = mutableMapOf(),
     val dbConfiguration: DatabaseConfiguration = DatabaseConfiguration()
 ) : Data() {
-    operator fun get(id: ULong) = guildConfigurations[id]
-    fun hasGuildConfig(guildId: ULong) = guildConfigurations.containsKey(guildId)
-
+    operator fun get(id: Snowflake) = guildConfigurations[id]
     fun setup(
-        guild: Guild,
-        prefix: String,
-        adminRole: Role,
-        staffRole: Role,
-        moderatorRole: Role,
-        mutedRole: Role,
-        logging: LoggingConfiguration
+        guild: Guild, configuration: GuildConfiguration
     ) {
-        if (guildConfigurations[guild.id.value] != null) return
-
-        val newConfiguration = GuildConfiguration(
-            guild.id.toString(),
-            prefix,
-            mutableListOf(moderatorRole.id.toString()),
-            mutableListOf(staffRole.id.toString()),
-            mutableListOf(adminRole.id.toString()),
-            mutedRole.id.toString(),
-            logging
-        )
+        if (guildConfigurations[guild.id] != null) return
 
         // Setup default punishments
         // TODO: Add configuration commands for this
-        newConfiguration.punishments.add(PunishmentLevel(0, PunishmentType.NONE, 0L))
-        newConfiguration.punishments.add(PunishmentLevel(10, PunishmentType.MUTE, 1000L * 60 * 60 * 1))
-        newConfiguration.punishments.add(PunishmentLevel(20, PunishmentType.MUTE, 1000L * 60 * 60 * 12))
-        newConfiguration.punishments.add(PunishmentLevel(30, PunishmentType.MUTE, 1000L * 60 * 60 * 24))
-        newConfiguration.punishments.add(PunishmentLevel(40, PunishmentType.MUTE, 1000L * 60 * 60 * 24 * 30))
-        newConfiguration.punishments.add(PunishmentLevel(50, PunishmentType.BAN))
+        configuration.punishments.add(PunishmentLevel(0, PunishmentType.NONE, 0L))
+        configuration.punishments.add(
+            PunishmentLevel(
+                10, PunishmentType.MUTE, 1.toDuration(DurationUnit.HOURS).inWholeMilliseconds
+            )
+        )
+        configuration.punishments.add(
+            PunishmentLevel(
+                20, PunishmentType.MUTE, 12.toDuration(DurationUnit.HOURS).inWholeMilliseconds
+            )
+        )
+        configuration.punishments.add(
+            PunishmentLevel(
+                30, PunishmentType.MUTE, 24.toDuration(DurationUnit.HOURS).inWholeMilliseconds
+            )
+        )
+        configuration.punishments.add(
+            PunishmentLevel(
+                40, PunishmentType.MUTE, 28.toDuration(DurationUnit.DAYS).inWholeMilliseconds
+            )
+        )
+        configuration.punishments.add(PunishmentLevel(50, PunishmentType.BAN))
 
-        guildConfigurations[guild.id.value] = newConfiguration
-        save()
+        edit { guildConfigurations[guild.id] = configuration }
     }
 }
 
 @Serializable
 data class DatabaseConfiguration(
-    val address: String = "mongodb://localhost:27017",
-    val databaseName: String = "judgebot"
+    val address: String = "mongodb://localhost:27017", val databaseName: String = "judgebot"
 )
 
 @Serializable
 data class GuildConfiguration(
-    val id: String = "",
     var prefix: String = "j!",
-    var moderatorRoles: MutableList<String> = mutableListOf(),
-    var staffRoles: MutableList<String> = mutableListOf(),
-    var adminRoles: MutableList<String> = mutableListOf(),
-    var mutedRole: String = "",
-    var loggingConfiguration: LoggingConfiguration = LoggingConfiguration(),
+    var moderatorRoles: MutableList<Snowflake> = mutableListOf(),
+    var staffRoles: MutableList<Snowflake> = mutableListOf(),
+    var adminRoles: MutableList<Snowflake> = mutableListOf(),
+    var mutedRole: Snowflake,
+    var loggingConfiguration: LoggingConfiguration,
     var infractionConfiguration: InfractionConfiguration = InfractionConfiguration(),
     var punishments: MutableList<PunishmentLevel> = mutableListOf(),
     var reactions: ReactionConfiguration = ReactionConfiguration()
@@ -72,11 +69,8 @@ data class GuildConfiguration(
 
 @Serializable
 data class LoggingConfiguration(
-    var alertChannel: String = "",
-    var loggingChannel: String = "insert_id",
-    var logRoles: Boolean = true,
-    var logInfractions: Boolean = true,
-    var logPunishments: Boolean = true
+    var alertChannel: Snowflake,
+    var loggingChannel: Snowflake,
 )
 
 @Serializable
@@ -84,21 +78,20 @@ data class InfractionConfiguration(
     var pointCeiling: Int = 50,
     var strikePoints: Int = 10,
     var warnPoints: Int = 0,
+    var warnUpgradeThreshold: Int = 40,
     var pointDecayPerWeek: Int = 2,
+    var gagDuration: Long = 5.toDuration(DurationUnit.MINUTES).inWholeMilliseconds
 )
 
 @Serializable
 data class PunishmentLevel(
-    var points: Int = 0,
-    var punishment: PunishmentType,
-    var duration: Long? = null
+    var points: Int = 0, var punishment: PunishmentType, var duration: Long? = null
 )
 
 @Serializable
 data class ReactionConfiguration(
     var enabled: Boolean = true,
-    var gagReaction: String = "",
-    var historyReaction: String = "",
-    var deleteMessageReaction: String = "",
-    var flagMessageReaction: String = ""
+    var gagReaction: String = "${Emojis.mute}",
+    var deleteMessageReaction: String = "${Emojis.wastebasket}",
+    var flagMessageReaction: String = "${Emojis.stopSign}"
 )

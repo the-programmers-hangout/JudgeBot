@@ -5,15 +5,14 @@ import dev.kord.common.kColor
 import dev.kord.core.entity.Guild
 import dev.kord.rest.Image
 import dev.kord.rest.builder.message.EmbedBuilder
-import me.ddivad.judgebot.arguments.validConfigParameters
 import me.ddivad.judgebot.dataclasses.GuildConfiguration
 import me.ddivad.judgebot.dataclasses.Punishment
-import me.ddivad.judgebot.util.timeBetween
 import me.ddivad.judgebot.util.timeToString
+import me.jakejmattson.discordkt.extensions.TimeStamp
+import me.jakejmattson.discordkt.extensions.TimeStyle
 import me.jakejmattson.discordkt.extensions.addField
-import me.jakejmattson.discordkt.extensions.toSnowflake
-import org.joda.time.DateTime
 import java.awt.Color
+import java.time.Instant
 
 suspend fun EmbedBuilder.createConfigEmbed(config: GuildConfiguration, guild: Guild) {
     title = "Configuration"
@@ -25,10 +24,10 @@ suspend fun EmbedBuilder.createConfigEmbed(config: GuildConfiguration, guild: Gu
     field {
         name = "**General:**"
         value = "Bot Prefix: ${config.prefix} \n" +
-                "Admin Roles: ${config.adminRoles.map{ guild.getRoleOrNull(it.toSnowflake())?.mention }} \n" +
-                "Staff Roles: ${config.staffRoles.map{ guild.getRoleOrNull(it.toSnowflake())?.mention }} \n" +
-                "Moderator Roles: ${config.moderatorRoles.map{ guild.getRoleOrNull(it.toSnowflake())?.mention }} \n" +
-                "Mute Role: ${guild.getRoleOrNull(config.mutedRole.toSnowflake())?.mention} \n"
+                "Admin Roles: ${config.adminRoles.map { guild.getRoleOrNull(it)?.mention }} \n" +
+                "Staff Roles: ${config.staffRoles.map { guild.getRoleOrNull(it)?.mention }} \n" +
+                "Moderator Roles: ${config.moderatorRoles.map { guild.getRoleOrNull(it)?.mention }} \n" +
+                "Mute Role: ${guild.getRoleOrNull(config.mutedRole)?.mention} \n"
     }
 
     field {
@@ -36,14 +35,15 @@ suspend fun EmbedBuilder.createConfigEmbed(config: GuildConfiguration, guild: Gu
         value = "Point Ceiling: ${config.infractionConfiguration.pointCeiling} \n" +
                 "Strike points: ${config.infractionConfiguration.strikePoints} \n" +
                 "Warn Points: ${config.infractionConfiguration.warnPoints} \n" +
-                "Point Decay / Week: ${config.infractionConfiguration.pointDecayPerWeek}"
+                "Warn Upgrade Prompt: ${config.infractionConfiguration.warnUpgradeThreshold} Points\n" +
+                "Point Decay / Week: ${config.infractionConfiguration.pointDecayPerWeek} \n" +
+                "Gag Duration: ${timeToString(config.infractionConfiguration.gagDuration)}"
     }
 
     field {
         name = "**Reactions**"
         value = "Enabled: ${config.reactions.enabled} \n" +
                 "Gag: ${config.reactions.gagReaction} \n" +
-                "History: ${config.reactions.historyReaction} \n" +
                 "Delete Message: ${config.reactions.deleteMessageReaction} \n" +
                 "Flag Message: ${config.reactions.flagMessageReaction}"
     }
@@ -53,27 +53,14 @@ suspend fun EmbedBuilder.createConfigEmbed(config: GuildConfiguration, guild: Gu
         config.punishments.forEach {
             value += "Punishment Type: ${it.punishment} \n" +
                     "Point Threshold: ${it.points} \n" +
-                    "Punishment Duration: ${if (it.duration !== null) timeToString(it.duration!!) else "indefinite"}" + "\n\n"
+                    "Punishment Duration: ${if (it.duration !== null) timeToString(it.duration!!) else "Permanent"}" + "\n\n"
         }
     }
 
     field {
         name = "**Logging:**"
-        value = "Logging Channel: ${guild.getChannelOrNull(config.loggingConfiguration.loggingChannel.toSnowflake())?.mention} \n" +
-                "Alert Channel: ${guild.getChannelOrNull(config.loggingConfiguration.alertChannel.toSnowflake())?.mention}"
-    }
-    footer {
-        icon = guild.getIconUrl(Image.Format.PNG) ?: ""
-        text = guild.name
-    }
-}
-
-fun EmbedBuilder.createConfigOptionsEmbed(config: GuildConfiguration, guild: Guild) {
-    title = "Available Configuration Options"
-    color = Color.MAGENTA.kColor
-    field {
-        name = "Usage: `${config.prefix}configuration <option>`"
-        value = "```css\n${validConfigParameters.joinToString("\n")}\n```"
+        value = "Logging Channel: ${guild.getChannelOrNull(config.loggingConfiguration.loggingChannel)?.mention} \n" +
+                "Alert Channel: ${guild.getChannelOrNull(config.loggingConfiguration.alertChannel)?.mention}"
     }
     footer {
         icon = guild.getIconUrl(Image.Format.PNG) ?: ""
@@ -87,7 +74,14 @@ suspend fun EmbedBuilder.createActivePunishmentsEmbed(guild: Guild, punishments:
     punishments.forEach {
         val user = guild.kord.getUser(Snowflake(it.userId))?.mention
         addField(
-            "${it.id} - ${it.type} - ${timeBetween(DateTime(it.clearTime))} left.",
+            "${it.id} - ${it.type} - ${
+                if (it.clearTime != null) "Cleartime - ${
+                    TimeStamp.at(
+                        Instant.ofEpochMilli(it.clearTime),
+                        TimeStyle.RELATIVE
+                    )
+                }" else ""
+            }",
             "User: $user"
         )
     }

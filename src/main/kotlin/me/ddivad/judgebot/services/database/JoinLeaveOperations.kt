@@ -3,14 +3,16 @@ package me.ddivad.judgebot.services.database
 import dev.kord.core.entity.Member
 import me.ddivad.judgebot.dataclasses.JoinLeave
 import me.jakejmattson.discordkt.annotations.Service
-import org.joda.time.DateTime
 import org.litote.kmongo.and
 import org.litote.kmongo.eq
 import org.litote.kmongo.setValue
+import java.time.Instant
 
 @Service
 class JoinLeaveOperations(connection: ConnectionService) {
-    private val joinLeaveCollection = connection.db.getCollection<JoinLeave>("JoinLeaves")
+    companion object: Collection("JoinLeaves")
+
+    private val joinLeaveCollection = connection.db.getCollection<JoinLeave>(name)
 
     suspend fun createJoinLeaveRecord(guildId: String, target: Member) {
         val joinLeave = JoinLeave(guildId, target.id.toString(), target.joinedAt.toEpochMilliseconds())
@@ -24,7 +26,7 @@ class JoinLeaveOperations(connection: ConnectionService) {
                 JoinLeave::userId eq userId,
                 JoinLeave::leaveDate eq null
             ),
-            setValue(JoinLeave::leaveDate, DateTime.now().millis)
+            setValue(JoinLeave::leaveDate, Instant.now().toEpochMilli())
         )
     }
 

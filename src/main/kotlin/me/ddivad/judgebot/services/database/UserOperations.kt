@@ -1,10 +1,6 @@
 package me.ddivad.judgebot.services.database
 
 import dev.kord.core.entity.Guild
-
-import me.ddivad.judgebot.dataclasses.GuildMemberDetails
-import me.ddivad.judgebot.dataclasses.GuildMember
-import me.ddivad.judgebot.dataclasses.Infraction
 import dev.kord.core.entity.User
 import me.ddivad.judgebot.dataclasses.*
 import me.ddivad.judgebot.services.LoggingService
@@ -18,13 +14,15 @@ class UserOperations(
     private val joinLeaveService: JoinLeaveOperations,
     private val loggingService: LoggingService
 ) {
-    private val userCollection = connection.db.getCollection<GuildMember>("Users")
+    companion object: Collection("Users")
+
+    private val userCollection = connection.db.getCollection<GuildMember>(name)
 
     suspend fun getOrCreateUser(target: User, guild: Guild): GuildMember {
         val userRecord = userCollection.findOne(GuildMember::userId eq target.id.toString())
         return if (userRecord != null) {
             userRecord.ensureGuildDetailsPresent(guild.id.toString())
-            userRecord.checkPointDecay(guild, configuration[guild.id.value]!!, loggingService)
+            userRecord.checkPointDecay(guild, configuration[guild.id]!!, loggingService)
             this.updateUser(userRecord)
             target.asMemberOrNull(guild.id)?.let {
                 joinLeaveService.createJoinLeaveRecordIfNotRecorded(guild.id.toString(), it)
@@ -117,13 +115,33 @@ class UserOperations(
         return this.updateUser(user)
     }
 
+    suspend fun updatePointDecayState(guild: Guild, user: GuildMember, freeze: Boolean): GuildMember {
+        user.updatePointDecayState(guild, freeze)
+        return this.updateUser(user)
+    }
+
+    suspend fun enableThinIceMode(guild: Guild, user: GuildMember): GuildMember {
+        user.enableThinIce(guild)
+        return this.updateUser(user)
+    }
+
+    suspend fun addBanRecord(guild: Guild, user: GuildMember, ban: Ban): GuildMember {
+        user.addBan(guild, ban)
+        return this.updateUser(user)
+    }
+
+    suspend fun addUnbanRecord(guild: Guild, user: GuildMember, thinIce: Boolean): GuildMember {
+        user.unban(guild, thinIce, configuration[guild.id]!!.infractionConfiguration.warnUpgradeThreshold)
+        return this.updateUser(user)
+    }
+
     private suspend fun updateUser(user: GuildMember): GuildMember {
         userCollection.updateOne(GuildMember::userId eq user.userId, user)
         return user
     }
 
     private fun getPunishmentForPoints(guild: Guild, guildMember: GuildMember): PunishmentLevel {
-        val punishmentLevels = configuration[guild.id.value]?.punishments
+        val punishmentLevels = configuration[guild.id]?.punishments
         return punishmentLevels!!.filter {
             it.points <= guildMember.getGuildInfo(guild.id.toString()).points
         }.maxByOrNull { it.points }!!

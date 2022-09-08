@@ -8,7 +8,9 @@ import org.litote.kmongo.eq
 
 @Service
 class MessageDeleteOperations(connection: ConnectionService) {
-    private val messageDeleteCollection = connection.db.getCollection<MessageDelete>("MessageDelete")
+    companion object: Collection("MessageDelete")
+
+    private val messageDeleteCollection = connection.db.getCollection<MessageDelete>(name)
 
     suspend fun createMessageDeleteRecord(guildId: String, target: Member, messageLink: String?) {
         val record = MessageDelete(target.id.toString(), guildId, messageLink)

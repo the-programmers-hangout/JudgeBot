@@ -3,16 +3,15 @@ package me.ddivad.judgebot.services.database
 import dev.kord.core.entity.Guild
 import dev.kord.core.entity.Member
 import dev.kord.core.entity.User
-import kotlinx.coroutines.runBlocking
 import me.ddivad.judgebot.dataclasses.*
 import me.jakejmattson.discordkt.annotations.Service
 import org.litote.kmongo.eq
 
-// Note: RunBlocking is needed for DB operations in this service, as they are used in a conversation (which does not support "suspend" functions)
-
 @Service
 class GuildOperations(connection: ConnectionService) {
-    private val guildCollection = connection.db.getCollection<GuildInformation>("Guilds")
+    companion object: Collection("Guilds")
+
+    private val guildCollection = connection.db.getCollection<GuildInformation>(name)
 
     suspend fun setupGuild(guild: Guild): GuildInformation {
         val guildConfig = GuildInformation(guild.id.toString(), guild.name)
@@ -22,16 +21,12 @@ class GuildOperations(connection: ConnectionService) {
 
     suspend fun getRules(guild: Guild): List<Rule> {
         val guildInfo = this.getGuild(guild)
-        return runBlocking {
-            guildInfo.rules.sortedBy { it.number }
-        }
+        return guildInfo.rules.sortedBy { it.number }
     }
 
     suspend fun getRule(guild: Guild, ruleId: Int): Rule? {
         val guildInfo = this.getGuild(guild)
-        return runBlocking {
-            guildInfo.rules.find { it.number == ruleId }
-        }
+        return guildInfo.rules.find { it.number == ruleId }
     }
 
     suspend fun addRule(guild: Guild, rule: Rule) {
@@ -41,18 +36,14 @@ class GuildOperations(connection: ConnectionService) {
 
     suspend fun editRule(guild: Guild, oldRule: Rule, updatedRule: Rule) {
         val guildInfo = this.getGuild(guild)
-        runBlocking {
-            guildInfo.editRule(oldRule, updatedRule)
-            updateGuild(guildInfo)
-        }
+        guildInfo.editRule(oldRule, updatedRule)
+        updateGuild(guildInfo)
     }
 
     suspend fun archiveRule(guild: Guild, ruleNumber: Int) {
         val guildInfo = this.getGuild(guild)
-        runBlocking {
-            guildInfo.archiveRule(ruleNumber)
-            updateGuild(guildInfo)
-        }
+        guildInfo.archiveRule(ruleNumber)
+        updateGuild(guildInfo)
     }
 
     suspend fun addPunishment(guild: Guild, punishment: Punishment) {
@@ -95,7 +86,7 @@ class GuildOperations(connection: ConnectionService) {
     }
 
     suspend fun getBanOrNull(guild: Guild, userId: String): Ban? {
-        return this.getGuild(guild).bans.find {it.userId == userId}
+        return this.getGuild(guild).bans.find { it.userId == userId }
     }
 
     suspend fun getPunishmentsForGuild(guild: Guild, type: InfractionType): List<Punishment> {
@@ -108,7 +99,7 @@ class GuildOperations(connection: ConnectionService) {
 
     private suspend fun getGuild(guild: Guild): GuildInformation {
         return guildCollection.findOne(GuildInformation::guildId eq guild.id.toString())
-                ?: GuildInformation(guild.id.toString(), guild.name)
+            ?: GuildInformation(guild.id.toString(), guild.name)
     }
 
     private suspend fun updateGuild(guildInformation: GuildInformation): GuildInformation {
