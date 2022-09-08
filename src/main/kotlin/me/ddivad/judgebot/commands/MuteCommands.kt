@@ -24,7 +24,7 @@ fun createMuteCommands(muteService: MuteService, configuration: Configuration) =
     slash("mute", "Mute a user for a specified time.", Permissions.MODERATOR) {
         execute(LowerMemberArg("Member", "Target Member"), TimeArg("Time"), EveryArg("Reason")) {
             val (targetMember, length, reason) = args
-            val interactionResponse = interaction?.deferPublicResponse()
+            val interactionResponse = interaction?.deferPublicResponse() ?: return@execute
             val dmEnabled: Boolean = try {
                 targetMember.testDmStatus()
                 true
@@ -32,7 +32,7 @@ fun createMuteCommands(muteService: MuteService, configuration: Configuration) =
                 false
             }
             muteService.applyMuteAndSendReason(targetMember, length.roundToLong() * 1000, reason)
-            interactionResponse?.respond {
+            interactionResponse.respond {
                 content =
                     "User ${targetMember.mention} has been muted ${if (!dmEnabled) "\n**Note**: user has DMs disabled and won't receive bot messages." else ""}"
             }
@@ -42,13 +42,13 @@ fun createMuteCommands(muteService: MuteService, configuration: Configuration) =
     slash("unmute", "Unmute a user.", Permissions.MODERATOR) {
         execute(MemberArg) {
             val targetMember = args.first
-            val interactionResponse = interaction?.deferPublicResponse()
+            val interactionResponse = interaction?.deferPublicResponse() ?: return@execute
             if (muteService.checkMuteState(guild, targetMember) == MuteState.None) {
                 interactionResponse?.respond { content = "User ${targetMember.mention} isn't muted" }
                 return@execute
             }
             muteService.removeMute(guild, targetMember.asUser())
-            interactionResponse?.respond {
+            interactionResponse.respond {
                 content = "User ${args.first.mention} has been unmuted"
             }
         }

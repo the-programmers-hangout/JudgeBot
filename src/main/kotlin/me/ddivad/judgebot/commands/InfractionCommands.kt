@@ -44,7 +44,7 @@ fun createInfractionCommands(
         ) {
             val (targetMember, ruleName, reason, force) = args
             val guildConfiguration = config[guild.id] ?: return@execute
-            val interactionResponse = interaction?.deferPublicResponse()
+            val interactionResponse = interaction?.deferPublicResponse() ?: return@execute
             val dmEnabled: Boolean = try {
                 targetMember.testDmStatus()
                 true
@@ -53,7 +53,7 @@ fun createInfractionCommands(
             }
             val user = databaseService.users.getOrCreateUser(targetMember, guild)
             if (user.getTotalHistoricalPoints(guild) >= guildConfiguration.infractionConfiguration.warnUpgradeThreshold && !force) {
-                interactionResponse?.respond {
+                interactionResponse.respond {
                     content =
                         "This user has more than ${guildConfiguration.infractionConfiguration.warnUpgradeThreshold} historical points, so please consider striking (`/strike`) instead. You can use the optional `Force` argument to override this, but please discuss with other staff before doing so."
                 }
@@ -84,7 +84,7 @@ fun createInfractionCommands(
         ) {
             val (targetMember, ruleName, reason, weight) = args
             val guildConfiguration = config[guild.id] ?: return@execute
-            val interactionResponse = interaction?.deferPublicResponse()
+            val interactionResponse = interaction?.deferPublicResponse() ?: return@execute
             val dmEnabled: Boolean = try {
                 targetMember.testDmStatus()
                 true
@@ -101,7 +101,7 @@ fun createInfractionCommands(
             )
             infractionService.infract(targetMember, guild, user, infraction)
             channel.createMenu { createHistoryEmbed(targetMember, user, guild, config, databaseService) }
-            interactionResponse?.respond {
+            interactionResponse.respond {
                 content =
                     "Updated history for ${targetMember.mention}: ${if (!dmEnabled) "\n**Note**: User has DMs disabled" else ""}"
             }
