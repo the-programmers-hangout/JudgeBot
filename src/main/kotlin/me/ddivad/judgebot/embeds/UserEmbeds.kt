@@ -369,11 +369,11 @@ private suspend fun getEmbedColour(guild: Guild, target: User, databaseService: 
 private suspend fun getStatus(guild: Guild, target: User, databaseService: DatabaseService): String? {
     var status = ""
     val userRecord = databaseService.users.getOrCreateUser(target, guild).getGuildInfo(guild.id.toString())
-    if (target.asMemberOrNull(guild.id) == null) return "```css\nUser not currently in this guild```"
     guild.getBanOrNull(target.id)?.let {
         val reason = databaseService.guilds.getBanOrNull(guild, target.id.toString())?.reason ?: it.reason
         return "```css\nUser is banned with reason:\n${reason}```"
     }
+    if (target.asMemberOrNull(guild.id) == null) return "```css\nUser not currently in this guild```"
     if (userRecord.pointDecayFrozen) {
         status += "```css\nPoint decay is currently frozen for this user```"
     }
