@@ -138,10 +138,10 @@ class MuteService(
     private suspend fun initialiseMuteTimers(guild: Guild) {
         runBlocking {
             val punishments = databaseService.guilds.getPunishmentsForGuild(guild, InfractionType.Mute)
-            logger.info { "Existing Punishments :: ${punishments.size} existing punishments found for ${guild.name}" }
+            logger.info { "${guild.name} (${guild.id}): Existing Punishments :: ${punishments.size} existing punishments found for ${guild.name}" }
             punishments.forEach {
                 if (it.clearTime != null) {
-                    logger.info { "Adding Existing Timer :: UserId: ${it.userId}, GuildId: ${guild.id.value}, PunishmentId: ${it.id}" }
+                    logger.info { "${guild.name} (${guild.id}): Adding Existing Timer :: UserId: ${it.userId}, GuildId: ${guild.id.value}, PunishmentId: ${it.id}" }
                     val difference = it.clearTime - Instant.now().toEpochMilli()
                     val member = guild.getMemberOrNull(it.userId.toSnowflake()) ?: return@forEach
                     val user = member.asUser()
@@ -203,7 +203,7 @@ class MuteService(
                         "Judgebot Overwrite"
                     )
                 } catch (ex: RequestException) {
-                    logger.warn { "No permssions to add overwrite to ${it.id.value} - ${it.name}" }
+                    logger.warn { "${guild.name} (${guild.id}): No permssions to add overwrite to ${it.id.value} - ${it.name}" }
                 }
             }
         }

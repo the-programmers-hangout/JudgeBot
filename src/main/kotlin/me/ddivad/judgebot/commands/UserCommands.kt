@@ -62,7 +62,7 @@ fun createUserCommands(
                 "true",
                 "false",
                 "Unban user in 'Thin Ice' mode which sets their points to 40 and freezes their point decay"
-            )
+            ).optional(false)
         ) {
             val (user, thinIce) = args
             guild.getBanOrNull(user.id)?.let {
