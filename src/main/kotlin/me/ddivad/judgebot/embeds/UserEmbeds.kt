@@ -327,13 +327,9 @@ private suspend fun MenuBuilder.buildJoinLeavePage(
         addField("", "")
         joinLeaves.forEachIndexed { index, record ->
             addInlineField("Record", "#${index + 1}")
-            addInlineField("Joined", SimpleDateFormat("dd/MM/yyyy").format(Date(record.joinDate)))
+            addInlineField("Joined", TimeStamp.at(Instant.ofEpochMilli(record.joinDate), TimeStyle.DATE_SHORT))
             addInlineField(
-                "Left", if (record.leaveDate == null) "-" else SimpleDateFormat("dd/MM/yyyy").format(
-                    Date(
-                        record.leaveDate!!
-                    )
-                )
+                "Left", if (record.leaveDate == null) "-" else TimeStamp.at(Instant.ofEpochMilli(record.leaveDate!!), TimeStyle.DATE_SHORT)
             )
 
         }
@@ -386,11 +382,11 @@ private suspend fun getStatus(guild: Guild, target: User, databaseService: Datab
                     it
                 )
             }?.let { TimeStamp.at(it) }
-        }. Point decay frozen until ${TimeStamp.at(Instant.ofEpochMilli(userRecord.pointDecayTimer))}"
+        }. Point decay frozen until ${TimeStamp.at(Instant.ofEpochMilli(userRecord.pointDecayTimer), TimeStyle.DATETIME_SHORT)}"
     }
     databaseService.guilds.getPunishmentsForUser(guild, target).firstOrNull()?.let {
         val clearTime = Instant.ofEpochMilli(it.clearTime!!)
-        status += "\nMuted until ${TimeStamp.at(clearTime)} (${TimeStamp.at(clearTime, TimeStyle.RELATIVE)})"
+        status += "\nMuted until ${TimeStamp.at(clearTime, TimeStyle.DATETIME_SHORT)} (${TimeStamp.at(clearTime, TimeStyle.RELATIVE)})"
     }
     return status
 }
