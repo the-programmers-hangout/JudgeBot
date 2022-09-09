@@ -68,7 +68,7 @@ fun createInfractionCommands(
             )
             infractionService.infract(targetMember, guild, user, infraction)
             channel.createMenu { createHistoryEmbed(targetMember, user, guild, config, databaseService) }
-            interactionResponse?.respond {
+            interactionResponse.respond {
                 content =
                     "Updated history for ${targetMember.mention}: ${if (!dmEnabled) "\n**Note**: User has DMs disabled" else ""}"
             }
