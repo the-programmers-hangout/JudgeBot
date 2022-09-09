@@ -49,7 +49,7 @@ fun createUserCommands(
             val ban = Ban(target.id.toString(), author.id.toString(), reason)
             banService.banUser(target, guild, ban, deleteDays).also {
                 loggingService.userBanned(guild, target, ban)
-                respondPublic("User ${target.mention} banned")
+                respondPublic("User ${target.mention} banned\n**Reason**: $reason")
             }
         }
     }
@@ -67,7 +67,7 @@ fun createUserCommands(
             val (user, thinIce) = args
             guild.getBanOrNull(user.id)?.let {
                 banService.unbanUser(user, guild, thinIce)
-                respond("${user.tag} unbanned ${if (thinIce) "in thin ice mode" else ""}")
+                respondPublic("${user.tag} unbanned ${if (thinIce) "in thin ice mode" else ""}")
                 return@execute
             }
             respondPublic("${user.mention} isn't banned from this guild.")
