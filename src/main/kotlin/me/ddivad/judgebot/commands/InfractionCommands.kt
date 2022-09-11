@@ -64,7 +64,7 @@ fun createInfractionCommands(
                 reason,
                 InfractionType.Warn,
                 guildConfiguration.infractionConfiguration.warnPoints,
-                ruleName.split(" -").first().toInt()
+                getRuleNumber(ruleName)
             )
             infractionService.infract(targetMember, guild, user, infraction)
             channel.createMenu { createHistoryEmbed(targetMember, user, guild, config, databaseService) }
@@ -97,7 +97,7 @@ fun createInfractionCommands(
                 reason,
                 InfractionType.Strike,
                 weight.toInt() * guildConfiguration.infractionConfiguration.strikePoints,
-                ruleName.split(" -").first().toInt()
+                getRuleNumber(ruleName)
             )
             infractionService.infract(targetMember, guild, user, infraction)
             channel.createMenu { createHistoryEmbed(targetMember, user, guild, config, databaseService) }
@@ -140,7 +140,11 @@ fun createInfractionCommands(
 
             val badPfp = Infraction(author.id.toString(), "BadPfp", InfractionType.BadPfp)
             badPfpService.applyBadPfp(targetMember, guild)
-            databaseService.users.addInfraction(guild, databaseService.users.getOrCreateUser(targetMember, guild), badPfp)
+            databaseService.users.addInfraction(
+                guild,
+                databaseService.users.getOrCreateUser(targetMember, guild),
+                badPfp
+            )
             interactionResponse.respond {
                 content = "${targetMember.mention} has been muted and a badpfp has been triggered."
             }
@@ -153,4 +157,10 @@ fun createInfractionCommands(
             respond("User renamed to ${args.first.mention}")
         }
     }
+}
+
+private fun getRuleNumber(ruleName: String): Int? {
+    return if (ruleName.split(" -").first().toInt() > 0) {
+        ruleName.split(" -").first().toInt()
+    } else null
 }

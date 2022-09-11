@@ -21,6 +21,11 @@ class GuildOperations(connection: ConnectionService) {
 
     suspend fun getRules(guild: Guild): List<Rule> {
         val guildInfo = this.getGuild(guild)
+        return guildInfo.rules.filter { it.number != 0 }.sortedBy { it.number }
+    }
+
+    suspend fun getRulesForInfractionPrompt(guild: Guild): List<Rule> {
+        val guildInfo = this.getGuild(guild)
         return guildInfo.rules.sortedBy { it.number }
     }
 
