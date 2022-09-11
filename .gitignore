@@ -10,3 +10,5 @@ build
 data/
 config/*
 .env
+
+src/main/resources/bot.properties
