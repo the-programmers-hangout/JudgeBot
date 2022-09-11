@@ -12,7 +12,7 @@ import me.jakejmattson.discordkt.conversations.slashConversation
 
 class EditRuleConversation(private val databaseService: DatabaseService) {
     fun createAddRuleConversation(guild: Guild, ruleName: String) = slashConversation("cancel") {
-        val rules = databaseService.guilds.getRules(guild)
+        val rules = databaseService.guilds.getRulesForInfractionPrompt(guild)
         val ruleToUpdate = rules.find { it.number == ruleName.split(" -").first().toInt() } ?: return@slashConversation
         respond("Current Rule:")
         respond {

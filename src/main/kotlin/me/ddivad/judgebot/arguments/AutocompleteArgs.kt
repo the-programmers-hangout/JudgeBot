@@ -7,7 +7,7 @@ import me.jakejmattson.discordkt.arguments.AnyArg
 
 fun autoCompletingRuleArg(databaseService: DatabaseService) = AnyArg("Rule", "Rule for infraction").autocomplete {
     val guild = (interaction as GuildAutoCompleteInteraction).getGuild()
-    databaseService.guilds.getRules(guild)
+    databaseService.guilds.getRulesForInfractionPrompt(guild)
         .map { "${it.number} - ${it.title}" }
         .filter { it.contains(input, true) }
 }
