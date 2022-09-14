@@ -1,6 +1,8 @@
 package me.ddivad.judgebot.commands
 
 import dev.kord.common.exception.RequestException
+import dev.kord.core.behavior.interaction.response.respond
+import dev.kord.rest.builder.message.modify.embed
 import dev.kord.x.emoji.Emojis
 import me.ddivad.judgebot.arguments.LowerMemberArg
 import me.ddivad.judgebot.dataclasses.Info
@@ -19,6 +21,7 @@ fun createInformationCommands(databaseService: DatabaseService) = subcommand("Me
     sub("send", "Send an information message to a guild member") {
         execute(LowerMemberArg("Member", "Target Member"), EveryArg("Content")) {
             val (target, content) = args
+            val interactionResponse = interaction?.deferPublicResponse() ?: return@execute
             var dmEnabled: Boolean
             try {
                 target.testDmStatus()
@@ -33,13 +36,15 @@ fun createInformationCommands(databaseService: DatabaseService) = subcommand("Me
                 dmEnabled = false
             }
 
-            respondPublic {
-                color = discord.configuration.theme
-                title = "Information Command: ${if (dmEnabled) Emojis.whiteCheckMark else Emojis.x}"
-                description = if (dmEnabled) {
-                    "Message added and sent to ${target.mention}"
-                } else {
-                    "User ${target.mention} has DMs disabled. Message not added or sent."
+            interactionResponse.respond {
+                embed {
+                    color = discord.configuration.theme
+                    title = "Message Command: ${if (dmEnabled) Emojis.whiteCheckMark else Emojis.x}"
+                    description = if (dmEnabled) {
+                        "Message added and sent to ${target.mention}"
+                    } else {
+                        "User ${target.mention} has DMs disabled. Message not added or sent."
+                    }
                 }
             }
         }
@@ -48,13 +53,14 @@ fun createInformationCommands(databaseService: DatabaseService) = subcommand("Me
     sub("remove", "Remove a message record from a member. Only removes from history record, user DM will remain.") {
         execute(MemberArg, IntegerArg("ID", "ID of message record to delete")) {
             val (target, id) = args
+            val interactionResponse = interaction?.deferPublicResponse() ?: return@execute
             val user = databaseService.users.getOrCreateUser(target, guild)
             if (user.getGuildInfo(guild.id.toString()).info.isEmpty()) {
                 respond("${target.mention} has no message records.")
                 return@execute
             }
             databaseService.users.removeInfo(guild, user, id)
-            respondPublic("Message record removed from ${target.mention}.")
+            interactionResponse.respond { content = "Message record removed from ${target.mention}." }
         }
     }
 }
