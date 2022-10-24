@@ -45,12 +45,6 @@ fun createInfractionCommands(
             val (targetMember, ruleName, reason, force) = args
             val guildConfiguration = config[guild.id] ?: return@execute
             val interactionResponse = interaction?.deferPublicResponse() ?: return@execute
-            val dmEnabled: Boolean = try {
-                targetMember.testDmStatus()
-                true
-            } catch (ex: RequestException) {
-                false
-            }
             val user = databaseService.users.getOrCreateUser(targetMember, guild)
             if (user.getTotalHistoricalPoints(guild) >= guildConfiguration.infractionConfiguration.warnUpgradeThreshold && !force) {
                 interactionResponse.respond {
@@ -67,6 +61,12 @@ fun createInfractionCommands(
                 getRuleNumber(ruleName)
             )
             infractionService.infract(targetMember, guild, user, infraction)
+            val dmEnabled: Boolean = try {
+                targetMember.testDmStatus()
+                true
+            } catch (ex: RequestException) {
+                false
+            }
             channel.createMenu { createHistoryEmbed(targetMember, user, guild, config, databaseService) }
             interactionResponse.respond {
                 content =
@@ -85,12 +85,6 @@ fun createInfractionCommands(
             val (targetMember, ruleName, reason, weight) = args
             val guildConfiguration = config[guild.id] ?: return@execute
             val interactionResponse = interaction?.deferPublicResponse() ?: return@execute
-            val dmEnabled: Boolean = try {
-                targetMember.testDmStatus()
-                true
-            } catch (ex: RequestException) {
-                false
-            }
             val user = databaseService.users.getOrCreateUser(targetMember, guild)
             val infraction = Infraction(
                 author.id.toString(),
@@ -100,6 +94,12 @@ fun createInfractionCommands(
                 getRuleNumber(ruleName)
             )
             infractionService.infract(targetMember, guild, user, infraction)
+            val dmEnabled: Boolean = try {
+                targetMember.testDmStatus()
+                true
+            } catch (ex: RequestException) {
+                false
+            }
             channel.createMenu { createHistoryEmbed(targetMember, user, guild, config, databaseService) }
             interactionResponse.respond {
                 content =
