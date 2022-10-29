@@ -14,7 +14,7 @@ fun noteCommandsSub(databaseService: DatabaseService) = subcommand("Note", Permi
             val (target, note) = args
             val user = databaseService.users.getOrCreateUser(target, guild)
             databaseService.users.addNote(guild, user, note, author.id.toString())
-            respondPublic("Note added to ${target.mention}.")
+            respondPublic("Note added to ${target.mention}: \n${note}")
         }
     }
 
