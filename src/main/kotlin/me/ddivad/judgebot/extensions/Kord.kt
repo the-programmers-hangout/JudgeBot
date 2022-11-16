@@ -9,7 +9,10 @@ suspend fun User.testDmStatus() {
     getDmChannel().createMessage("Infraction message incoming").delete()
 }
 
-suspend fun Member.getHighestRolePosition() = roles.toList().maxByOrNull { it.rawPosition }?.rawPosition ?: -1
+suspend fun Member.getHighestRolePosition(): Int {
+    if (isBot) return -1
+    return roles.toList().maxByOrNull { it.rawPosition }?.rawPosition ?: -1
+}
 
 fun Member.hasStaffRoles(guildConfiguration: GuildConfiguration): Boolean {
     val staffRoleIds =
