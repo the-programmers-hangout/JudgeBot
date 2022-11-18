@@ -79,7 +79,7 @@ fun createInfractionCommands(
         execute(
             LowerMemberArg("Member", "Target Member"),
             autoCompletingRuleArg(databaseService),
-            EveryArg,
+            AnyArg("Reason", "Infraction reason to send to user"),
             autoCompletingWeightArg(config)
         ) {
             val (targetMember, ruleName, reason, weight) = args
