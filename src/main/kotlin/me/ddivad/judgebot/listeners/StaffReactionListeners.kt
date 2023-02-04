@@ -1,9 +1,11 @@
 package me.ddivad.judgebot.listeners
 
+import dev.kord.common.exception.RequestException
 import dev.kord.core.event.message.ReactionAddEvent
 import dev.kord.x.emoji.Emojis
 import dev.kord.x.emoji.addReaction
 import me.ddivad.judgebot.dataclasses.Configuration
+import me.ddivad.judgebot.embeds.createMessageDeleteEmbed
 import me.ddivad.judgebot.extensions.getHighestRolePosition
 import me.ddivad.judgebot.extensions.hasStaffRoles
 import me.ddivad.judgebot.services.LoggingService
@@ -43,6 +45,16 @@ fun onStaffReactionAdd(
                 }
                 guildConfiguration.reactions.deleteMessageReaction -> {
                     infractionService.deleteMessage(guild, messageAuthor, msg, reactionUser)
+                    try {
+                        messageAuthor.sendPrivateMessage {
+                            createMessageDeleteEmbed(guild, msg)
+                        }
+                    } catch (ex: RequestException) {
+                        reactionUser.sendPrivateMessage(
+                            "User ${messageAuthor.mention} has DM's disabled." +
+                                    " Message deleted without notification."
+                        )
+                    }
                 }
                 Emojis.question.unicode -> {
                     if (this.user.isSelf() || msg.author != this.message.kord.getSelf()) return@on
