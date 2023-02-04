@@ -24,7 +24,6 @@ class InfractionService(
     private val banService: BanService,
     private val muteService: MuteService
 ) {
-
     suspend fun infract(target: Member, guild: Guild, userRecord: GuildMember, infraction: Infraction): Infraction {
         var rule: Rule? = null
         if (infraction.ruleNumber != null) {

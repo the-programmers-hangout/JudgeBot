@@ -14,8 +14,6 @@ import me.jakejmattson.discordkt.extensions.descriptor
 import me.jakejmattson.discordkt.extensions.idDescriptor
 import me.jakejmattson.discordkt.extensions.pfpUrl
 import mu.KotlinLogging
-import java.text.SimpleDateFormat
-import java.util.*
 
 @Service
 class LoggingService(private val configuration: Configuration) {
