@@ -1,7 +1,7 @@
 import java.util.*
 
 group = "me.ddivad"
-version = "2.0.0-RC1"
+version = "2.9.0"
 description = "A bot for managing discord infractions in an intelligent and user-friendly way."
 
 plugins {
