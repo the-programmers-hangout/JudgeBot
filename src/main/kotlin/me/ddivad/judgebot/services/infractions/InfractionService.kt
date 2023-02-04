@@ -67,16 +67,6 @@ class InfractionService(
             databaseService.users.getOrCreateUser(target, guild),
             true
         )
-        try {
-            target.sendPrivateMessage {
-                createMessageDeleteEmbed(guild, message)
-            }
-        } catch (ex: RequestException) {
-            moderator.sendPrivateMessage(
-                "User ${target.mention} has DM's disabled." +
-                        " Message deleted without notification."
-            )
-        }
         val deleteLogMessage =
             loggingService.deleteReactionUsed(guild, moderator, target, Emojis.wastebasket.toReaction(), message)
         databaseService.messageDeletes.createMessageDeleteRecord(

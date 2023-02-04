@@ -89,7 +89,8 @@ fun contextCommands(
         message(
             "Delete Message",
             "contextMessageDelete",
-            "Delete a message and notify a user via DM"
+            "Delete a message and notify a user via DM",
+            Permissions.STAFF
         ) {
             val targetMember = arg.getAuthorAsMember() ?: return@message
             val interactionResponse = interaction!!.deferEphemeralResponse()
