@@ -50,19 +50,20 @@
 | reset             | LowerUserArg, choice | Reset a user's notes, infractions or whole record           |
 
 ## Context
-| Commands           | Arguments | Description                                                                                     |
-|--------------------|-----------|-------------------------------------------------------------------------------------------------|
-| contextUserBadpfp  | User      | Apply a badpfp to a user (please use via the 'Apps' menu instead of as a command)               |
-| contextUserHistory | User      | View a condensed history for this user (please use via the 'Apps' menu instead of as a command) |
-| report             | Message   | Report a message to staff (please use via the 'Apps' menu instead of as a command)              |
+| Commands             | Arguments | Description                                                                                     |
+|----------------------|-----------|-------------------------------------------------------------------------------------------------|
+| contextMessageDelete | Message   | Delete a message and notify a user via DM                                                       |
+| contextUserBadpfp    | User      | Apply a badpfp to a user (please use via the 'Apps' menu instead of as a command)               |
+| contextUserHistory   | User      | View a condensed history for this user (please use via the 'Apps' menu instead of as a command) |
+| report               | Message   | Report a message to staff (please use via the 'Apps' menu instead of as a command)              |
 
 ## Infraction
-| Commands | Arguments                     | Description                                                                  |
-|----------|-------------------------------|------------------------------------------------------------------------------|
-| badname  | Member                        | Rename a guild member that has a bad name.                                   |
-| badpfp   | Option, Member                | Mutes a user and prompts them to change their pfp with a 30 minute ban timer |
-| strike   | Member, Rule, Text, [Weight]  | Strike a user.                                                               |
-| warn     | Member, Rule, Reason, [Force] | Warn a user.                                                                 |
+| Commands | Arguments                      | Description                                                                  |
+|----------|--------------------------------|------------------------------------------------------------------------------|
+| badname  | Member                         | Rename a guild member that has a bad name.                                   |
+| badpfp   | Option, Member                 | Mutes a user and prompts them to change their pfp with a 30 minute ban timer |
+| strike   | Member, Rule, Reason, [Weight] | Strike a user.                                                               |
+| warn     | Member, Rule, Reason, [Force]  | Warn a user.                                                                 |
 
 ## Mute
 | Commands | Arguments            | Description                       |

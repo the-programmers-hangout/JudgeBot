@@ -4,11 +4,16 @@ import dev.kord.common.exception.RequestException
 import dev.kord.core.behavior.edit
 import dev.kord.core.entity.Guild
 import dev.kord.core.entity.Member
+import dev.kord.core.entity.Message
+import dev.kord.x.emoji.Emojis
+import dev.kord.x.emoji.toReaction
 import me.ddivad.judgebot.dataclasses.*
 import me.ddivad.judgebot.embeds.createInfractionEmbed
+import me.ddivad.judgebot.embeds.createMessageDeleteEmbed
 import me.ddivad.judgebot.services.DatabaseService
 import me.ddivad.judgebot.services.LoggingService
 import me.jakejmattson.discordkt.annotations.Service
+import me.jakejmattson.discordkt.extensions.jumpLink
 import me.jakejmattson.discordkt.extensions.sendPrivateMessage
 
 @Service
@@ -54,5 +59,31 @@ class InfractionService(
             "Stephen", "Bob", "Joe", "Timmy", "Arnold", "Jeff", "Tim", "Doug"
         )
         member.edit { nickname = badNames.random() }
+    }
+
+    suspend fun deleteMessage(guild: Guild, target: Member, message: Message, moderator: Member) {
+        message.delete()
+        databaseService.users.addMessageDelete(
+            guild,
+            databaseService.users.getOrCreateUser(target, guild),
+            true
+        )
+        try {
+            target.sendPrivateMessage {
+                createMessageDeleteEmbed(guild, message)
+            }
+        } catch (ex: RequestException) {
+            moderator.sendPrivateMessage(
+                "User ${target.mention} has DM's disabled." +
+                        " Message deleted without notification."
+            )
+        }
+        val deleteLogMessage =
+            loggingService.deleteReactionUsed(guild, moderator, target, Emojis.wastebasket.toReaction(), message)
+        databaseService.messageDeletes.createMessageDeleteRecord(
+            guild.id.toString(),
+            target,
+            deleteLogMessage.first()?.jumpLink()
+        )
     }
 }

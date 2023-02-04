@@ -10,6 +10,7 @@ import me.ddivad.judgebot.extensions.getHighestRolePosition
 import me.ddivad.judgebot.extensions.hasStaffRoles
 import me.ddivad.judgebot.services.DatabaseService
 import me.ddivad.judgebot.services.LoggingService
+import me.ddivad.judgebot.services.infractions.InfractionService
 import me.ddivad.judgebot.services.infractions.MuteService
 import me.ddivad.judgebot.services.infractions.MuteState
 import me.jakejmattson.discordkt.dsl.listeners
@@ -21,6 +22,7 @@ import me.jakejmattson.discordkt.extensions.sendPrivateMessage
 fun onStaffReactionAdd(
     muteService: MuteService,
     databaseService: DatabaseService,
+    infractionService: InfractionService,
     loggingService: LoggingService,
     configuration: Configuration
 ) = listeners {
@@ -45,29 +47,7 @@ fun onStaffReactionAdd(
                     reactionUser.sendPrivateMessage("${messageAuthor.mention} gagged.")
                 }
                 guildConfiguration.reactions.deleteMessageReaction -> {
-                    message.delete()
-                    databaseService.users.addMessageDelete(
-                        guild,
-                        databaseService.users.getOrCreateUser(messageAuthor, guild.asGuild()),
-                        true
-                    )
-                    try {
-                        messageAuthor.sendPrivateMessage {
-                            createMessageDeleteEmbed(guild, msg)
-                        }
-                    } catch (ex: RequestException) {
-                        reactionUser.sendPrivateMessage(
-                            "User ${messageAuthor.mention} has DM's disabled." +
-                                    " Message deleted without notification."
-                        )
-                    }
-                    val deleteLogMessage =
-                        loggingService.deleteReactionUsed(guild, reactionUser, messageAuthor, this.emoji, msg)
-                    databaseService.messageDeletes.createMessageDeleteRecord(
-                        guildId.toString(),
-                        messageAuthor,
-                        deleteLogMessage.first()?.jumpLink()
-                    )
+                    infractionService.deleteMessage(guild, messageAuthor, msg, reactionUser)
                 }
                 Emojis.question.unicode -> {
                     if (this.user.isSelf() || msg.author != this.message.kord.getSelf()) return@on

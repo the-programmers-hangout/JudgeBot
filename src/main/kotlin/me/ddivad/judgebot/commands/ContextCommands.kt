@@ -12,11 +12,12 @@ import me.ddivad.judgebot.embeds.createSelfHistoryEmbed
 import me.ddivad.judgebot.extensions.hasStaffRoles
 import me.ddivad.judgebot.services.DatabaseService
 import me.ddivad.judgebot.services.infractions.BadPfpService
+import me.ddivad.judgebot.services.infractions.InfractionService
 import me.ddivad.judgebot.util.createFlagMessage
 import me.jakejmattson.discordkt.commands.commands
 
 @Suppress("Unused")
-fun contextCommands(configuration: Configuration, databaseService: DatabaseService, badPfpService: BadPfpService) =
+fun contextCommands(configuration: Configuration, databaseService: DatabaseService, badPfpService: BadPfpService, infractionService: InfractionService) =
     commands("Context") {
         message(
             "Report Message",
@@ -75,5 +76,14 @@ fun contextCommands(configuration: Configuration, databaseService: DatabaseServi
             interactionResponse.respond {
                 content = "${targetMember.mention} has been muted and a badpfp has been triggered."
             }
+        }
+
+        message(
+            "Delete Message",
+            "contextMessageDelete",
+            "Delete a message and notify a user via DM"
+        ) {
+            val targetMember = arg.getAuthorAsMember() ?: return@message
+            infractionService.deleteMessage(guild, targetMember, arg, author.asMember(guild.id))
         }
     }
