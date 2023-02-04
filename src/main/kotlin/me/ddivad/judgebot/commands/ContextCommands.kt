@@ -1,5 +1,6 @@
 package me.ddivad.judgebot.commands
 
+import dev.kord.common.exception.RequestException
 import dev.kord.core.behavior.getChannelOf
 import dev.kord.core.behavior.interaction.response.respond
 import dev.kord.core.entity.channel.TextChannel
@@ -8,15 +9,23 @@ import dev.kord.x.emoji.addReaction
 import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.dataclasses.Permissions
 import me.ddivad.judgebot.embeds.createCondensedHistoryEmbed
+import me.ddivad.judgebot.embeds.createMessageDeleteEmbed
 import me.ddivad.judgebot.embeds.createSelfHistoryEmbed
 import me.ddivad.judgebot.extensions.hasStaffRoles
 import me.ddivad.judgebot.services.DatabaseService
 import me.ddivad.judgebot.services.infractions.BadPfpService
+import me.ddivad.judgebot.services.infractions.InfractionService
 import me.ddivad.judgebot.util.createFlagMessage
 import me.jakejmattson.discordkt.commands.commands
+import me.jakejmattson.discordkt.extensions.sendPrivateMessage
 
 @Suppress("Unused")
-fun contextCommands(configuration: Configuration, databaseService: DatabaseService, badPfpService: BadPfpService) =
+fun contextCommands(
+    configuration: Configuration,
+    databaseService: DatabaseService,
+    badPfpService: BadPfpService,
+    infractionService: InfractionService
+) =
     commands("Context") {
         message(
             "Report Message",
@@ -74,6 +83,27 @@ fun contextCommands(configuration: Configuration, databaseService: DatabaseServi
             badPfpService.applyBadPfp(targetMember, guild)
             interactionResponse.respond {
                 content = "${targetMember.mention} has been muted and a badpfp has been triggered."
+            }
+        }
+
+        message(
+            "Delete Message",
+            "contextMessageDelete",
+            "Delete a message and notify a user via DM",
+            Permissions.STAFF
+        ) {
+            val targetMember = arg.getAuthorAsMember() ?: return@message
+            val interactionResponse = interaction!!.deferEphemeralResponse()
+            infractionService.deleteMessage(guild, targetMember, arg, author.asMember(guild.id))
+            try {
+                targetMember.sendPrivateMessage {
+                    createMessageDeleteEmbed(guild, arg)
+                }
+                interactionResponse.respond { content = "Message deleted" }
+            } catch (ex: RequestException) {
+                interactionResponse.respond {
+                    content = "User ${targetMember.mention} has DM's disabled. Message deleted without notification."
+                }
             }
         }
     }

@@ -8,19 +8,18 @@ import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.embeds.createMessageDeleteEmbed
 import me.ddivad.judgebot.extensions.getHighestRolePosition
 import me.ddivad.judgebot.extensions.hasStaffRoles
-import me.ddivad.judgebot.services.DatabaseService
 import me.ddivad.judgebot.services.LoggingService
+import me.ddivad.judgebot.services.infractions.InfractionService
 import me.ddivad.judgebot.services.infractions.MuteService
 import me.ddivad.judgebot.services.infractions.MuteState
 import me.jakejmattson.discordkt.dsl.listeners
 import me.jakejmattson.discordkt.extensions.isSelf
-import me.jakejmattson.discordkt.extensions.jumpLink
 import me.jakejmattson.discordkt.extensions.sendPrivateMessage
 
 @Suppress("unused")
 fun onStaffReactionAdd(
     muteService: MuteService,
-    databaseService: DatabaseService,
+    infractionService: InfractionService,
     loggingService: LoggingService,
     configuration: Configuration
 ) = listeners {
@@ -45,12 +44,7 @@ fun onStaffReactionAdd(
                     reactionUser.sendPrivateMessage("${messageAuthor.mention} gagged.")
                 }
                 guildConfiguration.reactions.deleteMessageReaction -> {
-                    message.delete()
-                    databaseService.users.addMessageDelete(
-                        guild,
-                        databaseService.users.getOrCreateUser(messageAuthor, guild.asGuild()),
-                        true
-                    )
+                    infractionService.deleteMessage(guild, messageAuthor, msg, reactionUser)
                     try {
                         messageAuthor.sendPrivateMessage {
                             createMessageDeleteEmbed(guild, msg)
@@ -61,13 +55,6 @@ fun onStaffReactionAdd(
                                     " Message deleted without notification."
                         )
                     }
-                    val deleteLogMessage =
-                        loggingService.deleteReactionUsed(guild, reactionUser, messageAuthor, this.emoji, msg)
-                    databaseService.messageDeletes.createMessageDeleteRecord(
-                        guildId.toString(),
-                        messageAuthor,
-                        deleteLogMessage.first()?.jumpLink()
-                    )
                 }
                 Emojis.question.unicode -> {
                     if (this.user.isSelf() || msg.author != this.message.kord.getSelf()) return@on

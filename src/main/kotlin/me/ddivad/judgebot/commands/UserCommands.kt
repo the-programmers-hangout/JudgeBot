@@ -120,7 +120,7 @@ fun createUserCommands(
 
     user("PFP Lookup", "whatpfp","Perform a reverse image search of a User's profile picture", Permissions.EVERYONE) {
         val user = args.first
-        val reverseSearchUrl = "<https://www.google.com/searchbyimage?&image_url=${user.pfpUrl}>"
+        val reverseSearchUrl = "<https://lens.google.com/uploadbyurl?url=${user.pfpUrl}>"
 
         if (interaction?.invokedCommandType == ApplicationCommandType.User) {
             respond {
