@@ -15,6 +15,7 @@ import me.jakejmattson.discordkt.arguments.EveryArg
 import me.jakejmattson.discordkt.arguments.MemberArg
 import me.jakejmattson.discordkt.arguments.TimeArg
 import me.jakejmattson.discordkt.commands.commands
+import me.jakejmattson.discordkt.extensions.TimeStyle
 import me.jakejmattson.discordkt.extensions.TimeStamp
 import java.time.Instant
 import kotlin.math.roundToLong
@@ -77,6 +78,14 @@ fun createMuteCommands(muteService: MuteService, configuration: Configuration) =
             return@user
         }
         muteService.gag(guild, targetMember, author)
-        respond("${targetMember.mention} has been muted for ${TimeStamp.at(Instant.ofEpochMilli(muteDuration))}")
+        respond(
+            "${targetMember.mention} has been muted until ${
+                TimeStamp.at(
+                    Instant.ofEpochMilli(
+                        Instant.now().toEpochMilli() + muteDuration
+                    ), TimeStyle.TIME_SHORT
+                )
+            }"
+        )
     }
 }
