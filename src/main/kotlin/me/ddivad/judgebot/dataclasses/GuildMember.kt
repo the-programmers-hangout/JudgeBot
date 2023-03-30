@@ -122,35 +122,31 @@ data class GuildMember(
 
     suspend fun checkPointDecay(guild: Guild, configuration: GuildConfiguration, loggingService: LoggingService) =
         with(this.getGuildInfo(guild.id.toString())) {
-            if (bans.lastOrNull()?.thinIce == true && this.pointDecayFrozen && Instant.now()
-                    .toEpochMilli() >= this.pointDecayTimer
-            ) {
+        if (this.pointDecayFrozen) {
+            return@with
+        }
+        when {
+            bans.lastOrNull()?.thinIce == true && Instant.now().toEpochMilli() >= this.pointDecayTimer -> {
                 this.pointDecayTimer = Instant.now().toEpochMilli()
                 this.pointDecayFrozen = false
-            } else if (this.pointDecayFrozen) {
-                return@with
             }
-            val weeksSincePointsDecayed = (ChronoUnit.DAYS.between(Instant.ofEpochMilli(this.pointDecayTimer), Instant.now()) / 7).toInt()
-            logger.debug { "Point decay: $weeksSincePointsDecayed - $points - $pointDecayTimer" }
-            if (weeksSincePointsDecayed > 0) {
-                if (this.points > 0) {
-                    val pointsToRemove =
-                        configuration.infractionConfiguration.pointDecayPerWeek * weeksSincePointsDecayed
+            else -> {
+                val weeksSincePointsDecayed = (ChronoUnit.DAYS.between(Instant.ofEpochMilli(this.pointDecayTimer), Instant.now()) / 7).toInt()
+                logger.debug { "Point decay: $weeksSincePointsDecayed - $points - $pointDecayTimer" }
+                if (weeksSincePointsDecayed > 0 && this.points > 0) {
+                    val pointsToRemove = configuration.infractionConfiguration.pointDecayPerWeek * weeksSincePointsDecayed
                     if (pointsToRemove > this.points) {
                         this.points = 0
-                    } else this.points -= pointsToRemove
-                    loggingService.pointDecayApplied(
-                        guild,
-                        this@GuildMember,
-                        this.points,
-                        pointsToRemove,
-                        weeksSincePointsDecayed
-                    )
+                    } else {
+                        this.points -= pointsToRemove
+                        loggingService.pointDecayApplied(guild, this@GuildMember, this.points, pointsToRemove, weeksSincePointsDecayed)
+                    }
+                    this.pointDecayTimer = Instant.now().toEpochMilli()
+                    logger.debug { "Point decay timer set to $pointDecayTimer" }
                 }
-                this.pointDecayTimer = Instant.now().toEpochMilli()
-                logger.debug { "Point decay timer set to $pointDecayTimer" }
             }
         }
+    }
 
     fun updatePointDecayState(guild: Guild, frozen: Boolean) = with(this.getGuildInfo(guild.id.toString())) {
         this.pointDecayFrozen = frozen

@@ -118,30 +118,21 @@ class LoggingService(private val configuration: Configuration) {
         message: Message
     ): List<Message?> {
         logger.info { buildGuildLogMessage(guild, "Reaction ${reaction.name} used by ${moderator.idDescriptor()}") }
-        val msg = message.content.chunked(1800)
+        val msg = message.content
+        val attachments = message.attachments
 
-        if (msg.isNotEmpty()) {
-            val firstMessage = logAndReturnMessage(
-                guild,
-                "**Info ::** ${reaction.name} used by ${moderator.username} on ${target.mention}\n" +
-                        "**Message:**```\n" +
-                        "${msg.first()}\n```"
-            )
-
-            val rest = msg.takeLast(msg.size - 1).map {
-                logAndReturnMessage(guild, "**Continued:**```\n$it\n```")
+        if (msg.isNotEmpty() || attachments.isNotEmpty()) {
+            val messageChunks = msg.chunked(1800)
+            val messageContent = if (messageChunks.isNotEmpty()) {
+                messageChunks.joinToString(separator = "\n") { "```\n$it\n```" }
+            } else {
+                "```\n${attachments.first().filename}\n```"
             }
-
-            return listOf(firstMessage).plus(rest)
-        } else if (message.attachments.isNotEmpty()) {
-            return listOf(
-                logAndReturnMessage(
-                    guild,
-                    "**Info ::** ${reaction.name} used by ${moderator.username} on ${target.mention}\n" +
-                            "**Message: (message was attachment, so only filename is logged)**```\n" +
-                            "${message.attachments.first().filename}\n```"
-                )
-            )
+            val messageHeader = "**Info ::** ${reaction.name} used by ${moderator.username} on ${target.mention}\n"
+            val messages = messageContent.chunked(1800).map {
+                logAndReturnMessage(guild, messageHeader + "**Message:**$it")
+            }
+            return messages
         }
         return emptyList()
     }

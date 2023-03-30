@@ -34,45 +34,33 @@ fun configurationSubcommands(configuration: Configuration, databaseService: Data
             val (roleType, operation, role) = args
             val guildConfiguration = configuration[guild.id] ?: return@execute
 
-            when (roleType) {
-                "Admin" -> {
-                    if (operation == "Add") {
-                        guildConfiguration.adminRoles.add(role.id)
-                        respondPublic("Added **${role.name}** to Admin roles.")
-                    } else {
-                        if (!guildConfiguration.adminRoles.contains(role.id)) {
-                            respond("**${role.name}** is not a configured Admin rol")
-                        } else {
-                            guildConfiguration.adminRoles.remove(role.id)
-                            respondPublic("Removed **${role.name}** from Admin Roles")
-                        }
-                    }
+            when {
+                roleType == "Admin" && operation == "Add" -> {
+                    guildConfiguration.adminRoles.add(role.id)
+                    respondPublic("Added **${role.name}** to Admin roles.")
                 }
-                "Staff" -> {
-                    if (operation == "Add") {
-                        guildConfiguration.staffRoles.add(role.id)
-                        respondPublic("Added **${role.name}** to Staff roles.")
-                    } else {
-                        if (!guildConfiguration.staffRoles.contains(role.id)) {
-                            respond("**${role.name}** is not a configured Staff role")
-                        } else {
-                            guildConfiguration.staffRoles.remove(role.id)
-                            respondPublic("Removed **${role.name}** from Staff Roles")
-                        }
-                    }
+                roleType == "Admin" && guildConfiguration.adminRoles.contains(role.id) -> {
+                    guildConfiguration.adminRoles.remove(role.id)
+                    respondPublic("Removed **${role.name}** from Admin Roles")
                 }
-                "Moderator" -> {
-                    if (operation == "Add") {
-                        guildConfiguration.moderatorRoles.add(role.id)
-                        respondPublic("Added **${role.name}** to Moderator roles.")
-                    } else {
-                        if (!guildConfiguration.moderatorRoles.contains(role.id)) {
-                            respond("**${role.name}** is not a configured Moderator role")
-                        } else {
-                            guildConfiguration.moderatorRoles.remove(role.id)
-                            respondPublic("Removed **${role.name}** from Moderator Roles")
-                        }
-                    }
+                roleType == "Staff" && operation == "Add" -> {
+                    guildConfiguration.staffRoles.add(role.id)
+                    respondPublic("Added **${role.name}** to Staff roles.")
+                }
+                roleType == "Staff" && guildConfiguration.staffRoles.contains(role.id) -> {
+                    guildConfiguration.staffRoles.remove(role.id)
+                    respondPublic("Removed **${role.name}** from Staff Roles")
+                }
+                roleType == "Moderator" && operation == "Add" -> {
+                    guildConfiguration.moderatorRoles.add(role.id)
+                    respondPublic("Added **${role.name}** to Moderator roles.")
+                }
+                roleType == "Moderator" && guildConfiguration.moderatorRoles.contains(role.id) -> {
+                    guildConfiguration.moderatorRoles.remove(role.id)
+                    respondPublic("Removed **${role.name}** from Moderator Roles")
+                }
+                else -> {
+                    respond("Invalid choice.")
                 }
             }
             configuration.save()

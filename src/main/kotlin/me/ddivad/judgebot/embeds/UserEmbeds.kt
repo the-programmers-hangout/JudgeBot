@@ -102,27 +102,26 @@ private suspend fun MenuBuilder.buildOverviewPage(
 
         getStatus(guild, target, databaseService)?.let { addField("Current Status", it) }
 
-        if (userRecord.infractions.size > 0) {
+        if (userRecord.infractions.isNotEmpty()) {
             val lastInfraction = userRecord.infractions.maxByOrNull { it.dateTime }!!
             addField(
-                "**__Most Recent Infraction__**: (${
-                    TimeStamp.at(
-                        Instant.ofEpochMilli(lastInfraction.dateTime),
-                        TimeStyle.RELATIVE
+                "**__Most Recent Infraction__**: (${TimeStamp.at(Instant.ofEpochMilli(lastInfraction.dateTime), TimeStyle.RELATIVE)})",
+                buildString {
+                    append("Type: **${lastInfraction.type} (${lastInfraction.points})** Rule: **${lastInfraction.ruleNumber ?: "None"}**\n")
+                    append(
+                        "Issued by **${guild.kord.getUser(Snowflake(lastInfraction.moderator))?.username}** on **${
+                            SimpleDateFormat(
+                                "dd/MM/yyyy"
+                            ).format(Date(lastInfraction.dateTime))
+                        }**\n"
                     )
-                })",
-                "Type: **${lastInfraction.type} (${lastInfraction.points})** Rule: **${lastInfraction.ruleNumber ?: "None"}**\n " +
-                        "Issued by **${guild.kord.getUser(Snowflake(lastInfraction.moderator))?.username}** " +
-                        "on **${SimpleDateFormat("dd/MM/yyyy").format(Date(lastInfraction.dateTime))}**\n" +
-                        "Punishment: **${lastInfraction.punishment?.punishment}** ${getDurationText(lastInfraction.punishment)}\n" +
-                        lastInfraction.reason
+                    append("Punishment: **${lastInfraction.punishment?.punishment}** ${getDurationText(lastInfraction.punishment)}\n")
+                    append(lastInfraction.reason)
+                }
             )
         } else addField("", "**User has no recent infractions**")
 
-        addInlineField(
-            "",
-            "**${userRecord.deletedMessageCount.deleteReaction}** Deletes (${config.reactions.deleteMessageReaction})"
-        )
+        addInlineField("", "**${userRecord.deletedMessageCount.deleteReaction}** Deletes (${config.reactions.deleteMessageReaction})")
         addInlineField("", "**${userRecord.bans.size}** Bans (${Emojis.x})")
         addInlineField("", "**${userRecord.linkedAccounts.size}** Alt(s) (${Emojis.link})")
 
@@ -161,16 +160,14 @@ private suspend fun MenuBuilder.buildInfractionPage(
             val moderator = guild.kord.getUser(Snowflake(infraction.moderator))?.username
             addField(
                 "ID :: ${infraction.id} :: Staff :: __${moderator}__",
-                "Type: **${infraction.type} (${infraction.points})** :: " +
-                        "Rule: **${infraction.ruleNumber ?: "None"}**\n" +
-                        "Date: **${SimpleDateFormat("dd/MM/yyyy").format(Date(infraction.dateTime))}** (${
-                            TimeStamp.at(
-                                Instant.ofEpochMilli(infraction.dateTime),
-                                TimeStyle.RELATIVE
-                            )
-                        })\n " +
-                        "Punishment: **${infraction.punishment?.punishment}** ${getDurationText(infraction.punishment)}\n" +
-                        infraction.reason
+                buildString {
+                    append("Type: **${infraction.type} (${infraction.points})** :: ")
+                    append("Rule: **${infraction.ruleNumber ?: "None"}**\n")
+                    append("Date: **${SimpleDateFormat("dd/MM/yyyy").format(Date(infraction.dateTime))}** ")
+                    append("(${TimeStamp.at(Instant.ofEpochMilli(infraction.dateTime), TimeStyle.RELATIVE)})\n")
+                    append("Punishment: **${infraction.punishment?.punishment}** ${getDurationText(infraction.punishment)}\n")
+                    append(infraction.reason)
+                }
             )
         }
 
@@ -179,17 +176,14 @@ private suspend fun MenuBuilder.buildInfractionPage(
             val moderator = guild.kord.getUser(Snowflake(infraction.moderator))?.username
             addField(
                 "ID :: ${infraction.id} :: Staff :: __${moderator}__",
-                "Type: **${infraction.type} (${infraction.points})** :: " +
-                        "Rule: **${infraction.ruleNumber ?: "None"}**\n" +
-
-                        "Date: **${SimpleDateFormat("dd/MM/yyyy").format(Date(infraction.dateTime))}** (${
-                            TimeStamp.at(
-                                Instant.ofEpochMilli(infraction.dateTime),
-                                TimeStyle.RELATIVE
-                            )
-                        })\n " +
-                        "Punishment: **${infraction.punishment?.punishment}** ${getDurationText(infraction.punishment)}\n" +
-                        infraction.reason
+                buildString {
+                    append("Type: **${infraction.type} (${infraction.points})** :: ")
+                    append("Rule: **${infraction.ruleNumber ?: "None"}**\n")
+                    append("Date: **${SimpleDateFormat("dd/MM/yyyy").format(Date(infraction.dateTime))}** ")
+                    append("(${TimeStamp.at(Instant.ofEpochMilli(infraction.dateTime), TimeStyle.RELATIVE)})\n")
+                    append("Punishment: **${infraction.punishment?.punishment}** ${getDurationText(infraction.punishment)}\n")
+                    append(infraction.reason)
+                }
             )
         }
 
@@ -244,14 +238,11 @@ private suspend fun MenuBuilder.buildNotesPages(
                 val moderator = guild.kord.getUser(Snowflake(note.moderator))?.username ?: note.moderator
                 addField(
                     "ID :: ${note.id} :: Staff :: __${moderator}__",
-                    "Date: **${SimpleDateFormat("dd/MM/yyyy").format(Date(note.dateTime))}** (${
-                        TimeStamp.at(
-                            Instant.ofEpochMilli(
-                                note.dateTime
-                            ), TimeStyle.RELATIVE
-                        )
-                    })\n" +
-                            note.note
+                    buildString {
+                        append("Date: **${SimpleDateFormat("dd/MM/yyyy").format(Date(note.dateTime))}** ")
+                        append("(${TimeStamp.at(Instant.ofEpochMilli(note.dateTime), TimeStyle.RELATIVE)})\n")
+                        append(note.note)
+                    }
                 )
             }
             footer {
@@ -286,14 +277,11 @@ private suspend fun MenuBuilder.buildInformationPage(
             val moderator = guild.kord.getUser(Snowflake(info.moderator))?.username
             addField(
                 "ID :: ${info.id} :: Staff :: __${moderator}__",
-                "Date: **${SimpleDateFormat("dd/MM/yyyy").format(Date(info.dateTime))}** (${
-                    TimeStamp.at(
-                        Instant.ofEpochMilli(
-                            info.dateTime
-                        ), TimeStyle.RELATIVE
-                    )
-                })\n" +
-                        info.message
+                buildString {
+                    append("Date: **${SimpleDateFormat("dd/MM/yyyy").format(Date(info.dateTime))}** ")
+                    append("(${TimeStamp.at(Instant.ofEpochMilli(info.dateTime), TimeStyle.RELATIVE)})\n")
+                    append(info.message)
+                }
             )
         }
         footer {
@@ -331,7 +319,6 @@ private suspend fun MenuBuilder.buildJoinLeavePage(
             addInlineField(
                 "Left", if (record.leaveDate == null) "-" else TimeStamp.at(Instant.ofEpochMilli(record.leaveDate!!), TimeStyle.DATE_SHORT)
             )
-
         }
         footer {
             icon = guild.getIconUrl(Image.Format.PNG) ?: ""
@@ -341,17 +328,9 @@ private suspend fun MenuBuilder.buildJoinLeavePage(
 }
 
 private fun getDurationText(level: PunishmentLevel?): String {
-    if (level == null) return ""
-    return when {
-        level.punishment == PunishmentType.NONE -> {
-            ""
-        }
-        level.duration != null -> {
-            "for **" + timeToString(level.duration!!) + "**"
-        }
-        else -> {
-            ""
-        }
+    return when (level?.punishment) {
+        PunishmentType.NONE -> ""
+        else -> level?.duration?.let { "for **${timeToString(it)}**" } ?: ""
     }
 }
 
@@ -363,32 +342,33 @@ private suspend fun getEmbedColour(guild: Guild, target: User, databaseService: 
 }
 
 private suspend fun getStatus(guild: Guild, target: User, databaseService: DatabaseService): String? {
-    var status = ""
     val userRecord = databaseService.users.getOrCreateUser(target, guild).getGuildInfo(guild.id.toString())
     guild.getBanOrNull(target.id)?.let {
         val reason = databaseService.guilds.getBanOrNull(guild, target.id.toString())?.reason ?: it.reason
         return "```css\nUser is banned with reason:\n${reason}```"
     }
     if (target.asMemberOrNull(guild.id) == null) return "```css\nUser not currently in this guild```"
-    if (userRecord.pointDecayFrozen) {
-        status += "```css\nPoint decay is currently frozen for this user```"
+
+    return buildString {
+        if (userRecord.pointDecayFrozen) {
+            append("```css\nPoint decay is currently frozen for this user```")
+        }
+        if (userRecord.bans.lastOrNull()?.thinIce == true && userRecord.pointDecayFrozen && Instant.now()
+                .toEpochMilli() < userRecord.pointDecayTimer
+        ) {
+            append("User is on Thin Ice after being unbanned on ${
+                userRecord.bans.last().unbanTime?.let {
+                    Instant.ofEpochMilli(
+                        it
+                    )
+                }?.let { TimeStamp.at(it) }
+            }. Point decay frozen until ${TimeStamp.at(Instant.ofEpochMilli(userRecord.pointDecayTimer), TimeStyle.DATETIME_SHORT)}")
+        }
+        databaseService.guilds.getPunishmentsForUser(guild, target).firstOrNull()?.let {
+            val clearTime = Instant.ofEpochMilli(it.clearTime!!)
+            append("\nMuted until ${TimeStamp.at(clearTime, TimeStyle.DATETIME_SHORT)} (${TimeStamp.at(clearTime, TimeStyle.RELATIVE)})")
+        }
     }
-    if (userRecord.bans.lastOrNull()?.thinIce == true && userRecord.pointDecayFrozen && Instant.now()
-            .toEpochMilli() < userRecord.pointDecayTimer
-    ) {
-        status += "User is on Thin Ice after being unbanned on ${
-            userRecord.bans.last().unbanTime?.let {
-                Instant.ofEpochMilli(
-                    it
-                )
-            }?.let { TimeStamp.at(it) }
-        }. Point decay frozen until ${TimeStamp.at(Instant.ofEpochMilli(userRecord.pointDecayTimer), TimeStyle.DATETIME_SHORT)}"
-    }
-    databaseService.guilds.getPunishmentsForUser(guild, target).firstOrNull()?.let {
-        val clearTime = Instant.ofEpochMilli(it.clearTime!!)
-        status += "\nMuted until ${TimeStamp.at(clearTime, TimeStyle.DATETIME_SHORT)} (${TimeStamp.at(clearTime, TimeStyle.RELATIVE)})"
-    }
-    return status
 }
 
 suspend fun MenuBuilder.createLinkedAccountMenu(
@@ -456,13 +436,11 @@ suspend fun EmbedBuilder.createCondensedHistoryEmbed(
 
             addField(
                 "ID :: ${note.id} :: Staff :: __${moderator}__",
-                "Noted by **${moderator}** on **${SimpleDateFormat("dd/MM/yyyy").format(Date(note.dateTime))}** (${
-                    TimeStamp.at(
-                        Instant.ofEpochMilli(note.dateTime),
-                        TimeStyle.RELATIVE
-                    )
-                })\n" +
-                        note.note
+                buildString {
+                    append("Noted by **${moderator}** on **${SimpleDateFormat("dd/MM/yyyy").format(Date(note.dateTime))}** ")
+                    append("(${TimeStamp.at(Instant.ofEpochMilli(note.dateTime), TimeStyle.RELATIVE)})\n")
+                    append(note.note)
+                }
             )
         }
     }

@@ -4,6 +4,8 @@ import dev.kord.common.exception.RequestException
 import dev.kord.core.event.message.ReactionAddEvent
 import dev.kord.x.emoji.Emojis
 import dev.kord.x.emoji.addReaction
+import kotlinx.coroutines.flow.toList
+import me.ddivad.judgebot.arguments.autoCompletingRuleArg
 import me.ddivad.judgebot.dataclasses.Configuration
 import me.ddivad.judgebot.embeds.createMessageDeleteEmbed
 import me.ddivad.judgebot.extensions.getHighestRolePosition
@@ -30,7 +32,10 @@ fun onStaffReactionAdd(
         val reactionUser = user.asMemberOrNull(guild.id) ?: return@on
         val msg = message.asMessage()
         val messageAuthor = msg.author?.asMemberOrNull(guild.id) ?: return@on
-
+        println("user highest role: ${reactionUser.getHighestRolePosition()}")
+        println("author highest role: ${messageAuthor.getHighestRolePosition()}")
+        println("user higher than author: ${reactionUser.getHighestRolePosition() > messageAuthor.getHighestRolePosition()}")
+        println(messageAuthor.roles.toList().map { it.id })
         if (reactionUser.hasStaffRoles(guildConfiguration) && reactionUser.getHighestRolePosition() > messageAuthor.getHighestRolePosition()) {
             when (this.emoji.name) {
                 guildConfiguration.reactions.gagReaction -> {

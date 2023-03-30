@@ -17,6 +17,11 @@ suspend fun Member.getHighestRolePosition(): Int {
 fun Member.hasStaffRoles(guildConfiguration: GuildConfiguration): Boolean {
     val staffRoleIds =
         ((guildConfiguration.adminRoles union guildConfiguration.staffRoles) union guildConfiguration.moderatorRoles)
+    println("staff roles: \n${staffRoleIds.joinToString("\n")}")
+    println()
+    println("checeking roles: $roleIds")
+    println()
+    println(staffRoleIds.any { roleIds.contains(it) })
     return staffRoleIds.any { roleIds.contains(it) }
 }
 
